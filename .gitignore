@@ -6,8 +6,13 @@
 
 # ...then re-include only the plugin's published paths.
 !/.claude-plugin/**
-!/plugins/**
+!/.codex-plugin/**
+!/skills/**
+!/agents/**
+!/references/**
+!/hooks/**
 !/scripts/**
 !/docs/**
+!/AGENTS.md
 !/README.md
 !/.gitignore

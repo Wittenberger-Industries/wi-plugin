@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "wi",
-      "source": "./plugins/wi",
+      "source": "./",
       "description": "Opinionated dev loop for /goal-driven work. /wi:scan documents and bootstraps a repo (with a mermaid architecture diagram); /wi:dev brainstorms a feature with you, designs (research skill), confirms architecture + design at one gate (auto-approvable with --auto), then implements to an open PR — printing a ready-made line for Claude Code's built-in /goal so the run keeps going until the condition is met. Parallel subagent waves, isolated worktrees, ADR-NNNN decision log, token report. Soft-integrates obra/superpowers and frontend-design. /wi:rpa turns a UiPath PDD (parsed via markitdown) into a built REFramework solution: deep TO-BE refinement, an SDD + architecture + assumptions, design gate (approve the build paradigm: XAML-only or coded), then delegates the build to the UiPath skills — one run per PDD (1..N processes), Workflow Analyzer gate.",
       "version": "0.7.0",
       "category": "development",

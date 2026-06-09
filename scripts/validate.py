@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-validate.py — pre-release check for the wi plugin marketplace. Run from anywhere:
+validate.py — pre-release check for the wi plugin. Run from anywhere:
 
     python3 scripts/validate.py
 
 Checks (from the repo root, detected automatically):
-  1. JSON validity of `.claude-plugin/marketplace.json` and every `plugins/*/.claude-plugin/plugin.json`.
-  2. Every `SKILL.md` / agent `.md` has valid YAML frontmatter with `name` + `description`
+  1. JSON validity of `.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json`.
+  2. Every `skills/**/SKILL.md` / `agents/*.md` has valid YAML frontmatter with `name` + `description`
      — this catches the col-0 `<example>` / block-scalar bug that stopped the agents loading.
      Needs PyYAML for the full parse (`pip install pyyaml`); without it, the YAML parse is skipped
      and only delimiters + key presence are checked.
-  3. Every `${CLAUDE_PLUGIN_ROOT}/<path>` reference in a plugin's `.md` files resolves to a real file.
+  3. Every `${CLAUDE_PLUGIN_ROOT}/<path>` reference in `.md` files resolves to a real file under the repo root.
 
 Exit 0 if all pass; non-zero otherwise. Stdlib only (PyYAML optional).
 """
@@ -29,8 +29,10 @@ except ImportError:
     HAVE_YAML = False
 
 # 1. JSON manifests --------------------------------------------------------
-manifests = [ROOT / ".claude-plugin" / "marketplace.json"]
-manifests += sorted(ROOT.glob("plugins/*/.claude-plugin/plugin.json"))
+manifests = [
+    ROOT / ".claude-plugin" / "marketplace.json",
+    ROOT / ".claude-plugin" / "plugin.json",
+]
 for m in manifests:
     if not m.is_file():
         errors.append(f"missing manifest: {m.relative_to(ROOT)}")
@@ -41,7 +43,7 @@ for m in manifests:
         errors.append(f"invalid JSON {m.relative_to(ROOT)}: {e}")
 
 # 2. Frontmatter on SKILL.md + agents -------------------------------------
-fm_files = sorted(ROOT.glob("plugins/*/skills/**/SKILL.md")) + sorted(ROOT.glob("plugins/*/agents/*.md"))
+fm_files = sorted(ROOT.glob("skills/**/SKILL.md")) + sorted(ROOT.glob("agents/*.md"))
 for f in fm_files:
     txt = f.read_text(encoding="utf-8")
     rel = f.relative_to(ROOT)
@@ -70,15 +72,20 @@ for f in fm_files:
             if k not in fm:
                 errors.append(f"{rel}: frontmatter missing '{k.rstrip(':')}'")
 
-# 3. ${CLAUDE_PLUGIN_ROOT} cross-refs resolve (per plugin) ------------------
+# 3. ${CLAUDE_PLUGIN_ROOT} cross-refs resolve (against repo root) -----------
 rx = re.compile(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^\s`)\]]+)")
-for plugin_dir in sorted(ROOT.glob("plugins/*")):
-    if not plugin_dir.is_dir():
+ref_md = (
+    list(ROOT.glob("skills/**/*.md"))
+    + list(ROOT.glob("agents/*.md"))
+    + list(ROOT.glob("references/*.md"))
+    + [ROOT / "AGENTS.md", ROOT / "README.md"]
+)
+for md in ref_md:
+    if not md.is_file():
         continue
-    for md in plugin_dir.rglob("*.md"):
-        for ref in rx.findall(md.read_text(encoding="utf-8")):
-            if not (plugin_dir / ref).exists():
-                errors.append(f"{md.relative_to(ROOT)}: broken ref ${{CLAUDE_PLUGIN_ROOT}}/{ref}")
+    for ref in rx.findall(md.read_text(encoding="utf-8")):
+        if not (ROOT / ref).exists():
+            errors.append(f"{md.relative_to(ROOT)}: broken ref ${{CLAUDE_PLUGIN_ROOT}}/{ref}")
 
 # Report -------------------------------------------------------------------
 note = "" if HAVE_YAML else "  [PyYAML absent → YAML parse skipped; `pip install pyyaml` for the full check]"
