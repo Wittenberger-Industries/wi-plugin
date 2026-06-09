@@ -6,8 +6,7 @@ description: >
   when the user types "/wi:research", "research the approach", "design this feature", or when resuming a
   goal whose progress.md Phase is research, plan, or design-gate. It dispatches parallel researcher
   agents, writes ADR/spec/tasks/pitfalls into .wi/, and on approval — or auto-approval via
-  "/wi:dev --auto" — hands off to implementation (the build and ship skills), with Claude Code's
-  BUILT-IN /goal command as the recommended keep-alive wrapper.
+  "/wi:dev --auto" — hands off to implementation (the build and ship skills), with a keep-alive loop (Claude/Codex /goal, or Copilot Autopilot) as the recommended persistence wrapper.
 ---
 
 # research — design it, prove it, get the nod
@@ -80,17 +79,28 @@ Then check **Gate mode** in `progress.md`:
 Only an explicit approve (or auto-approve) advances to goal.
 
 ### 4 - Hand off to implementation
-If the built-in `/goal` wasn't armed at handoff, print the ready-made line again (the user is present —
-they just approved) so they can paste it:
+If persistence wasn't armed at handoff, print the ready-made keep-alive again (the user is present —
+they just approved) for the current platform:
 
-```
-/goal The <slug> PR is open and its branch passes <lint + test commands from repo-map.md>;
-.wi/goals/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change;
-never force-push; tests are never weakened to pass.
-```
+- **Claude Code / Codex CLI** (built-in `/goal`):
+
+  ```
+  /goal The <slug> PR is open and its branch passes <lint + test commands from repo-map.md>;
+  .wi/goals/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change;
+  never force-push; tests are never weakened to pass.
+  ```
+
+- **GitHub Copilot CLI** (Autopilot — condition in the prompt):
+
+  ```
+  copilot --autopilot --max-autopilot-continues <N> --no-ask-user -p "Drive the <slug> goal to done:
+  build then ship until the <slug> PR is open, its branch passes <lint + test commands>, and
+  .wi/goals/<slug>/progress.md Phase is done. Only files named in tasks.md change; never force-push;
+  never weaken tests."
+  ```
 
 Then proceed: **build** (`wi:build`) — worktree + parallel waves — then **ship** (`wi:ship`), which ends
-with the PR and the final report (token table included). The built-in `/goal` is the persistence
-wrapper; build/ship are the method. No questions from here on.
+with the PR and the final report (token table included). The keep-alive loop (/goal or Autopilot) is the
+persistence wrapper; build/ship are the method. No questions from here on.
 
 Phase contracts & resumability: `${CLAUDE_PLUGIN_ROOT}/skills/research/references/workflow.md`.

@@ -135,8 +135,7 @@ under `~/.claude/projects/`; pass the path if you know it). Write its output int
 only reliable orchestrator measure.** **If the script fails** (no transcript or no `usage`), report the
 orchestrator total as **unavailable for this run** and keep the **subagent-exact sum** as the headline. Do
 **not** fall back to any unreliable substitute and do **not** fabricate an overhead figure. The two numbers wi
-trusts: **subagent-exact** (completion notifications) and **orchestrator-from-transcript** (this script). If the
-built-in `/goal` is armed, this is the state in which its condition holds and the loop clears.
+trusts: **subagent-exact** (completion notifications) and **orchestrator-from-transcript** (this script). If a keep-alive loop is armed (Claude/Codex `/goal` or Copilot Autopilot), this is the state in which its condition holds and the loop clears.
 
 ## 8 · Compound — capture what's worth remembering
 

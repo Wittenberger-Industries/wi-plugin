@@ -106,6 +106,10 @@ for tm in ("references/codex-tools.md", "references/copilot-tools.md", "AGENTS.m
     if not (ROOT / tm).is_file():
         errors.append(f"missing portability file: {tm}")
 
+for s in ("skills/dev/SKILL.md", "skills/research/SKILL.md"):
+    if "autopilot" not in (ROOT / s).read_text(encoding="utf-8").lower():
+        errors.append(f"{s}: missing Copilot Autopilot handoff branch")
+
 # Report -------------------------------------------------------------------
 note = "" if HAVE_YAML else "  [PyYAML absent → YAML parse skipped; `pip install pyyaml` for the full check]"
 print(f"validate.py — {len(manifests)} manifest(s), {len(fm_files)} frontmatter file(s){note}")

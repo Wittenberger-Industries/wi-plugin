@@ -5,7 +5,7 @@ description: >
   "/wi:dev <idea>", or says "build me <feature>", "I want a feature that <does X>", "add <capability> to
   this project", or otherwise asks to design-and-build something. dev orchestrates the whole loop:
   brainstorm (dialogue about WHAT) -> research skill (design: research -> plan -> design gate) -> build ->
-  ship -> PR. At handoff it prints a ready-made line for Claude Code's BUILT-IN /goal command so the run
+  ship -> PR. At handoff it arms a keep-alive loop (Claude Code & Codex CLI use their built-in /goal; Copilot CLI uses Autopilot) so the run
   keeps going across turns until the PR condition is met. Supports "/wi:dev <idea> --auto" to
   auto-approve the design gate for a fully hands-off run (the gate summary is still recorded).
 ---
@@ -31,18 +31,30 @@ artifacts, gates), `/goal` provides the keep-running-until-done loop.
    `wi-directory.md`).
 3. **Brainstorm** (skill `wi:brainstorm`) — the dialogue about desired behavior, scope, constraints.
    Writes `brief.md`.
-4. **Hand off — and arm the built-in `/goal`.** Recap the brief in 3-5 lines and print the ready-made
-   keep-alive line:
+4. **Hand off — and arm persistence (platform-aware).** Recap the brief in 3-5 lines, then print the
+   keep-alive handoff for the current platform:
 
-   ```
-   /goal The <slug> PR is open and its branch passes <lint + test commands from repo-map.md>;
-   .wi/goals/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change;
-   never force-push; tests are never weakened to pass.
-   ```
+   - **Claude Code / Codex CLI** (both have a built-in `/goal`):
 
-   This is Claude Code's built-in persistence loop — armed, the run continues across turns until the
-   condition verifiably holds (wi works without it, just less robustly through a stalled turn). **Then
-   branch on Gate mode (from `progress.md`):**
+     ```
+     /goal The <slug> PR is open and its branch passes <lint + test commands from repo-map.md>;
+     .wi/goals/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change;
+     never force-push; tests are never weakened to pass.
+     ```
+
+   - **GitHub Copilot CLI** (no `/goal` — use Autopilot, condition in the prompt):
+
+     ```
+     copilot --autopilot --max-autopilot-continues <N> --no-ask-user -p "Drive the <slug> goal to done:
+     build then ship until the <slug> PR is open, its branch passes <lint + test commands>, and
+     .wi/goals/<slug>/progress.md Phase is done. Only files named in tasks.md change; never force-push;
+     never weaken tests."
+     ```
+
+   Armed, the run continues across turns until the condition holds (wi works without it, just less
+   robustly through a stalled turn). The per-platform mechanism is in
+   `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` / `copilot-tools.md`. **Then branch on Gate mode
+   (from `progress.md`):**
    - **auto-approve** (`--auto`): do **not** ask for confirmation — the user already chose hands-off by
      passing the flag. Set Phase = `research` and continue straight into the design phase **in the same
      turn**. Brainstorm was the only stop; pausing for "say go" here is the bug `--auto` exists to avoid.
