@@ -44,6 +44,11 @@ Never `git worktree remove --force` a tree with uncommitted work without telling
 - **Restricted filesystems** (network/Windows mounts that forbid rmdir): put the worktree on a local
   path instead — `git worktree add` accepts any absolute path. Symptoms to expect otherwise: pytest
   tmpdir crashes and `git worktree remove` failing. scan's verify-the-commands step is the early warning.
+- **Sandboxed / no-branch environments (e.g. Codex sandbox):** if `git rev-parse --git-dir` differs from
+  `git rev-parse --git-common-dir` (already in a linked worktree) or `git branch --show-current` is empty
+  (detached HEAD), do **not** create a worktree or try to push. Work in place, commit per task, and at
+  ship hand the user a suggested branch name, commit message, and PR body to apply via the platform's
+  native controls. Note "Worktree: - (sandboxed)" in progress.md.
 
 If `superpowers:using-git-worktrees` is installed, prefer it — it handles edge cases (submodules, dirty
 trees) well. This file is the fallback.
@@ -53,6 +58,12 @@ trees) well. This file is the fallback.
 Each task runs in a **fresh** subagent so context doesn't accumulate across a long build. Use the
 `task-runner` agent (`agents/task-runner.md`). Scope its prompt tightly — give it the task and its
 immediate context, not the whole project.
+
+The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` /
+`copilot-tools.md`): Claude uses the Agent/Task tool, Copilot uses the `task` tool and `/fleet` for waves,
+Codex uses `spawn_agent` bounded by `[agents] max_threads`. On every platform, pass the task-runner prompt
+**inline** to a generic worker — don't depend on a pre-registered named agent (Codex named-role dispatch
+is unreliable across builds).
 
 ### Task-runner prompt skeleton
 
