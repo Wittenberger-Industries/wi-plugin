@@ -117,8 +117,10 @@ each platform discovers it).
 
 ### Copilot CLI
 - No plugin bundle exists. The skill **is** the distributable unit.
-- Install options (documented in README): `gh skill install Wittenberger-Industries/wi-plugin <skill>`
-  per skill, **or** `/skills add <cloned-repo>/skills` to register the canonical dir in one shot.
+- Install (documented in README): **clone the repo and `/skills add <cloned-repo>/skills`** to register the
+  whole canonical dir at once — recommended, because wi skills are interdependent (cross-skill script refs +
+  a plugin-version read need a shared root). Per-skill `gh skill install …` works for a one-off skill but
+  breaks those cross-references, so it's discouraged for the full suite.
 - `/wi:*` slash commands do not exist on Copilot → skills are invoked as `/<skill-name>` (e.g. `/dev`)
   or auto-trigger by `description`. Document the namespace difference; do not fight it.
 
@@ -159,9 +161,13 @@ platform-conditional block. Affected files: `skills/dev/SKILL.md`, `skills/resea
 
 ### 7.1 `${CLAUDE_PLUGIN_ROOT}` (209 references)
 - **Keep them.** They resolve on Claude (native) and Codex (compat var).
-- Add one rule to `copilot-tools.md` + `AGENTS.md`: *on Copilot, `${CLAUDE_PLUGIN_ROOT}/skills/<x>/…`
-  denotes that skill's own directory — read the bundled file by relative path.* Copilot auto-discovers
-  every file in a skill's dir, so this is a reliable one-time mapping.
+- Add one rule to `copilot-tools.md` + `AGENTS.md`: *`${CLAUDE_PLUGIN_ROOT}` is the wi **plugin root** — the
+  directory holding `skills/`, `agents/`, and `.claude-plugin/`.* On Claude/Codex it's the installed plugin
+  dir (Codex sets the compat var); on Copilot it's the cloned wi repo (hence install wi **whole**, §5). The
+  agent resolves every `${CLAUDE_PLUGIN_ROOT}/…` against that one root — this covers same-skill refs,
+  **cross-skill refs** (`ship` → `skills/scan/scripts/check_mermaid.py`), and the plugin-root version read
+  (`research` → `.claude-plugin/plugin.json`). The version read additionally needs a Copilot fallback
+  ("if the file isn't present, omit the version") — see the plan.
 - Rejected alternative: rewrite all 209 refs to skill-relative paths. Bigger diff, and bare relative
   paths are not guaranteed to resolve from the skill dir on Claude (CWD is the project). Revisit only if
   empirical testing shows Claude resolves skill-relative paths.
