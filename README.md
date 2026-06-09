@@ -1,68 +1,146 @@
-# WI — Claude Code plugin suite
+# WI — a cross-platform agentic dev loop
 
-`wi` is a marketplace containing the **`wi`** plugin: an opinionated, low-token development loop. You scan a
-project once, then drive each feature with a single command that talks to you twice — brainstorm and a design gate —
-and otherwise runs to a pull request on its own.
+`wi` is an opinionated, low-token development loop that runs on **Claude Code**, **Codex CLI**, and
+**GitHub Copilot CLI** from one source. You scan a project once, then drive each feature with a single
+command that talks to you twice — brainstorm and a design gate — and otherwise runs to a pull request on
+its own.
 
-| Command | Status | What it does |
-|---------|--------|--------------|
-| **`/wi:scan`** | ✅ available | Documents an existing project — incl. a mermaid architecture diagram — and bootstraps wi (constitution + optional plugin installs). |
-| **`/wi:dev "idea"`** | ✅ available | Brainstorms a feature with you, designs, confirms architecture + design at one gate, then builds and ships hands-off to an open PR. Add `--auto` to auto-approve the gate. |
-| **`/wi:rpa "pdd"`** | ✅ available | Parses a PDD (markitdown), refines the TO-BE, writes an SDD + architecture + assumptions, then builds a REFramework solution via the UiPath skills — XAML-only or coded, your choice at the design gate — to a PR. One run per PDD (1..N processes); `--auto` supported. |
+| Command | What it does |
+|---------|--------------|
+| **`/wi:scan`** | Documents an existing project — incl. a mermaid architecture diagram — and bootstraps wi (constitution + optional plugin installs). |
+| **`/wi:dev "idea"`** | Brainstorms a feature with you, designs, confirms architecture + design at one gate, then builds and ships hands-off to an open PR. Add `--auto` to auto-approve the gate. |
+| **`/wi:rpa "pdd"`** | Parses a PDD (markitdown), refines the TO-BE, writes an SDD + architecture + assumptions, then builds a REFramework solution via the UiPath skills — XAML-only or coded, your choice at the design gate — to a PR. One run per PDD (1..N processes); `--auto` supported. |
+
+On Claude the commands are `/wi:scan`, `/wi:dev`, …; on Codex/Copilot the skills invoke as `/scan`, `/dev`,
+… or auto-trigger from natural language.
 
 ## Install
 
+**Claude Code**
 ```
-/plugin marketplace add <path-or-git-url-of-this-repo>
+/plugin marketplace add Wittenberger-Industries/wi-plugin
 /plugin install wi@wi
 ```
 
-`wi` is the marketplace name (from `.claude-plugin/marketplace.json`); `wi` is also the plugin. Its skills
-then invoke as `/wi:scan`, `/wi:dev`, etc., and also auto-trigger from natural language.
+**Codex CLI** — Codex reads this repo's `.claude-plugin/marketplace.json` and `.codex-plugin/plugin.json`;
+add the repo via Codex's plugin flow (`/plugins`) and enable `wi`. Native `/goal` and `CLAUDE_PLUGIN_ROOT`
+compatibility work out of the box.
 
-## Updating after edits (local marketplace)
+**GitHub Copilot CLI** — clone the repo and register the whole skills dir (recommended — wi's skills are
+interdependent, so install them together, not one at a time):
+```
+git clone https://github.com/Wittenberger-Industries/wi-plugin
+# then, in Copilot CLI:
+/skills add <path-to-clone>/skills
+```
+Persistence uses Autopilot instead of `/goal`: wi's hands-off handoff prints
+`copilot --autopilot --max-autopilot-continues <N> --no-ask-user --allow-all …`. ⚠️ That runs **fully
+unattended** (prompts suppressed, all tools/paths granted) — drop `--allow-all` to keep risky-action
+confirmations.
 
-1. Edit the plugin source; bump `version` in `plugins/wi/.claude-plugin/plugin.json` (+ the marketplace entry).
-2. `/plugin marketplace update wi`   (local marketplaces don't auto-update by default)
-3. `/reload-plugins` when prompted — or restart Claude Code.
-4. Stale anyway? `/plugin uninstall wi@wi` then `/plugin install wi@wi`. Optionally enable auto-update
-   for the `wi` marketplace in the `/plugin` UI.
+## Platform differences
 
-## Validating (before publishing)
+wi is one source across three harnesses; only the autonomy spine differs:
 
-From the repo root, run `python3 scripts/validate.py` — it checks the manifests are valid JSON, every skill
-and agent has valid YAML frontmatter (`name` + `description`), and every `${CLAUDE_PLUGIN_ROOT}` reference
-resolves. `pip install pyyaml` enables the full frontmatter parse.
+| | Claude Code | Codex CLI | Copilot CLI |
+|---|---|---|---|
+| Skills | plugin (`.claude-plugin/`) | `.codex-plugin/` (+ reads `.claude-plugin/marketplace.json`) | whole-repo `/skills add` |
+| Keep-alive | built-in `/goal` | native `/goal` | Autopilot flags |
+| Command namespace | `/wi:dev` | `$dev` / `/skills` | `/dev` |
+| `${CLAUDE_PLUGIN_ROOT}` | native | compat var | the cloned repo root |
+| Subagents | Agent/Task | `spawn_agent` | `task` / `/fleet` |
+
+Tool-name mappings live in `references/codex-tools.md` and `references/copilot-tools.md`; the
+cross-platform bootstrap is `AGENTS.md`.
+
+## How it flows
+
+```
+/wi:scan                  once per project — documents it, bootstraps wi
+/wi:dev "idea"         -> brainstorm (you) -> research -> plan -> DESIGN GATE (you) -> build -> ship -> PR
+/wi:dev "idea" --auto  -> same, gate auto-approved & recorded — fully hands-off
+/wi:rpa "PDD.docx"     -> ingest(markitdown) -> refine TO-BE (you) -> SDD -> DESIGN GATE (you) -> REFramework build -> PR
+```
+
+At handoff wi arms a keep-alive loop so the run continues across turns until the PR condition holds —
+Claude Code & Codex use their built-in `/goal`; Copilot uses Autopilot. wi works without it too, just less
+robustly through a stalled turn.
+
+## The `.wi/` directory
+
+```
+.wi/
+├── constitution.md      # project rules — written once, read by every phase
+├── repo-map.md          # cached scan: stack + exact commands + conventions + frontend/backend
+├── overview.md          # readable docs of an existing project (skipped for greenfield)
+├── architecture.md      # mermaid architecture diagram (scan; kept current by ship)
+├── glossary.md          # project domain terms (brainstorm): canonical names + aliases
+├── adr/                 # project-wide decision log: ADR-0001, ADR-0002, ... (+ index.md)
+├── learnings/           # non-obvious knowledge harvested at ship — compounds across goals
+├── roadmap.md           # optional: ordered goals for a larger effort
+└── goals/<slug>/
+    ├── progress.md      # the goal's state machine (source of truth)
+    ├── brief.md         # brainstorm output: what you want
+    ├── research/        # researcher notes + the chosen approach
+    ├── spec.md          # plan: what/why + testable acceptance criteria
+    ├── tasks.md         # plan: small ordered tasks (files + verification)
+    ├── pitfalls.md      # plan: failure modes for this change
+    └── tokens.md        # token ledger: the per-run cost report
+```
+
+## Skills & agents
+
+| Skill | Invoke (Claude) | Role |
+|-------|-----------------|------|
+| `scan` | `/wi:scan` | Document an existing project and bootstrap wi |
+| `dev` | `/wi:dev "idea"` | The interactive entry: brainstorm, then hand off |
+| `rpa` | `/wi:rpa "pdd"` | RPA entry: ingest PDD -> refine TO-BE -> SDD -> REFramework build via UiPath skills -> PR |
+| `brainstorm` | via `dev` | The requirements dialogue (the one interactive phase) + glossary upkeep |
+| `research` | via `dev` | The design half: research -> plan -> design gate (your confirmation) |
+| `plan` | via `research` | spec + tasks + pitfalls (+ ADR) |
+| `build` | post-gate | worktree + parallel waves of task subagents (TDD) |
+| `ship` | post-gate | gate -> review -> docs-sync -> learnings -> open PR |
+
+Agents: **task-runner** (executes one build task in isolation) and **researcher** (picks the approach in
+the autonomous phase). Every skill auto-triggers from natural language too.
 
 ## Structure
 
 ```
 .
 ├── .claude-plugin/
-│   └── marketplace.json      # lists the wi plugin
-├── plugins/
-│   └── wi/
-│       ├── .claude-plugin/plugin.json
-│       ├── skills/           # scan, dev, brainstorm, research, plan, build, ship, rpa
-│       ├── agents/           # task-runner, researcher
-│       └── README.md
-├── scripts/
-│   └── validate.py           # pre-release check (frontmatter, JSON, cross-refs)
-└── README.md                 # you are here
+│   ├── marketplace.json   # marketplace (Claude; Codex reads this too)
+│   └── plugin.json        # the wi plugin manifest
+├── .codex-plugin/
+│   └── plugin.json        # Codex plugin manifest
+├── skills/                # scan, dev, brainstorm, research, plan, build, ship, rpa
+├── agents/                # task-runner, researcher
+├── references/            # codex-tools.md, copilot-tools.md (tool-name maps)
+├── scripts/validate.py    # pre-release check (frontmatter, JSON, cross-refs)
+├── docs/                  # specs & plans
+├── AGENTS.md              # cross-platform bootstrap (Codex + Copilot)
+└── README.md              # you are here
 ```
 
-## How it flows
+## Setup & conventions
 
-```
-/wi:scan            once per project — documents it, bootstraps wi
-/wi:dev "idea"            ->  brainstorm (you) -> research -> plan -> DESIGN GATE (you) -> build -> ship -> PR
-/wi:dev "idea" --auto  ->  same, gate auto-approved & recorded — fully hands-off
-/wi:rpa "PDD.docx"      ->  ingest(markitdown) -> refine TO-BE (you) -> SDD -> DESIGN GATE (you) -> REFramework build via UiPath -> PR
-(at handoff, wi prints a ready-made line for Claude Code's BUILT-IN /goal — paste it and the run
- keeps going across turns until the PR condition is met)
-```
+- **No required env vars or MCP servers.** `/wi:scan` offers to install the optional skills wi delegates to.
+- **Python-first** defaults (uv · pytest · ruff · mypy), stack-agnostic — `scan` records whatever the repo
+  uses, and `constitution.md` is where you override.
+- Opening the PR uses `gh` if available; otherwise wi pushes the branch and leaves the PR command for you.
 
-## Design principles (shared across the suite)
+## Plays well with (optional, auto-detected)
+
+- **obra/superpowers** — brainstorming, writing-plans, subagent-driven-development, using-git-worktrees,
+  test-driven-development, requesting-code-review, verification-before-completion,
+  finishing-a-development-branch. Installable on Claude, Codex, and Copilot; used when present, with light
+  fallbacks when not.
+- **anthropics/skills:frontend-design** (+ `pbakaus/impeccable`, `leonxlnx/taste-skill`) for `[frontend]`
+  tasks.
+
+If none are installed, wi still runs the whole loop on its own.
+
+## Design principles
 
 1. **State on disk, not in context.** A `.wi/` folder of small Markdown files lets phases hand off cheaply
    and survive a fresh context window.
@@ -70,15 +148,26 @@ resolves. `pip install pyyaml` enables the full frontmatter parse.
    design; everywhere else wi is autonomous.
 3. **Delegate and summarize — in parallel.** Subagents do the heavy reading/editing and return short
    reports, dispatched concurrently in waves wherever the dependency graph allows.
-4. **Borrow, don't reinvent.** Detect installed skills (superpowers, frontend-design) and
-   hand off; ship light fallbacks so it still works standalone.
+4. **Borrow, don't reinvent.** Detect installed skills (superpowers, frontend-design) and hand off; ship
+   light fallbacks so it still works standalone.
 5. **An opinionated baseline beats no opinion.** Sensible defaults (Python-first), overridable per project
    in `constitution.md`.
-6. **Compounds across goals.** Each goal reads the project's memory (constitution, glossary, learnings)
-   and writes back what it learned, so the next one starts smarter.
+6. **Compounds across goals.** Each goal reads the project's memory (constitution, glossary, learnings) and
+   writes back what it learned, so the next one starts smarter.
+
+## Maintaining
+
+- **Validate before publishing:** from the repo root, `python scripts/validate.py` (or `python3`) — checks
+  manifests are valid JSON, every skill/agent has valid `name`+`description` frontmatter, and every
+  `${CLAUDE_PLUGIN_ROOT}` reference resolves. `pip install pyyaml` enables the full frontmatter parse.
+- **Claude local-marketplace updates:** bump `version` in `.claude-plugin/plugin.json` (+ the marketplace
+  entry), then `/plugin marketplace update wi` and `/reload-plugins` (or restart). Codex and Copilot
+  re-read the repo through their own install/update flows.
 
 ## Roadmap
 
-- **`/wi:rpa`** shipped (v0.7.0): PDD -> SDD -> REFramework build via the UiPath skills, with the build
-  **paradigm chosen at the design gate — XAML-only (default) or coded `.cs`**. Next: a dry-run to harden it,
-  Flow/non-REFramework targets, and deeper Orchestrator provisioning.
+- **Cross-platform** (Codex CLI + Copilot CLI) support shipped — one source, per-platform packaging + a
+  platform-aware autonomy spine. Design and plan in `docs/specs/` and `docs/plans/`.
+- **`/wi:rpa`** (v0.7.0): PDD -> SDD -> REFramework build via the UiPath skills, build paradigm chosen at
+  the design gate (XAML-only default, or coded `.cs`). Next: a dry-run to harden it, Flow/non-REFramework
+  targets, and deeper Orchestrator provisioning.
