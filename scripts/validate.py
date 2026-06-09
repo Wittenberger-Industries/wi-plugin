@@ -102,6 +102,10 @@ for md in ref_md:
         if not (ROOT / ref).exists():
             errors.append(f"{md.relative_to(ROOT)}: broken ref ${{CLAUDE_PLUGIN_ROOT}}/{ref}")
 
+for tm in ("references/codex-tools.md", "references/copilot-tools.md"):
+    if not (ROOT / tm).is_file():
+        errors.append(f"missing portability file: {tm}")
+
 # Report -------------------------------------------------------------------
 note = "" if HAVE_YAML else "  [PyYAML absent → YAML parse skipped; `pip install pyyaml` for the full check]"
 print(f"validate.py — {len(manifests)} manifest(s), {len(fm_files)} frontmatter file(s){note}")
