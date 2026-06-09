@@ -11,7 +11,7 @@ scan (once, project-level)
         |
   /wi:dev --> brainstorm --(handoff)--> research -> plan -> [DESIGN GATE] -> build -> ship -> done
 (interactive)                          |_ research skill _|  (interactive*)  |_ build+ship, kept alive
-                                                                              by built-in /goal _|
+                                                                              by /goal or Autopilot _|
 
 * the design gate is interactive by default; `/wi:dev --auto` auto-approves it (the same summary is
   still recorded in progress.md).
@@ -29,7 +29,7 @@ handoff, the only user interaction is the design gate.
 | research | research | autonomous | brief, repo-map, constitution | research/*, .wi/adr/ADR-* (if hard-to-reverse) | approach already chosen & recorded |
 | plan | research | autonomous | brief, research, repo-map, constitution | spec, tasks, pitfalls | never |
 | design-gate | research | interactive* | adr, spec, tasks | gate outcome in progress.md | never — it is the second human gate |
-| build | post-gate loop (built-in /goal keeps it alive) | autonomous | tasks, spec, constitution | source, ticked tasks | tasks already all ticked |
+| build | post-gate loop (/goal or Autopilot keeps it alive) | autonomous | tasks, spec, constitution | source, ticked tasks | tasks already all ticked |
 | ship | post-gate loop | autonomous | the diff, spec, constitution | commits, PR | never |
 
 ## Rules

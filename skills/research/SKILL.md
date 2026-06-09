@@ -13,7 +13,7 @@ description: >
 
 `dev` captured the WHAT; you decide the HOW and get it confirmed. You own three phases — research →
 plan → **design gate** — and then implementation proceeds (build → ship) to the PR, kept alive by the
-built-in `/goal` if the user armed it.
+keep-alive loop (`/goal` or Autopilot) if the user armed it.
 
 ## Operating principles
 

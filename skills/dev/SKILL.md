@@ -18,8 +18,8 @@ goes straight through to a PR.
 
 The contract: brainstorming decides the *what*; the research skill proposes the *how*; the **design
 gate** is where the user confirms it; after their go, nothing more is asked until the PR is up. wi
-pairs with Claude Code's **built-in `/goal`** for persistence: wi provides the method (skills,
-artifacts, gates), `/goal` provides the keep-running-until-done loop.
+pairs with a **keep-alive loop** for persistence — Claude Code & Codex use their built-in `/goal`,
+Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the loop keeps running until done.
 
 ## Procedure
 
@@ -77,4 +77,4 @@ artifacts, gates), `/goal` provides the keep-running-until-done loop.
   stop for anything else.
 - If brainstorming reveals several features, capture them in `.wi/roadmap.md` and run each as its own
   `/wi:dev`. One goal = one feature = one PR.
-- Keep dev thin: it sequences; the phase skills do the work; the built-in `/goal` keeps it alive.
+- Keep dev thin: it sequences; the phase skills do the work; the keep-alive loop (`/goal` or Autopilot) keeps it alive.
