@@ -79,6 +79,6 @@ resolves. `pip install pyyaml` enables the full frontmatter parse.
 
 ## Roadmap
 
-- **`/wi:rpa`** shipped (scaffold + core, v0.5.0): PDD -> SDD -> REFramework build via the UiPath skills.
-  Next: a dry-run to harden it, coded-workflow/Flow targets beyond REFramework, and deeper Orchestrator
-  provisioning.
+- **`/wi:rpa`** shipped (v0.7.0): PDD -> SDD -> REFramework build via the UiPath skills, with the build
+  **paradigm chosen at the design gate — XAML-only (default) or coded `.cs`**. Next: a dry-run to harden it,
+  Flow/non-REFramework targets, and deeper Orchestrator provisioning.
