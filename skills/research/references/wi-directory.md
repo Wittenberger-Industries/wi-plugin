@@ -119,4 +119,4 @@ still reading PENDING after ship is a defect._
 | 3 | <goal> | <slug> | planned | 1 |
 
 ## Notes
-- Sequencing rationale, parking-lot ideas, things explicitly out
+- Sequencing rationale, parking-lot ideas, things explicitly out of scope.

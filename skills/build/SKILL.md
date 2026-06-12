@@ -73,4 +73,6 @@ isolate, hypothesize, test. If the failure reveals the **plan** was wrong, stop 
 
 ## 4 · Keep scope honest
 
-Only touch files the tasks name. If you disc
+Only touch files the tasks name. If you discover necessary work the plan missed, don't absorb it
+silently: in-scope gaps become a new task in `tasks.md` (noted in `progress.md`); out-of-scope ideas go
+to `.wi/roadmap.md`. Scope creep hidden inside a task is how builds drift from their spec.

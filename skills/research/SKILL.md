@@ -99,4 +99,35 @@ Then check **Gate mode** in `progress.md`:
 - **auto-approve** (`/wi:dev --auto`): skip the question; write the same rendered summary into
   `progress.md` and log "design gate auto-approved (--auto)" — the user reads it after the fact.
 
-Only an explicit approve (or auto
+Only an explicit approve (or auto-approve) advances to goal.
+
+### 4 - Hand off to implementation
+If persistence wasn't armed at handoff, print the ready-made keep-alive again (the user is present —
+they just approved) for the current platform:
+
+- **Claude Code / Codex CLI** (built-in `/goal`):
+
+  ```
+  /goal The <slug> PR is open and its branch passes <lint + test commands from repo-map.md>;
+  .wi/goals/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change;
+  never force-push; tests are never weakened to pass.
+  ```
+
+- **GitHub Copilot CLI** (Autopilot — condition in the prompt):
+
+  ```
+  copilot --autopilot --max-autopilot-continues <N> --no-ask-user --allow-all -p "Drive the <slug> goal to done:
+  build then ship until the <slug> PR is open, its branch passes <lint + test commands>, and
+  .wi/goals/<slug>/progress.md Phase is done. Only files named in tasks.md change; never force-push;
+  never weaken tests."
+  ```
+
+⚠️ `--no-ask-user --allow-all` runs Copilot fully unattended (prompts suppressed, all tools/paths granted)
+— bounded only by `--max-autopilot-continues <N>` and the in-prompt constraints. Use it in repos you trust;
+drop `--allow-all` if you want Copilot to still confirm risky actions.
+
+Then proceed: **build** (`wi:build`) — worktree + parallel waves — then **ship** (`wi:ship`), which ends
+with the PR and the final report (token table included). The keep-alive loop (/goal or Autopilot) is the
+persistence wrapper; build/ship are the method. No questions from here on.
+
+Phase contracts & resumability: `${CLAUDE_PLUGIN_ROOT}/skills/research/references/workflow.md`.
