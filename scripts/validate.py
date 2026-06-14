@@ -16,7 +16,9 @@ Checks (from the repo root, detected automatically):
      dev/research skills carry the Copilot Autopilot handoff branch.
   5. OKF conformance (see docs/specs/2026-06-14-okf-knowledge-format.md): every concept doc under
      skills/ · agents/ · references/ · docs/ plus README.md/AGENTS.md opens with parseable YAML
-     frontmatter carrying a non-empty `type`. `index.md` / `log.md` are reserved and exempt.
+     frontmatter carrying a non-empty `type`. Each must also end with a trailing newline and have
+     balanced code fences — the two signatures of a truncated/interrupted write (the bug class that
+     shipped half-written docs before this guard existed). `index.md` / `log.md` are reserved and exempt.
 
 Exit 0 if all pass; non-zero otherwise. Stdlib only (PyYAML optional).
 """
@@ -132,6 +134,13 @@ for f in sorted(set(concept_md)):
     okf_checked += 1
     rel = f.relative_to(ROOT)
     txt = f.read_text(encoding="utf-8")
+    # Truncation guards: a concept doc cut off by an interrupted write ends mid-content. Two cheap
+    # signatures catch it — no trailing newline, and an odd number of ``` fences (a block left open or a
+    # stray close). validate.py is the only gate, so these prevent shipping a half-written doc.
+    if txt and not txt.endswith("\n"):
+        errors.append(f"{rel}: no trailing newline (truncated-write signature)")
+    if sum(1 for ln in txt.splitlines() if ln.startswith("```")) % 2:
+        errors.append(f"{rel}: unbalanced code fences (odd ``` count — truncated or stray fence)")
     if not txt.startswith("---"):
         errors.append(f"{rel}: OKF — no frontmatter (needs a non-empty 'type')")
         continue

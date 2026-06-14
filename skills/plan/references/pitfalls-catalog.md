@@ -73,4 +73,3 @@ don't apply.
 - Scope creep mid-build (plan and code diverge silently).
 - Touching files outside the goal's stated scope.
 - Committing generated files, large blobs, or secrets.
-```

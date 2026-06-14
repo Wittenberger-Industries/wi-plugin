@@ -84,4 +84,3 @@ timestamp: <YYYY-MM-DD>
 REFramework; connectors/APIs preferred over UI (but UI is fine where needed); secrets as Orchestrator
 assets; business vs system exceptions with 3 retries; Workflow Analyzer error-clean as the gate; reuse
 before build. An opinionated baseline beats no opinion — the constitution is where a project overrides it.
-```
