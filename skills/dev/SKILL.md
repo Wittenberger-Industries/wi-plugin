@@ -67,4 +67,49 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
 
      ```
      /goal The <slug> PR is open and its branch passes <lint + test commands from repo-map.md>;
-     .wi/goals/<slug>/progress.md Phase is done. Constraints:
+     .wi/goals/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change;
+     never force-push; tests are never weakened to pass.
+     ```
+
+   - **GitHub Copilot CLI** (no `/goal` — use Autopilot, condition in the prompt):
+
+     ```
+     copilot --autopilot --max-autopilot-continues <N> --no-ask-user --allow-all -p "Drive the <slug> goal to done:
+     build then ship until the <slug> PR is open, its branch passes <lint + test commands>, and
+     .wi/goals/<slug>/progress.md Phase is done. Only files named in tasks.md change; never force-push;
+     never weaken tests."
+     ```
+
+   ⚠️ `--no-ask-user --allow-all` runs Copilot fully unattended (prompts suppressed, all tools/paths
+   granted) — bounded only by `--max-autopilot-continues <N>` and the in-prompt constraints. Use it in
+   repos you trust; drop `--allow-all` if you want Copilot to still confirm risky actions.
+
+   Armed, the run continues across turns until the condition holds (wi works without it, just less
+   robustly through a stalled turn). The per-platform mechanism is in
+   `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` / `copilot-tools.md`. **Then branch on Gate mode
+   (from `progress.md`):**
+   - **auto-approve** (`--auto`): do **not** ask for confirmation — the user already chose hands-off by
+     passing the flag. Set Phase = `research` and continue straight into the design phase **in the same
+     turn**. Brainstorm was the only stop; pausing for "say go" here is the bug `--auto` exists to avoid.
+   - **interactive** (default): ask once — *"Ready to hand off?"* — and advance to `research` only on the
+     user's go (pasting the `/goal` line counts as go).
+5. **Design** (skill `wi:research`): research -> plan -> **design gate** (inline summary; approve / amend
+   / stop — or auto-approve per the flag).
+6. **Implement** (after the gate): **build** (skill `wi:build`) — worktree + parallel waves — then
+   **ship** (skill `wi:ship`) — verification gate, PR, cleanup, and the final report including the token
+   table. **No questions anywhere in this stretch**; decisions get made, recorded, and moved past.
+
+## Boundaries
+
+- User interactions by mode: **interactive** = brainstorm + a one-line handoff confirmation + the design
+  gate; **`--auto`** = brainstorm only (no handoff confirmation, gate auto-approved and recorded). Never
+  stop for anything else.
+- If brainstorming reveals several features, capture them in `.wi/roadmap.md` and run each as its own
+  `/wi:dev`. One goal = one feature = one PR.
+- **Mid-run user input is routed, never absorbed silently.** If the user interjects during the autonomous
+  stretch, record the message in progress.md (Decisions/blockers), then route it: small and inside the
+  approved spec → append a task to `tasks.md` (build schedules it like any other); out-of-scope → a
+  `roadmap.md` line (tell them which goal it became); contradicts the approved design/ADR → pause,
+  re-open the design gate with a delta summary (approve / amend / stop), continue on the answer. The run
+  never derails on input, and input never vanishes.
+- Keep dev thin: it sequences; the phase skills do the work; the keep-alive loop (`/goal` or Autopilot) keeps it alive.

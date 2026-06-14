@@ -77,4 +77,4 @@ build executes tasks in concurrent waves, so record whether the suite tolerates 
 - Can't tell cheaply -> **unknown** (build will then run Verify commands serially after each wave instead
   of guessing).
 
-Record t
+Record the answer as `Tests parallel-safe:` in `repo-map.md`'s Commands block.

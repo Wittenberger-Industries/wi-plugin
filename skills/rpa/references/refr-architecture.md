@@ -91,4 +91,5 @@ the runtime diagram must show all of them.
    serialize.
 4. **Wire-up** — queues/assets/triggers via `uipath-platform`.
 
-Same "shared foundation as an early task so the rest fan out" 
+Same "shared foundation as an early task so the rest fan out" rule as `wi:dev`, applied at the process
+level then again at the sub-workflow level.

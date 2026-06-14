@@ -43,4 +43,5 @@ Notes:
   genuinely exists. Record the choice + rationale inline in `tobe.md` and in SDD §6.
 - Credentials/secrets always become Orchestrator **assets/credentials** (names in the SDD), never
   hardcoded.
-- Keep this list short and current-ish; it's a prompt, not an inventory. `uipath-platform` has the r
+- Keep this list short and current-ish; it's a prompt, not an inventory. `uipath-platform` has the real,
+  up-to-date connector catalog.

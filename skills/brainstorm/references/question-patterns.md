@@ -36,4 +36,5 @@ ambiguity that would otherwise cause a wrong plan — not to interrogate the use
 
 ## Smell test
 
-A good question, answered either way, changes the plan. If both answers lead to the same plan, d
+A good question, answered either way, changes the plan. If both answers lead to the same plan, don't ask
+it — just proceed.

@@ -38,4 +38,4 @@ After detecting what's missing, ask once with AskUserQuestion, e.g.:
 
 Record the outcome in your scan report ("installed: superpowers; skipped: find-skills"). wi's phase skills
 each detect availability again at run time and fall back gracefully, so a "skip now" is never fatal — the
-user can re-r
+user can re-run `/wi:scan` or install later.

@@ -76,4 +76,5 @@ Stop. A red gate is information, not an obstacle to route around. Options, in or
 ## Don't gold-plate
 
 The gate proves the goal's acceptance criteria, not the whole codebase's perfection. Resist expanding
-scope to fix unrelated issues you notice — l
+scope to fix unrelated issues you notice — log them (a new goal or a roadmap line) and ship the goal you
+planned.

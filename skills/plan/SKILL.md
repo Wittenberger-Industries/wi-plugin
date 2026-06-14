@@ -89,4 +89,13 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
 ```
 
 Tag frontend tasks so build routes them to a design skill. Keep verification concrete — "it works" is not
-verification; a named t
+verification; a named test or command is. A plan whose tasks each end in a runnable check is a plan that
+builds and ships without drama.
+
+## Sizing heuristics
+
+- If a task can't name its verification, split it until each piece can.
+- If two tasks always change the same file in lockstep, merge them; if two *parallel* tasks merely brush
+  the same file, move the shared piece into its own prerequisite task — shared files serialize a wave.
+- 3-9 tasks is typical for a feature. Many more usually means the goal is too big — split it
+  (one goal = one feature = one PR).

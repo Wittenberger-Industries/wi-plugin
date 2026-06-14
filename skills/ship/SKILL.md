@@ -208,4 +208,9 @@ notifications) — that sum is the real, measurable cost of the delegated work; 
 with the orchestrator figure (or `unavailable`) alongside. The two numbers wi trusts: **subagent-exact**
 (completion notifications) and **orchestrator-from-transcript** (`token_report.py`). If a keep-alive loop
 is armed (Claude/Codex `/goal` or Copilot Autopilot), the checklist passing is the state in which its
-condition holds and the lo
+condition holds and the loop clears.
+
+## Offer
+
+If the change is the kind that recurs (a release, a periodic check), mention that wi's loop can be
+re-run per goal — and that the user can keep `.wi/roadmap.md` as the running backlog.

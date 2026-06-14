@@ -111,3 +111,5 @@ context-gathering to ask good questions is fine; deep approach research is not.
 - <things the user couldn't answer that goal's research should resolve>
 ```
 
+Keep it under ~120 lines. A good brief is small and clear about intent; the cleverness comes later, on its
+own.

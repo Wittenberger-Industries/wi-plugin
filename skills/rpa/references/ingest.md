@@ -75,4 +75,14 @@ timestamp: <YYYY-MM-DD>
 |-----------|------|---------|-----------------------|----------|
 | SendNotification | workflow | standard email/Teams notify | (to, subject, body) -> () | Shared/SendNotification.xaml |
 | LoginSystemX | workflow | authenticate to SystemX | (config) -> (session) | Shared/LoginSystemX.xaml |
-| Common.Activities | Library (.nupkg) | org-wide helpers | (various) | 
+| Common.Activities | Library (.nupkg) | org-wide helpers | (various) | feed/Common.Activities |
+```
+
+This registry is **project-level and persists across runs** — build reads it first (reuse), and registers
+any new reusable component it creates. That is how the second process in a project starts ahead of the
+first.
+
+## Output
+
+`pdd.md` (per run), and the project-level `inputs.md` + `components.md` created/updated. Report a 3-5 line
+summary: PDD pages/sections found, N supporting inputs registered, M reusable components found.

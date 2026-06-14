@@ -92,4 +92,4 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
 
 The design gate, isolated worktrees, **parallel build waves**, the ship PR + **docs-sync** (architecture
 diagrams kept current), **compound/learnings**, the **token report**, `check_mermaid.py`, and
-plugin-bootstr
+plugin-bootstrap all work unchanged — `wi:rpa` swaps the *domain* (UiPath/SDD/PDD) into the same machine.

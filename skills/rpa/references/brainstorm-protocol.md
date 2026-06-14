@@ -214,4 +214,22 @@ timestamp: <YYYY-MM-DD>
 
 # TO-BE — <process name>  (refined from PDD ToBe; <date>)
 
-## Trig
+## Trigger
+<what starts it; inputs per unit>
+
+## Steps
+1. <step> — **impl: connector(Outlook) / API / UI activity** — <notes; reuses Component X?>
+2. <decision: if <cond>> → <branch A> ; else → <branch B>
+3. ...
+
+## Exceptions
+- <business exception> → no retry, route to <exception queue/notify>
+- <system exception> → retry per Config
+
+## Outputs
+<what is produced and where it goes>
+```
+
+Include a small **mermaid flowchart** of the TO-BE (validate with
+`${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py`). Keep `tobe.md` faithful to the refined
+process — the SDD turns it into the technical design.

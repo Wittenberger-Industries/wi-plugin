@@ -69,4 +69,4 @@ commit secrets or local robot artifacts; respect `.gitignore` for `.local`, `*.u
 
 - If `uipath-rpa-workflows` isn't installed, build can't proceed — stop with the complete SDD pack and say
   so (the front-half artifacts are still a deliverable).
-- Keep `Main.xaml`/`Config.xlsx` edits 
+- Keep `Main.xaml`/`Config.xlsx` edits serialized (shared files) even when sub-workflows parallelize.

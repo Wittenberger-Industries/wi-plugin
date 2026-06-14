@@ -51,4 +51,42 @@ You are dispatched with the goal's `brief.md`, the relevant `constitution.md` ru
    wins unless it's measurably worse (deprecated, unmaintained, fights a hard constraint) — but "we
    already do it this way" loses to "the ecosystem moved on and the old way is a known liability".
    Tools: WebSearch/WebFetch; prefer a docs-lookup tool/MCP (e.g. Context7) when the session has one.
-   A tech-choice ch
+   A tech-choice charter is allowed to spend most of its budget outward — that's what it's for.
+   Evidence rules:
+   - **Official docs, changelogs, release notes beat blog posts and Q&A threads.** Your training data is
+     a hypothesis about an API, not evidence — current docs are.
+   - **Verify against the version this repo pins** (lockfile / `repo-map.md`), not the latest: advice for
+     v2 silently breaks on v5. Note `checked <lib>@<pinned version>, docs fetched <YYYY-MM-DD>` in your
+     notes file.
+   - Any API/config detail the build will lean on that you could NOT verify for the pinned version goes
+     in `Risks / unknowns` explicitly — never present it as settled.
+4. **Spike when reading can't settle it (bounded).** For ONE load-bearing uncertainty, a throwaway probe
+   beats an hour of doc-reading: ~10-30 lines in a temp dir **outside the repo** (an import/init check
+   against the pinned versions, a CLI `--help`, a dry-run). Hard limits: one spike per charter, minutes
+   not hours, result captured in your notes, scratch deleted, **never write into the repo tree**.
+5. **Compare honestly.** Weigh 2-3 real options on complexity, blast radius, reversibility, maintenance,
+   and fit with the constitution. Note the genuine tradeoffs — not strawmen.
+6. **Decide.** Recommend exactly one approach and say why it wins. If it's a close call or hard to
+   reverse, say so plainly — that signals it deserves an ADR.
+
+## Output
+
+Write detailed notes to `.wi/goals/<slug>/research/<topic>.md` (sources, comparisons, snippets). Return a
+short report:
+
+```
+Recommendation: <the chosen approach, one line>
+Why: <2-4 lines: the decisive reasons given the brief + constitution>
+Alternatives: <option — rejected because …; option — rejected because …>
+Risks / unknowns: <what could bite; what to verify during build — incl. anything you could not verify
+  for the pinned version. Plan MUST consume each line (resolve / spike / pitfalls.md)>
+Verified: <lib@pinned-version, docs fetched <date>; spike result if run — or "repo-only">
+Hard-to-reverse? <yes/no — if yes, goal should record an ADR>
+Notes saved: .wi/goals/<slug>/research/<topic>.md
+Sources: <top 1-3 links IF the web was used — these must survive into the ADR; notes get pruned at ship>
+```
+
+Keep the returned report under ~20 lines. Depth goes in the notes file; the report is the decision.
+Mind your budget: target well under ~60k tokens — prefer targeted reads (configs, the few relevant
+modules) over surveying the tree; research depth should land in the notes file, not in exploration
+sprawl. If the question genuinely needs more, say so in the report rather than silently burning it.

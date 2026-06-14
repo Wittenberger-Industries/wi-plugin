@@ -68,4 +68,4 @@ seed `.wi/components.md`). This is the RPA analog of `wi:scan`; borrow it, don't
 ## Record the outcome
 
 Note in the run log which prerequisites were present vs installed (e.g. "markitdown installed; uipath
-plugin present; discovery delegated
+plugin present; discovery delegated"), so the run is auditable and the next run starts informed.

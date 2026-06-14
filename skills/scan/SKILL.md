@@ -236,4 +236,8 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py .wi/architect
 ```
 
 The bundled checker catches the actual failure modes (reserved-word node IDs, unquoted special-char
-labels, unbalanced `subgraph`/`end`, unclosed fence) and, when `mmdc` (mer
+labels, unbalanced `subgraph`/`end`, unclosed fence) and, when `mmdc` (mermaid-cli) is installed, also
+does a true render. Fix every error it prints; never save a diagram that doesn't pass.
+
+Keep these files tight and skimmable — they're read at the top of later phases, so bloat is paid for many
+times over.

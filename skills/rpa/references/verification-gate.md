@@ -48,4 +48,4 @@ claim green you didn't verify).
 
 No PASS without a fresh run this session — analyzer/validate output from *this* build, not quoted from
 earlier and not "should pass". A red gate stops the ship: fix the workflow (loop back to build) or, if the
-SDD was wrong, amend it deliberately and 
+SDD was wrong, amend it deliberately and note it. Never weaken a rule to go green.
