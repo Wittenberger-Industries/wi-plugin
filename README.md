@@ -2,7 +2,7 @@
 type: Readme
 title: WI — a cross-platform agentic dev loop
 description: An opinionated, low-token dev loop (scan/dev/rpa) that runs on Claude Code, Codex CLI, and Copilot CLI from one source.
-timestamp: 2026-06-12
+timestamp: 2026-06-14
 tags: [wi, readme, overview]
 ---
 
@@ -65,10 +65,17 @@ cross-platform bootstrap is `AGENTS.md`.
 
 ```
 /wi:scan                  once per project — documents it, bootstraps wi
-/wi:dev "idea"         -> brainstorm (you) -> research -> plan -> DESIGN GATE (you) -> build -> ship -> PR
+/wi:dev "idea"         -> brainstorm (you) -> research -> plan -> check -> DESIGN GATE (you) -> build -> check -> ship -> PR
 /wi:dev "idea" --auto  -> same, gate auto-approved & recorded — fully hands-off
-/wi:rpa "PDD.docx"     -> ingest(markitdown) -> refine TO-BE (you) -> SDD -> DESIGN GATE (you) -> REFramework build -> PR
+/wi:rpa "PDD.docx"     -> ingest(markitdown) -> refine TO-BE (you) -> SDD -> check -> DESIGN GATE (you) -> REFramework build -> check -> PR
 ```
+
+The **check** steps are wi's read-only **checker** agent. In *plan mode* (before the gate) it builds a
+coverage matrix — every acceptance criterion, locked decision, glossary term, and pitfall mapped to a
+covering task — and flags silent scope-reduction or over-build as BLOCKER / WARNING / INFO for the gate to
+weigh. In *result mode* (at ship) it confirms each criterion and locked decision was actually delivered and
+**wired**, not just present. It feeds the gate and the ship review; it doesn't replace line-level code
+review.
 
 At handoff wi arms a keep-alive loop so the run continues across turns until the PR condition holds —
 Claude Code & Codex use their built-in `/goal`; Copilot uses Autopilot. wi works without it too, just less
@@ -94,9 +101,13 @@ robustly through a stalled turn.
     ├── spec.md          # plan: what/why + testable acceptance criteria
     ├── tasks.md         # plan: small ordered tasks (files + verification)
     ├── pitfalls.md      # plan: failure modes for this change
+    ├── verification.md  # checker output (plan + result mode) — ephemeral; verdict folds into PR.md
     ├── tokens.md        # token ledger: the per-run cost report (finalized before the PR)
     └── PR.md            # the PR description — committed, used by gh pr create
 ```
+
+Every file above is a typed **OKF** knowledge doc: it opens with YAML frontmatter carrying a `type` (plus
+title / description / timestamp), so each phase — and `validate.py` — can parse the dossier mechanically.
 
 ## Skills & agents
 
@@ -111,8 +122,13 @@ robustly through a stalled turn.
 | `build` | post-gate | worktree + parallel waves of task subagents (TDD) |
 | `ship` | post-gate | gate -> review -> docs-sync -> learnings -> tokens -> PR.md -> open PR -> checklist |
 
-Agents: **task-runner** (executes one build task in isolation) and **researcher** (picks the approach in
-the autonomous phase). Every skill auto-triggers from natural language too.
+Agents: **task-runner** (executes one build task in isolation), **researcher** (picks the approach in the
+autonomous phase), and **checker** (read-only goal-backward verification — the **check** steps above). The
+GSD-derived hardening that ships with these: the researcher tags every claim `[VERIFIED]` / `[CITED]` /
+`[ASSUMED]` and runs a **Runtime State Inventory** on rename/migration goals (the runtime state a `grep`
+can't see); the task-runner follows a typed deviation taxonomy (auto-fix small bugs, STOP-and-ask on
+architectural changes), self-checks before claiming done, and respects worktree git-safety rules. Every
+skill auto-triggers from natural language too.
 
 ## Structure
 
@@ -124,9 +140,9 @@ the autonomous phase). Every skill auto-triggers from natural language too.
 ├── .codex-plugin/
 │   └── plugin.json        # Codex plugin manifest
 ├── skills/                # scan, dev, brainstorm, research, plan, build, ship, rpa
-├── agents/                # task-runner, researcher
+├── agents/                # task-runner, researcher, checker
 ├── references/            # codex-tools.md, copilot-tools.md (tool-name maps)
-├── scripts/validate.py    # pre-release check (frontmatter, JSON, cross-refs)
+├── scripts/validate.py    # pre-release check (frontmatter, JSON, cross-refs, OKF)
 ├── docs/                  # specs & plans
 ├── AGENTS.md              # cross-platform bootstrap (Codex + Copilot)
 └── README.md              # you are here
@@ -164,18 +180,27 @@ If none are installed, wi still runs the whole loop on its own.
    in `constitution.md`.
 6. **Compounds across goals.** Each goal reads the project's memory (constitution, glossary, learnings) and
    writes back what it learned, so the next one starts smarter.
+7. **Build the least that works.** A Simplicity discipline threads through the loop — YAGNI, prefer the
+   stdlib or an existing dep over a new one, deletion over addition. The checker flags over-build, and the
+   design gate sees the *leaner path* next to the chosen approach.
 
 ## Maintaining
 
 - **Validate before publishing:** from the repo root, `python scripts/validate.py` (or `python3`) — checks
-  manifests are valid JSON, every skill/agent has valid `name`+`description` frontmatter, and every
-  `${CLAUDE_PLUGIN_ROOT}` reference resolves. `pip install pyyaml` enables the full frontmatter parse.
+  manifests are valid JSON, every skill/agent has valid `name`+`description` frontmatter, every
+  `${CLAUDE_PLUGIN_ROOT}` reference resolves, and every concept doc is **OKF**-conformant (typed YAML
+  frontmatter) with no truncated-write signatures — a missing trailing newline or unbalanced code fences.
+  `pip install pyyaml` enables the full frontmatter parse.
 - **Claude local-marketplace updates:** bump `version` in `.claude-plugin/plugin.json` (+ the marketplace
   entry), then `/plugin marketplace update wi` and `/reload-plugins` (or restart). Codex and Copilot
   re-read the repo through their own install/update flows.
 
 ## Roadmap
 
+- **Agent verification layer** (v0.9.2-v0.10.0) shipped — a read-only **checker** (goal-backward
+  verification, plan + result modes), researcher provenance + a **Runtime State Inventory**, a task-runner
+  deviation taxonomy + self-check, and a **Simplicity** discipline across the loop; distilled from
+  GSD-core's agent patterns and recorded in `docs/specs/2026-06-14-agent-upgrades-from-gsd.md`.
 - **Cross-platform** (Codex CLI + Copilot CLI) support shipped — one source, per-platform packaging + a
   platform-aware autonomy spine. Design and plan in `docs/specs/` and `docs/plans/`.
 - **`/wi:rpa`** (v0.7.0): PDD -> SDD -> REFramework build via the UiPath skills, build paradigm chosen at
