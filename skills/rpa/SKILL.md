@@ -57,8 +57,16 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
      `process-inventory.md` at run level.
    - **`tasks.md`** = the multi-process build DAG: shared components first, then processes, then each
      process's independent sub-workflows — parallel where the DAG allows.
-5. **Design gate.** Render the SDD summary + architecture + the assumptions register **and the open
-   dependencies `D1..Dn`** inline (use the same gate format as `wi:research`); the user must **resolve or
+5. **Design gate.** **Pre-gate check (checker · plan mode):** before rendering the gate, dispatch the
+   **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/checker.md`) in `plan` mode over `sdd.md` (acceptance criteria
+   §13 + locked decisions), `tasks.md`, `assumptions.md`, `orchestrator.md`, `rpa-constitution.md`, and any
+   Runtime State Inventory rows — it builds a goal-backward coverage matrix and returns BLOCKER/WARNING/INFO,
+   writing `verification.md`. A BLOCKER (an uncovered SDD criterion, a silently down-scoped decision, an
+   unresolved open dep) loops back to plan, then the checker re-checks (**max 2 rounds**); whatever remains is
+   carried into the gate summary with its severity.
+
+   Render the SDD summary + architecture + the assumptions register **and the open
+   dependencies `D1..Dn`** inline (use the same gate format as `wi:research` — including its **Leaner path** and **Checker (plan mode)** lines, mapped to the RPA artifacts); the user must **resolve or
    knowingly defer each open dep** — no silent "later". Confirm: approve / amend / stop — **and have the user approve the build
    paradigm: XAML-only (pure activities, default) or coded `.cs`** (a HARD binary — **no Invoke-Code middle
    ground**), recorded in `progress.md` (`Build paradigm:`). `--auto` records and proceeds on the constitution default (XAML-only). On
@@ -76,7 +84,7 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    append each unit's tokens to `tokens.md`, and
    register any new reusable component back into `.wi/components.md`.
 7. **Verify & ship.** Gate = `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/verification-gate.md` (**paradigm =
-   XAML REFramework** + Workflow Analyzer + `uip` validate + `tokens.md` present). Then reuse the **ship**
+   XAML REFramework** + Workflow Analyzer + `uip` validate + `tokens.md` present + the **goal-level checker · result mode** over `sdd.md` §13). Then reuse the **ship**
    skill (`wi:ship`) for the docs-sync, PR (`PR.md` committed, then `gh pr create --body-file`), close-out
    checklist, **compound/learnings** (confirm + promote the candidate `.wi/learnings/<slug>.md` written at
    the gate; update its `.wi/learnings.md` index line), and the **token report (`tokens.md` — finalized

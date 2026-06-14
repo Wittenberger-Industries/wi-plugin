@@ -31,6 +31,8 @@ assumption, and says so):**
 3. **Dispatcher/Performer split + the queue handoff** (§5).
 4. **Naming conventions** and **Orchestrator env / variables** (§6).
 5. **Every open dependency `D`** — resolve it now, or have the user *explicitly* defer it (§7 + the gate).
+6. **Rename / rebrand / migration only** — run the **Runtime State Inventory** (§6a): the old name almost
+   always lives on in Orchestrator resources and in-flight queue items a repo grep can't see.
 
 ## 0. Baseline — and challenge it
 
@@ -187,6 +189,29 @@ timestamp: <YYYY-MM-DD>
 
 > `?` / `<...>` = unknown or proposed (convention default) — confirm at the design gate.
 ```
+
+## 6a. Runtime State Inventory — rename / rebrand / migration runs only
+
+Skip this for a greenfield automation. **When the run renames, rebrands, or migrates an existing automation,**
+the source/code changes are the easy part — the old identity also lives in **runtime state no repo grep can
+see**, and the build will look green while production still references the old name. Sweep five categories and
+record each into `orchestrator.md` (a rename map) + `assumptions.md`, with a **separate migration task** in
+`tasks.md` (renaming how *new* items are written never fixes the *existing* ones). "None — verified by X" is
+a valid answer; a **blank is not**.
+
+1. **In-flight / stored data** — queue items already enqueued under the old queue, transaction references and
+   status keyed on the old string, Storage-Bucket paths, records in a target system.
+2. **Live Orchestrator config** — queue / asset / storage-bucket / **published-process** names, folder names,
+   triggers, alerts/dashboards named after the thing (none of it in the repo).
+3. **OS / platform-registered** — robot/machine names, the **published package** name in the feed, Library
+   feed entries, scheduled triggers registered in Orchestrator.
+4. **Credential & asset *names*** — the Orchestrator credential/asset **keys** (names only) referencing the
+   old name; renaming the key and the workflow that reads it must move in lockstep.
+5. **Build artifacts** — the published `.nupkg` package name/version, generated process names, anything a
+   downstream consumer binds to by name.
+
+Every load-bearing row becomes an assumption + a migration task; the checker (plan mode) then verifies each
+has a covering task.
 
 ## 7. Log assumptions & open dependencies
 

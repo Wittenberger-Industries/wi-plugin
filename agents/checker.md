@@ -45,6 +45,12 @@ You complement, not duplicate: the human **design gate** decides (you feed it), 
   locked decisions (ADRs, constitution). The question: **did the build actually satisfy them — wired, not
   just present?**
 
+**RPA goals (`wi:rpa`).** Same job, different artifact names — map them: `spec.md` → **`sdd.md`** (acceptance
+criteria in §13; locked decisions across §1-§7), `pitfalls.md` → **`assumptions.md`**, `constitution.md` →
+**`rpa-constitution.md`**, `brief.md` → **`pdd.md`**, plus **`orchestrator.md`** (the resource manifest) and
+any **Runtime State Inventory** rows for a rename/rebrand. In `result` mode the "diff / built tree" is the
+generated REFramework project.
+
 ## How you verify
 
 1. **Goal-backward, not code-forward.** Start from what the goal must deliver. For each required truth ask

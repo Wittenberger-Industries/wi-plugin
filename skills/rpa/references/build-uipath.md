@@ -65,6 +65,13 @@ APIs). Names come from the SDD §7 resource manifest. Never hardcode secrets —
 Stay within the confirmed SDD; new scope becomes a logged task/assumption, not a silent addition. Never
 commit secrets or local robot artifacts; respect `.gitignore` for `.local`, `*.user`, etc.
 
+**Shared-worktree git landmines** (the parallel build waves share one worktree, same as `wi:build`): **no
+`git stash`** (the stash stack is shared across worktrees via `refs/stash` — a `pop` can apply a sibling
+wave's WIP), **no `git clean`** (it deletes another wave's generated `.xaml`/`.cs` it sees as untracked), and
+**no `reset --hard` / `checkout` of shared or protected branches**. Need to park WIP? Commit it to a
+throwaway branch you own. The orchestrator commits per unit (step 2.4); a delegated build never runs
+destructive git.
+
 ## Notes
 
 - If `uipath-rpa-workflows` isn't installed, build can't proceed — stop with the complete SDD pack and say
