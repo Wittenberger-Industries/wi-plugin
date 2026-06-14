@@ -69,6 +69,18 @@ timestamp: <YYYY-MM-DD>
 - Check `.wi/components.md` before building any capability; reuse shared workflows / Library projects.
   Register new reusable components after building them.
 
+## Simplicity  (build the least that works)
+- Before building a workflow/component, ask whether it needs to exist — reuse `.wi/components.md` or a
+  Library first; a speculative handler the PDD never asked for = skip it, note it in one line. (YAGNI)
+- Reach in order: an existing component → an Integration Service **connector / API** → a standard activity →
+  a small VB expression → only then a new sub-workflow (a coded `.cs` only if the gate approved coded).
+- Fewest workflows that deliver the SDD. No abstraction for a single caller (no generic wrapper with one
+  user, no Config asset for a value that never changes). Prefer deleting a step to adding one.
+- Lazy, not negligent: never simplify away REFramework exception handling, retries, transaction logging, or
+  credential-by-name — those are load-bearing.
+- Mark a deliberate shortcut with an annotation naming its ceiling (e.g. "stub: folder-drop mock; real SAP
+  query when D3 resolves").
+
 ## Gate (definition of done)
 - Output matches the **gate-approved paradigm** — always REFramework XAML; `.cs` / `.codedworkflows` only if the user approved **coded-allowed**.
 - `uip` restore + validate succeed; **Workflow Analyzer: zero error-level violations**.   (confirm)
@@ -83,4 +95,4 @@ timestamp: <YYYY-MM-DD>
 
 REFramework; connectors/APIs preferred over UI (but UI is fine where needed); secrets as Orchestrator
 assets; business vs system exceptions with 3 retries; Workflow Analyzer error-clean as the gate; reuse
-before build. An opinionated baseline beats no opinion — the constitution is where a project overrides it.
+before build; **build the least that works** (YAGNI, connectors/components over new code, mark shortcuts). An opinionated baseline beats no opinion — the constitution is where a project overrides it.

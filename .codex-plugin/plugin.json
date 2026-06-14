@@ -1,6 +1,6 @@
 {
   "name": "wi",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "An opinionated, low-token engineering loop: /wi:scan documents and bootstraps a repo (--refresh drift-checks it); /wi:dev brainstorms a feature with you then designs and builds it to an open PR; /wi:rpa turns a UiPath PDD into a built REFramework solution. Spec-driven, parallel subagent waves, isolated worktrees, ADR log, token report. Runs on Claude Code, Codex CLI, and Copilot CLI from one source.",
   "skills": "./skills/"
 }

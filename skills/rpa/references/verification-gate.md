@@ -36,6 +36,15 @@ available in the run environment, the gate degrades to: **artifacts complete + t
 ruleset/criteria to pass**, and the actual Analyzer run is deferred to the user (say so explicitly — don't
 claim green you didn't verify).
 
+## Goal-level check (checker · result mode)
+
+Beyond the tooling above, dispatch the **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/checker.md`) in `result`
+mode against **`sdd.md` §13** (acceptance criteria) + the locked decisions (the SDD's §1-§7, the
+`rpa-constitution`, any ADR) — it confirms each is **delivered and wired in the generated project**, not just
+present, refreshing `verification.md`. Goal/coverage-level, distinct from the Analyzer's line-level rules. A
+result-mode **BLOCKER** — an unmet SDD criterion, or a decision silently reduced to a stub/mock not signed
+off — **loops back to build**; ship never opens the PR on a run the checker says isn't met.
+
 ## What "green" means
 
 - the build is the **expected paradigm** — XAML REFramework (or Coded only with an ADR), checked first.
@@ -43,6 +52,7 @@ claim green you didn't verify).
 - the **token report `tokens.md` exists** and lists each delegated build unit's tokens.
 - every SDD acceptance criterion (§13) maps to something that actually passed.
 - every assumption is either confirmed (gate) or recorded for sign-off; no unaddressed `NEEDS DECISION`.
+- the **checker (result mode) verdict is PASS** — every SDD §13 criterion and locked decision delivered and wired.
 
 ## The iron law (same as wi:dev)
 
