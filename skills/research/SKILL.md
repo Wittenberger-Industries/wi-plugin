@@ -87,6 +87,7 @@ inlined from the ADR/spec/tasks you just wrote):
 **Approach (ADR-NNNN):** <the decision, one line>
 **Why:** <2-3 lines — the decisive reasons>
 **Rejected:** <alternative — why not> · <alternative — why not>
+**Leaner path:** <the simplest version that meets the brief — and why anything beyond it is justified>
 
 **Acceptance criteria (what "done" means):**
 1. <criterion>  -> verified by <test/command>

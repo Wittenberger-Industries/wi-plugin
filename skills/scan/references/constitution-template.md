@@ -38,6 +38,13 @@ timestamp: <YYYY-MM-DD>
 - Prefer small, pure functions; isolate side effects; no dead code or commented-out blocks.
 - Naming follows existing files; match the surrounding module, don't import a new style.
 
+## Simplicity  (build the least that works)
+- Before building, ask whether it needs to exist at all. Speculative need = skip it, say so in one line. (YAGNI)
+- Reach in order: stdlib → native platform feature → already-installed dep → a few lines → and only then new code or a new dependency.
+- Deletion over addition. No abstraction until a second caller exists (no interface-of-one, no config for a value that never changes). Fewest files, shortest working diff.
+- Lazy, not negligent: never simplify away input validation at trust boundaries, error handling that prevents data loss, security, or accessibility.
+- Mark a deliberate shortcut with a comment naming its ceiling and the upgrade path — e.g. `# shortcut: global lock; per-account locks if throughput matters`.
+
 ## Testing  (this is enforced, not optional)
 - New behavior ships with tests. Default to TDD: write the failing test first.   (confirm)
 - Tests live in <tests/>, named <test_*.py>. A change isn't done until the relevant tests pass.
@@ -46,7 +53,7 @@ timestamp: <YYYY-MM-DD>
 
 ## Architecture & dependencies
 - Respect existing module boundaries and layering; don't reach across them for convenience.
-- Adding a dependency is a decision — justify it in the goal's spec, and prefer the stdlib / existing deps.
+- Adding a dependency is a decision — clear the Simplicity ladder first, then justify it in the goal's spec.
 - Any hard-to-reverse decision (datastore, framework, public API shape, auth model) requires an ADR.
 
 ## Git & shipping
@@ -69,6 +76,7 @@ baseline beats no opinion:
 
 - Test before merge; prefer TDD for non-trivial logic.
 - Lint + typecheck are part of "done".
-- New dependency = justify it.
+- New dependency = justify it; prefer stdlib / native / existing.
+- Build the least that works — skip speculative work (YAGNI), prefer deletion, mark deliberate shortcuts with their ceiling.
 - Hard-to-reverse decision = write an ADR.
 - One goal = one branch = one PR.

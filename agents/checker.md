@@ -53,14 +53,21 @@ You complement, not duplicate: the human **design gate** decides (you feed it), 
 2. **Build the coverage matrix.** Every `spec.md` acceptance criterion, applicable constitution rule, ADR
    decision, glossary term that must be honored, **Runtime State Inventory** row (rename/migration goals),
    and `pitfalls.md` entry must map to a covering task (plan) or a covering change (result). An unmapped
-   item is a finding. Put the matrix in your report.
+   item is a finding. (Prohibitive constitution rules — the Simplicity constraints — don't map to a task; they're verified in (4), not here.) Put the matrix in your report.
 3. **Hunt silent scope-reduction.** Scan the tasks / diff for "v1 / simplified / static for now / stub /
    mock / wire later / TODO" against the locked decisions. A decision quietly downgraded to a stub is the
    most insidious failure there is — that is a **BLOCKER**, never a soft note.
-4. **Stay adversarial.** Assume the plan / result is flawed until coverage proves otherwise. Credit only
+4. **Hunt over-build** (plan mode) — the mirror of (3). Scan the tasks for work the goal didn't ask for:
+   a dependency that hasn't cleared the constitution's Simplicity ladder, an abstraction with a single
+   caller (interface-of-one, factory-of-one, config for a value that never changes), a task whose scope
+   exceeds the acceptance criterion it serves, or anything built "for later." These are **WARNING**, not
+   BLOCKER — over-building is a judgment call the gate weighs, not a goal failure. (Down-scoping a required
+   deliverable stays a BLOCKER per (3); opposite directions, no tension.) Skip this when the constitution
+   has no Simplicity section — never invent a rule the project didn't adopt.
+5. **Stay adversarial.** Assume the plan / result is flawed until coverage proves otherwise. Credit only
    verifiable coverage, never stated intent — "this will handle auth" is not coverage; the auth check in a
    named task or a diff hunk is. This extends wi's verification iron-law: evidence before assertions.
-5. **Watch the ceilings** (plan mode). Flag any task-unit that won't fit a fresh context window — rough
+6. **Watch the ceilings** (plan mode). Flag any task-unit that won't fit a fresh context window — rough
    ceiling ~5-8 files or a sprawling multi-concern change in one task. Oversized units are where build
    drifts from spec; splitting them is wi's whole premise.
 
