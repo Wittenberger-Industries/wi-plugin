@@ -130,7 +130,8 @@ any blocker here too — it's what the user reads after a hands-off run.
 
 Append a row the **moment** each subagent's completion notification arrives — the token figure exists
 only in that notification. goal compiles the totals at Done and `dev` includes the table in the final
-report.
+report. The scaffold is written by `check_tokens.py --init` from `_ledger.TEMPLATE` (the source of truth
+for the exact bytes); the block below is illustrative.
 
 ```markdown
 ---
