@@ -83,3 +83,20 @@ class LedgerHelperTests(unittest.TestCase):
             self.assertEqual(_ledger.verify(p), "Orchestrator section still PENDING / unresolved")
             p.write_text(_resolve_orchestrator(_with_row_and_sum(_scaffold_text())), encoding="utf-8")
             self.assertIsNone(_ledger.verify(p))            # full pass
+
+    def test_verify_frontmatter_and_type_and_sum_reasons(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "tokens.md"
+            # frontmatter missing
+            p.write_text("no frontmatter\n| build | task-runner: t1 | 5 | exact |\n", encoding="utf-8")
+            self.assertEqual(_ledger.verify(p), "frontmatter missing or unparseable")
+            # wrong type
+            p.write_text("---\ntype: Spec\n---\n\n| build | task-runner: t1 | 5 | exact |\n", encoding="utf-8")
+            self.assertEqual(_ledger.verify(p), "frontmatter 'type' is not 'Token Ledger'")
+            # subagents sum not filled (data row present, <sum> still unfilled, checked before orchestrator)
+            t = _scaffold_text().replace(
+                "| orchestrator |",
+                "| build W1 | task-runner: t1 | 5 | exact |\n| orchestrator |",
+            )
+            p.write_text(t, encoding="utf-8")
+            self.assertEqual(_ledger.verify(p), "Subagents (exact) sum not filled (still '<sum>')")
