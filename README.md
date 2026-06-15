@@ -204,6 +204,11 @@ If none are installed, wi still runs the whole loop on its own.
 
 ## Roadmap
 
+- **tokens.md guardrails** (v0.10.4) shipped — the per-goal token ledger can no longer be silently
+  skipped: a deterministic scaffold (`check_tokens.py --init`), `token_report.py --write` finalizes the
+  orchestrator total + Subagents sum in place, and a `check_tokens.py` close-out gate blocks the PR on a
+  genuine skip (an honest `unavailable` still ships). Dev + rpa flows; design and plan in `docs/specs/`
+  and `docs/plans/`.
 - **Agent verification layer** (v0.9.2-v0.10.0) shipped — a read-only **checker** (goal-backward
   verification, plan + result modes), researcher provenance + a **Runtime State Inventory**, a task-runner
   deviation taxonomy + self-check, and a **Simplicity** discipline across the loop; distilled from
