@@ -37,7 +37,7 @@ DAG allows (independent processes and independent sub-workflows in parallel):
    approved at the design gate** (`progress.md` → `Build paradigm:`): **XAML-only** → every step is a real
    drag-drop XAML **activity** — **no `.cs` / `.codedworkflows` AND no Invoke Code activity** (no procedural VB/C#
    code blocks, ever; **HARD rule, no middle ground**). Normal **VB expressions** in Assign / If / conditions /
-   BuildDataTable etc. are expected and fine — the ban is only the *Invoke Code activity*. State this explicitly to `uipath-rpa-workflows`. If a
+   BuildDataTable etc. are expected and fine — the ban is only the *Invoke Code activity*. State this explicitly to `uipath-rpa-workflows`. **Readability:** prefer a **Multiple Assign** over a chain of single Assign activities — one grouped block beats a vertical stack of separate Assigns (pass this preference to the generator alongside the constitution rules). If a
    step genuinely can't be built from activities, that's the signal to pick the **coded** paradigm at the gate
    — never to smuggle code into an Invoke Code. **coded-allowed** → a REFramework project with coded `.cs`
    workflows is fine. Any `.cs` **or any Invoke Code** when the user approved **XAML-only** is **wrong and

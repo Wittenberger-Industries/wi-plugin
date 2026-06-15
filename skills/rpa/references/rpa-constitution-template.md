@@ -39,6 +39,8 @@ timestamp: <YYYY-MM-DD>
 ## Naming & structure
 - Workflows: PascalCase, descriptive (GetTransactionData, Process). Annotation on every workflow.
 - Arguments: `in_/out_/io_` prefixes; variables camelCase, meaningful.
+- **Prefer a Multiple Assign over a chain of single Assign activities** — group related assignments into
+  one block; it reads far cleaner than a vertical stack of separate Assigns.
 - Standard REFramework folders (Framework/, Data/, Tests/). **Process sub-workflows live under `Process/`,
   grouped into subfolders by system/concern** (`Process/DocuWare/`, `Process/MasterData/`, `Process/IDoc/`, …),
   each holding that area's workflows — not flat at the project root.
