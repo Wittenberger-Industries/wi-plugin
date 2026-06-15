@@ -100,3 +100,67 @@ class LedgerHelperTests(unittest.TestCase):
             )
             p.write_text(t, encoding="utf-8")
             self.assertEqual(_ledger.verify(p), "Subagents (exact) sum not filled (still '<sum>')")
+
+
+CHECK = SCRIPTS / "check_tokens.py"
+REPORT = SCRIPTS / "token_report.py"
+
+
+def run(*args):
+    return subprocess.run([sys.executable, *map(str, args)], capture_output=True, text=True)
+
+
+def init_ledger(d, slug="my-goal"):
+    p = Path(d) / slug / "tokens.md"
+    run(CHECK, "--init", p)
+    return p
+
+
+class CheckTokensCliTests(unittest.TestCase):
+    def test_init_creates_when_absent(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "my-goal" / "tokens.md"
+            r = run(CHECK, "--init", p)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            text = p.read_text(encoding="utf-8")
+            self.assertIn("type: Token Ledger", text)
+            self.assertIn("goal: my-goal", text)
+            self.assertIn("## Orchestrator", text)
+            self.assertIn("PENDING", text)
+            self.assertIn("<sum>", text)
+
+    def test_init_idempotent_byte_for_byte(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = init_ledger(d)
+            first = p.read_bytes()
+            r = run(CHECK, "--init", p)
+            self.assertEqual(r.returncode, 0)
+            self.assertEqual(p.read_bytes(), first)
+
+    def test_verify_missing_fails(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = run(CHECK, Path(d) / "tokens.md")
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("missing", (r.stdout + r.stderr).lower())
+
+    def test_verify_fresh_scaffold_fails_no_rows(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = init_ledger(d)
+            r = run(CHECK, p)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("row", (r.stdout + r.stderr).lower())
+
+    def test_verify_pending_fails_even_with_row_and_sum(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = init_ledger(d)
+            p.write_text(_with_row_and_sum(p.read_text(encoding="utf-8")), encoding="utf-8")
+            r = run(CHECK, p)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("orchestrator", (r.stdout + r.stderr).lower())
+
+    def test_verify_full_passes_with_unavailable(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = init_ledger(d)
+            p.write_text(_resolve_orchestrator(_with_row_and_sum(p.read_text(encoding="utf-8"))), encoding="utf-8")
+            r = run(CHECK, p)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
