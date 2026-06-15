@@ -11,8 +11,12 @@ tags: [rpa, reference]
 Before any design, capture the *whole* input surface. The build can only use what you register here, so
 this step is what makes the later UiPath handoff complete.
 
-## 1. Convert the PDD → `pdd.md`
+## 1. Derive the run-slug, then convert the PDD → `pdd.md`
 
+- **Derive `<slug>` first** — it's the goal-folder name used everywhere below: a kebab name from the
+  PDD/solution, **prefixed with the next global 4-digit ordinal** (`NNNN-<name>`, e.g. `0001-invoices`),
+  mirroring `ADR-NNNN`: global across `.wi/goals/`, monotonic, assigned once at creation, never renumbered.
+  Next = highest existing `.wi/goals/` ordinal + 1 (else `0001`); legacy unnumbered runs are left as-is.
 - If the PDD is `.docx`/`.pdf`/`.pptx`: `markitdown <pdd> -o .wi/goals/<slug>/pdd.md`.
 - If it's already `.md`: copy/reference it as `pdd.md` as-is (don't re-process).
 - **Prepend OKF frontmatter** so `pdd.md` is a typed concept like the rest of the bundle: open the file
