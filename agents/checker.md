@@ -76,6 +76,11 @@ generated REFramework project.
 6. **Watch the ceilings** (plan mode). Flag any task-unit that won't fit a fresh context window — rough
    ceiling ~5-8 files or a sprawling multi-concern change in one task. Oversized units are where build
    drifts from spec; splitting them is wi's whole premise.
+7. **Frontend delegation** (result mode). If the goal shipped UI from `[frontend]` tasks, confirm
+   `progress.md` logged `frontend via frontend-design` — the design skill was actually used, not bypassed.
+   UI built blind while `frontend-design` was installed (the log shows `frontend via wi fallback`, or
+   carries no frontend line at all) is a **WARNING** — a delegation defect per `integrations.md`, surfaced
+   for waiver at the ship gate, not a silent pass.
 
 ## Severity — mandatory on every finding
 

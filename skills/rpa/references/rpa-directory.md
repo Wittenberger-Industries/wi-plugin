@@ -74,6 +74,64 @@ onto the existing RPA registries rather than a new file: Orchestrator **queue/as
 `orchestrator.md` (names only, per the rpa-constitution), the **published package name** → a build
 artifact. Each load-bearing row still becomes its own migration task in `tasks.md`.
 
+## Frontmatter stubs (the prose-generated run files)
+
+`progress.md` has its full template below; `sdd.md`, `orchestrator.md`, `inputs.md`, `components.md`, and
+`rpa-constitution.md` carry templates in their reference docs. The remaining run files are written from
+prose — open each with its OKF frontmatter, then the body:
+
+```markdown
+---
+type: PDD
+title: <solution / process name> — PDD
+description: The ingested Process Definition Document, faithful to the source.
+goal: <run-slug>
+timestamp: <YYYY-MM-DD>
+---
+```
+
+```markdown
+---
+type: Architecture
+title: Runtime diagram — <solution name>
+description: Whole-solution runtime diagram — dispatcher, every performer, queues, systems, Orchestrator.
+goal: <run-slug>
+timestamp: <YYYY-MM-DD>
+---
+```
+
+```markdown
+---
+type: Process Inventory
+title: Process inventory — <solution name>
+description: The N processes in this solution and their dependencies.
+goal: <run-slug>
+timestamp: <YYYY-MM-DD>
+---
+```
+
+```markdown
+---
+type: Assumption Register
+title: Assumptions — <solution name>
+description: Gap/assumption register (per-process) plus the PDD->SDD traceability.
+goal: <run-slug>
+timestamp: <YYYY-MM-DD>
+---
+```
+
+```markdown
+---
+type: TO-BE
+title: <process name> — TO-BE
+description: The refined TO-BE flow for this process (feeds SDD §7.1.3).
+goal: <run-slug>
+timestamp: <YYYY-MM-DD>
+---
+```
+
+`tasks.md` uses the same `type: Task List` frontmatter as `wi:dev` (see the plan skill's `tasks.md` format).
+
 ## `progress.md` template (run-level)
 
 ```markdown

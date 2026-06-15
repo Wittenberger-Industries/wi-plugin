@@ -85,8 +85,11 @@ Two tiers, one index:
 
    ```markdown
    ---
+   type: Learning
+   title: <goal title> — learnings
+   description: <one-line hook — the gotcha/pattern worth recalling next goal>
    goal: <slug>
-   date: <YYYY-MM-DD>
+   timestamp: <YYYY-MM-DD>
    tags: [<area>, ...]
    ---
    # <goal title> — learnings
@@ -99,6 +102,13 @@ Two tiers, one index:
    recall learnings without opening every file. One line per learning, hook included:
 
    ```markdown
+   ---
+   type: Learnings Index
+   title: Learnings index — <project>
+   description: One line + hook per goal; phases read this, then open a detail file only when its hook fits.
+   timestamp: <YYYY-MM-DD>
+   ---
+
    # Learnings index
 
    - [<goal title>](learnings/<slug>.md) — <one-line hook: the gotcha/pattern in ~10 words>
@@ -151,10 +161,20 @@ Commit: `docs(<slug>): learnings` (or fold into the docs-sync commit).
 Write it from the goal's own artifacts — they were made for exactly this. The description is a **file,
 not console output**: save it as `.wi/goals/<slug>/PR.md` and commit it (`docs(<slug>): PR description`).
 It is part of the seven-file dossier and exists **whether or not** a PR can be opened this run — it is
-what `gh pr create --body-file` consumes, and what a human uses if they must create the PR by hand.
+what `gh pr create --body-file` consumes, and what a human uses if they must create the PR by hand. It
+opens with OKF frontmatter (`type: PR Description`); the PR **body** is everything *below* that
+frontmatter, so the frontmatter is stripped before feeding `gh` (§7) — it's dossier metadata, not PR text.
 Template:
 
 ```markdown
+---
+type: PR Description
+title: <goal title>
+description: <2-4 word summary of the change>
+goal: <slug>
+timestamp: <YYYY-MM-DD>
+---
+
 ## <type>: <goal title>
 
 ### Summary
@@ -185,14 +205,23 @@ findings with severity. Distilled from verification.md, which is pruned at close
 ## 7 · Open the PR (autonomous)
 
 The user chose hands-off-to-PR, so open it without asking. Push the branch
-(`git push -u origin wi/<slug>`), then:
-`gh pr create --title "<…>" --body-file .wi/goals/<slug>/PR.md` (add `--draft` if the run ended blocked
-or partial). Log the PR URL in `progress.md`.
+(`git push -u origin wi/<slug>`), strip PR.md's OKF frontmatter into a throwaway body file (outside the
+repo, so the dossier stays clean), then open the PR from it:
+
+```bash
+body=$(mktemp)
+awk 'NR==1&&$0=="---"{f=1;next} f&&$0=="---"{f=0;next} !f' .wi/goals/<slug>/PR.md > "$body"
+gh pr create --title "<…>" --body-file "$body"   # add --draft if the run ended blocked or partial
+rm -f "$body"
+```
+
+Log the PR URL in `progress.md`.
 
 **A pushed branch is not a shipped goal.** If `gh` is unavailable or `pr create` fails, the run is **not
-done**: record in `progress.md`'s Decisions/blockers the exact recovery command —
-`gh pr create --title "<…>" --body-file .wi/goals/<slug>/PR.md` — plus the failure reason, and tell the
-user in the final report that the PR still needs creating. Never silently stop at the push. **Never
+done**: record in `progress.md`'s Decisions/blockers the exact recovery command (frontmatter-stripped, as
+above) —
+`body=$(mktemp); awk 'NR==1&&$0=="---"{f=1;next} f&&$0=="---"{f=0;next} !f' .wi/goals/<slug>/PR.md > "$body"; gh pr create --title "<…>" --body-file "$body"`
+— plus the failure reason, and tell the user in the final report that the PR still needs creating. Never silently stop at the push. **Never
 force-push.** If `superpowers:finishing-a-development-branch` is installed, use it for the close-out.
 
 ## 8 · Close out — checklist, then the report
@@ -203,7 +232,7 @@ memory. `progress.md` Phase = `done` is **earned by this checklist**; an unticke
 finished, no matter what the console already said:
 
 - [ ] PR is **open** and its URL is logged in `progress.md` (sole substitute: branch pushed + failure
-      reason + exact `gh pr create … --body-file .wi/goals/<slug>/PR.md` command recorded as a blocker)
+      reason + the frontmatter-stripped `gh pr create …` recovery command (§7) recorded as a blocker)
 - [ ] `.wi/goals/<slug>/PR.md` exists and is committed on the branch
 - [ ] `tokens.md` has the subagent ledger rows **and** a finalized `## Orchestrator` section (parsed
       figure or explicit `unavailable`) — verify by reading the **file**, not the console log

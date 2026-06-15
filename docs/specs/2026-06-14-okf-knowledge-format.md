@@ -276,20 +276,34 @@ wi's repo holds two kinds of Markdown, and OKF conformance applies a little diff
 - **`learnings.md` is the named index, not `index.md`** — it is a specialized typed index;
   the reserved directory listing is the new `.wi/index.md`.
 
-## 8. What changed in this pass
+## 8. Generated-file templates & enforcement
 
-- This document (`docs/specs/2026-06-14-okf-knowledge-format.md`) — the analysis + profile.
-- `skills/research/references/wi-directory.md` + `skills/rpa/references/rpa-directory.md` —
-  an OKF section (frontmatter scheme, `type` vocabulary, index/log/citation/link rules) and
-  frontmatter added to the inline templates they define.
-- `skills/plan/references/{adr-template,spec-template}.md`,
+Every template wi uses to *write* a `.wi/` file opens that generated file with the §4.1 frontmatter
+(required `type` from §5). The complete set:
+
+- **Reference docs:** `skills/research/references/wi-directory.md` (progress, tokens, roadmap) and
+  `skills/rpa/references/rpa-directory.md` (RPA layout, the run-file frontmatter stubs, RPA progress).
+- **Plan / scan / RPA templates:** `skills/plan/references/{adr-template,spec-template}.md`,
   `skills/scan/references/constitution-template.md`,
-  `skills/rpa/references/sdd-template.md` — frontmatter in their generated templates;
-  ADR `## Sources` → `## Citations`.
-- Plugin source docs (`references/`, `docs/`, `AGENTS.md`, `README.md`) — OKF frontmatter
-  added; `type` added to `SKILL.md` + `agents/*.md`.
-- `scripts/validate.py` — a new OKF-conformance check (parseable frontmatter + non-empty
-  `type`) alongside the existing manifest/contract checks.
+  `skills/rpa/references/{sdd-template,rpa-constitution-template}.md`, and the orchestrator + `tobe.md`
+  templates in `brainstorm-protocol.md` and the inputs/components templates in `ingest.md`. ADR
+  `## Sources` → `## Citations`.
+- **SKILL-embedded templates:** `scan` (repo-map, overview, architecture), `brainstorm` (brief, glossary),
+  `plan` (tasks, pitfalls), `ship` (learnings detail, learnings index, PR) — each now opens with its `type`.
+- **Agents:** `agents/checker.md` (verification), `agents/researcher.md` (research note).
+
+`PR.md` carries `type: PR Description`; because it is *also* consumed by `gh pr create --body-file`, ship
+strips the leading frontmatter into a throwaway body file before creating the PR (the frontmatter is
+dossier metadata, not PR text — §7 of the ship skill).
+
+Plugin source docs (`references/`, `docs/`, `AGENTS.md`, `README.md`) carry OKF frontmatter; `SKILL.md` +
+`agents/*.md` add `type` alongside their loader `name`/`description` (§6).
+
+`scripts/validate.py` enforces two OKF checks so this can't regress: **(5)** every concept doc opens with
+parseable frontmatter carrying a non-empty `type`; **(6)** every generated-`.wi/`-file template (the fenced
+markdown blocks inside `skills/`·`agents/` that emit a runtime file) opens with frontmatter carrying a
+non-empty `type` — so a generated file can never ship type-less. Reserved `index.md`/`log.md` listings are
+exempt; console/shell examples (fenced as non-`markdown`) are skipped.
 
 ## Citations
 

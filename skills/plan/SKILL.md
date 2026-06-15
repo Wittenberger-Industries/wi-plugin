@@ -66,6 +66,14 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
 ## `tasks.md` format
 
 ```markdown
+---
+type: Task List
+title: Tasks — <goal title>
+description: Small ordered tasks (each with files + verify) and the build waves for this goal.
+goal: <slug>
+timestamp: <YYYY-MM-DD>
+---
+
 # Tasks: <goal title>
 
 > Ordered. Each task is small enough for one focused sitting and ends green.
@@ -91,6 +99,26 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
 Tag frontend tasks so build routes them to a design skill. Keep verification concrete — "it works" is not
 verification; a named test or command is. A plan whose tasks each end in a runnable check is a plan that
 builds and ships without drama.
+
+## `pitfalls.md` format
+
+Open with OKF frontmatter (`type: Pitfalls`); one entry per failure mode that genuinely applies, each
+naming the *specific* way it could bite here and the task that prevents it.
+
+```markdown
+---
+type: Pitfalls
+title: Pitfalls — <goal title>
+description: The failure modes that genuinely apply to this change, each with its preventing task.
+goal: <slug>
+timestamp: <YYYY-MM-DD>
+---
+
+# Pitfalls: <goal title>
+
+- **<pitfall>** — how it could bite *here*: <specific>. Prevented by: <task # / named check>.
+- **<pitfall>** — <specific>. Prevented by: <task #>.
+```
 
 ## Sizing heuristics
 

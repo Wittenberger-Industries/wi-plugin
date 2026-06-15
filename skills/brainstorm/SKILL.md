@@ -56,6 +56,13 @@ specs drift. Maintain project-level `.wi/glossary.md` (shared across goals; crea
   avoid:
 
 ```markdown
+---
+type: Glossary
+title: Glossary — <project>
+description: Canonical project domain terms and the aliases to avoid.
+timestamp: <YYYY-MM-DD>
+---
+
 # Glossary — <project>
 
 **<Term>:** <one or two sentences: what it IS, not what it does.>
@@ -88,6 +95,14 @@ context-gathering to ask good questions is fine; deep approach research is not.
 ## `brief.md` template
 
 ```markdown
+---
+type: Brief
+title: <feature title>
+description: What the user wants from this goal, in plain terms (the WHAT, not the HOW).
+goal: <slug>
+timestamp: <YYYY-MM-DD>
+---
+
 # Brief: <feature title>
 
 ## What the user wants

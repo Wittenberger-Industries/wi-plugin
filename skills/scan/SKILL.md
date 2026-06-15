@@ -135,7 +135,16 @@ learnings merged/promoted/pruned (counts), or "no drift — scan is current."
 
 ## `repo-map.md` template
 
+Open the file with OKF frontmatter (`type: Repo Map`), then the body below.
+
 ```markdown
+---
+type: Repo Map
+title: Repo map — <project>
+description: Stack, exact verified commands, and conventions scan recorded for this repo.
+timestamp: <YYYY-MM-DD>
+---
+
 # Repo map  (scanned <YYYY-MM-DD>)
 
 - **Kind:** existing | greenfield
@@ -168,7 +177,16 @@ learnings merged/promoted/pruned (counts), or "no drift — scan is current."
 
 ## `overview.md` template (existing projects)
 
+Open the file with OKF frontmatter (`type: Overview`), then the body below.
+
 ```markdown
+---
+type: Overview
+title: <project> — overview
+description: A human-facing tour of what this project is and how it's organized.
+timestamp: <YYYY-MM-DD>
+---
+
 # <project> — overview  (documented <YYYY-MM-DD> by /wi:scan)
 
 ## What it is
@@ -195,8 +213,24 @@ learnings merged/promoted/pruned (counts), or "no drift — scan is current."
 
 ## `architecture.md` template (existing projects)
 
-Write a `# Architecture — <project>` heading, a dated line, ONE primary mermaid `flowchart` of the real
-architecture, then a one-line legend. Example shape:
+Open the file with OKF frontmatter (`type: Architecture`), then a `# Architecture — <project>` heading, a
+dated line, ONE primary mermaid `flowchart` of the real architecture, then a one-line legend:
+
+```markdown
+---
+type: Architecture
+title: Architecture — <project>
+description: Mermaid module/dependency diagram of the real architecture.
+timestamp: <YYYY-MM-DD>
+---
+
+# Architecture — <project>
+_Diagrammed <YYYY-MM-DD> by /wi:scan._
+
+<the primary mermaid flowchart (shape below), then a one-line legend>
+```
+
+Example flowchart shape:
 
 ```mermaid
 flowchart TD

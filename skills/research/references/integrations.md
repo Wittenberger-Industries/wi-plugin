@@ -51,7 +51,13 @@ tree), route `[frontend]` tasks to a design skill instead of writing markup blin
 - `pbakaus/impeccable` (audit, critique, polish) — for tightening an existing UI.
 - `leonxlnx/taste-skill` — for visual/design-taste direction.
 
-Backend and glue tasks stay in the normal build loop; a single goal can mix both (tasks are tagged).
+**Delegation is mandatory when the skill is present** — the same rule as the phase table above. A
+`[frontend]` task built without `frontend-design` while it's installed is a defect, not a style choice.
+Operationally: `build` passes the routing into each `[frontend]` task-runner's charter, the runner builds
+the UI through the design skill and logs `frontend via frontend-design` (or `frontend via wi fallback
+(frontend-design absent)`) to `progress.md`, and ship's checker (result mode) flags any `[frontend]` UI
+that shipped blind while the skill was installed. Backend and glue tasks stay in the normal build loop; a
+single goal can mix both (tasks are tagged).
 
 ## Backend / Python
 

@@ -15,6 +15,9 @@ this step is what makes the later UiPath handoff complete.
 
 - If the PDD is `.docx`/`.pdf`/`.pptx`: `markitdown <pdd> -o .wi/goals/<slug>/pdd.md`.
 - If it's already `.md`: copy/reference it as `pdd.md` as-is (don't re-process).
+- **Prepend OKF frontmatter** so `pdd.md` is a typed concept like the rest of the bundle: open the file
+  with `type: PDD` (+ `title`, `description`, `goal: <slug>`, `timestamp` — stub in `rpa-directory.md`)
+  above the converted body. The frontmatter is metadata; the body stays faithful to the source.
 - Keep `pdd.md` faithful to the source — it is the record of *what the business actually wrote*. Refinement
   happens later in `tobe.md`, not by editing `pdd.md`.
 - **Check for dropped images.** markitdown can't render embedded diagrams — they become empty

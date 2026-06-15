@@ -47,8 +47,13 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
    relevant constitution rules, and the repo commands. Fresh agents keep context from rotting across a
    long build; parallel dispatch keeps wall-clock short.
 3. **TDD per task** (per the constitution): failing test first, minimal implementation, green, refactor.
-   `[frontend]` tasks MUST route through `frontend-design` when it's installed (log it; build markup blind
-   only when it's absent) and still verify behavior.
+   **Frontend routing is operational, not just asserted:** when a task is tagged `[frontend]`, the dispatch
+   MUST name the available design skill in that runner's charter — detect `frontend-design` (per
+   `integrations.md`) and tell the runner to build/refine the UI *through it*, not blind. The runner enforces
+   this (`agents/task-runner.md`) and logs `frontend via frontend-design` (or `frontend via wi fallback
+   (frontend-design absent)`) to `progress.md`; markup is authored by hand only when no design skill is
+   installed. Still verify behavior. (A `[frontend]` task built blind while `frontend-design` was installed
+   is a defect ship's checker flags.)
 4. **As each report returns:** check its Verify result and **honor its `Self-Check` line** — tick
    `progress.md` and commit the task (`<type>: <task title>`) only when the runner reports `Self-Check:
    PASS`; a stub or an unmet Verify means the task is *not* done, no matter what the console printed. You

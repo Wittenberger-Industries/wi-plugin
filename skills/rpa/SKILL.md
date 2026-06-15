@@ -45,7 +45,8 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    published-process names) into `.wi/orchestrator.md`. **Stamp the brainstorm mode** in `progress.md`
    (`brainstorm via superpowers:brainstorming` | `via wi fallback`). Log every gap you fill as an assumption.
    Parse `--auto` here (Gate mode).
-4. **Plan — write the artifacts** (layout: `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/rpa-directory.md`):
+4. **Plan — write the artifacts** (layout + OKF frontmatter stubs:
+   `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/rpa-directory.md` — each file opens with its `type`):
    - **`architecture.md`** — the whole-solution **Runtime diagram** (Dispatcher + every Performer, incl. a
      2nd/3rd, + queues + systems + Orchestrator; see `references/refr-architecture.md`), validated with
      `${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py`.

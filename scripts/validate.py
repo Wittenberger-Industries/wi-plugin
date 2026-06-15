@@ -19,6 +19,10 @@ Checks (from the repo root, detected automatically):
      frontmatter carrying a non-empty `type`. Each must also end with a trailing newline and have
      balanced code fences — the two signatures of a truncated/interrupted write (the bug class that
      shipped half-written docs before this guard existed). `index.md` / `log.md` are reserved and exempt.
+  6. Generated-`.wi/`-file templates (the ```markdown blocks inside skills/agents that emit the runtime
+     `.wi/` files) each open with frontmatter carrying a non-empty `type`, so a generated file can't ship
+     type-less. Reserved `index.md`/`log.md` listings are exempt; console/shell examples (non-`markdown`
+     fences) are skipped.
 
 Exit 0 if all pass; non-zero otherwise. Stdlib only (PyYAML optional).
 """
@@ -159,10 +163,74 @@ for f in sorted(set(concept_md)):
     elif "type:" not in parts[1]:
         errors.append(f"{rel}: OKF — missing 'type'")
 
+# 6. Embedded generated-.wi/-file templates carry OKF `type` ---------------
+# The generated .wi/ files live in user repos and never reach this script — but the *templates* that emit
+# them are ```markdown blocks inside the skills/agents that write them. Guard those: every non-reserved
+# generated-file template must open with frontmatter carrying a non-empty `type`, so a generated file can't
+# ship type-less (the bug class: a bare `# Heading` template with no frontmatter, or frontmatter that
+# forgot `type`). Reserved listings (index.md/log.md) are exempt — detected by the block's heading or the
+# two prose lines just above it naming `index.md`/`log.md`. Console/shell examples use a non-`markdown`
+# fence and are skipped.
+fence_rx = re.compile(r"^([ \t]*)```([A-Za-z]*)[ \t]*$")
+reserved_rx = re.compile(r"\b(?:index|log)\.md\b", re.I)
+tmpl_files = sorted(set(ROOT.glob("skills/**/*.md")) | set(ROOT.glob("agents/*.md")))
+tmpl_checked = 0
+for f in tmpl_files:
+    lines = f.read_text(encoding="utf-8").splitlines(keepends=True)
+    rel = f.relative_to(ROOT)
+    i = 0
+    while i < len(lines):
+        fmatch = fence_rx.match(lines[i])
+        if not fmatch:
+            i += 1
+            continue
+        indent, lang = fmatch.group(1), fmatch.group(2)
+        open_ln = i + 1
+        close_rx = re.compile(re.escape(indent) + r"```[ \t]*$")
+        j = i + 1
+        buf = []
+        while j < len(lines) and not close_rx.match(lines[j]):
+            buf.append(lines[j])
+            j += 1
+        nxt = j + 1  # past the closing fence (or EOF)
+        if lang.lower() not in ("markdown", "md"):
+            i = nxt
+            continue
+        body = "".join(ln[len(indent):] if ln.startswith(indent) else ln for ln in buf)
+        first = next((ln for ln in body.splitlines() if ln.strip()), "")
+        if not (first.lstrip().startswith("---") or first.lstrip().startswith("#")):
+            i = nxt  # not a whole-file template (a prose/table snippet)
+            continue
+        if reserved_rx.search("".join(lines[max(0, i - 2):i]) + first):
+            i = nxt  # reserved index.md / log.md listing — no frontmatter expected
+            continue
+        tmpl_checked += 1
+        if not body.lstrip().startswith("---"):
+            errors.append(f"{rel}: OKF template (line {open_ln}) — generated-file block has no frontmatter (needs a non-empty 'type')")
+            i = nxt
+            continue
+        tparts = body.lstrip().split("---", 2)
+        if len(tparts) < 3:
+            errors.append(f"{rel}: OKF template (line {open_ln}) — unterminated frontmatter")
+            i = nxt
+            continue
+        if HAVE_YAML:
+            try:
+                td = yaml.safe_load(tparts[1])
+            except Exception as e:
+                errors.append(f"{rel}: OKF template (line {open_ln}) — frontmatter YAML error: {e}")
+                i = nxt
+                continue
+            if not isinstance(td, dict) or not td.get("type"):
+                errors.append(f"{rel}: OKF template (line {open_ln}) — missing non-empty 'type'")
+        elif "type:" not in tparts[1]:
+            errors.append(f"{rel}: OKF template (line {open_ln}) — missing 'type'")
+        i = nxt
+
 # Report -------------------------------------------------------------------
 note = "" if HAVE_YAML else "  [PyYAML absent → YAML parse skipped; `pip install pyyaml` for the full check]"
 print(f"validate.py — {len(manifests)} manifest(s), {len(fm_files)} frontmatter file(s), "
-      f"{okf_checked} OKF concept doc(s){note}")
+      f"{okf_checked} OKF concept doc(s), {tmpl_checked} OKF template(s){note}")
 if errors:
     print(f"\n[FAIL] {len(errors)} issue(s):")
     for e in errors:

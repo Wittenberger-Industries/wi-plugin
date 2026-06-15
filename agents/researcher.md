@@ -126,9 +126,10 @@ covering task.
 
 ## Output
 
-Write detailed notes to `.wi/goals/<slug>/research/<topic>.md` (sources, comparisons, snippets) — add a
-`valid_until:` to its frontmatter (≈30 d for a stable area, ≈7 d for a fast-moving one) so a later goal
-knows when the research has gone stale. **Confirm the file actually wrote and parses before you return.**
+Write detailed notes to `.wi/goals/<slug>/research/<topic>.md` (sources, comparisons, snippets). Open it
+with OKF frontmatter — `type: Research Note`, plus `title`, `description`, `goal: <slug>`, `timestamp`,
+and a `valid_until:` (≈30 d for a stable area, ≈7 d for a fast-moving one) so a later goal knows when the
+research has gone stale. **Confirm the file actually wrote and parses before you return.**
 Return a short report:
 
 ```
