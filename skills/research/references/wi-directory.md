@@ -26,7 +26,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 ├── learnings/              # substantial per-goal learnings, each its own .md (ship; indexed above).
 ├── roadmap.md              # optional. Ordered list of goals for a larger effort.
 └── goals/
-    └── <slug>/             # one folder per goal (feature), slug is kebab-case
+    └── 0001-<slug>/        # one folder per goal; NNNN- global ordinal (creation order) + kebab slug
         ├── progress.md     # the state machine for this goal — single source of truth
         ├── brief.md        # brainstorm output: desired behavior, scope, constraints
         ├── research/       # questions.md + researcher notes + chosen-approach (+ runtime-state-inventory.md for rename/migration goals) — EPHEMERAL
@@ -40,7 +40,11 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 
 ## Conventions
 
-- **Slugs** are short, kebab-case, derived from the feature: "Add Stripe webhooks" -> `stripe-webhooks`.
+- **Slugs** are short, kebab-case, derived from the feature, **prefixed with a global 4-digit ordinal
+  assigned at creation**: "Add Stripe webhooks" -> `0001-stripe-webhooks`. The prefix mirrors `ADR-NNNN`
+  (global across `.wi/goals/`, monotonic, **never renumbered**) so `.wi/goals/` lists in implementation
+  order; next number = highest existing `.wi/goals/` ordinal + 1 (else `0001`). Legacy unnumbered goals
+  are left as-is and contribute nothing to the max.
 - **Commit `.wi/`.** It is documentation. Gitignore `research/` only if it gets large or holds scraped
   material — leave a one-line summary in the ADR/spec instead.
 - **Keep files lean.** Past ~150 lines a file is doing too much; split or summarize. Cheap handoff is the

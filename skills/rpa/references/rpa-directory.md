@@ -23,7 +23,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
 ├── learnings.md             # project: learnings INDEX — one line + hook per run; read this, not the dir
 ├── learnings/               # project: substantial learnings, each its own .md (indexed above)
 └── goals/
-    └── <run-slug>/          # one /wi:rpa run = one PDD -> solution
+    └── 0001-<run-slug>/     # one /wi:rpa run = one PDD -> solution; NNNN- global ordinal (creation order)
         ├── progress.md      # state machine for the run (single source of truth)
         ├── pdd.md           # the ingested PDD (faithful to source .docx)
         ├── architecture.md  # the whole-solution Runtime diagram (SDD §2): dispatcher + all performers
@@ -41,6 +41,9 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
 
 ## Conventions
 
+- **Run-slugs are numbered** — `NNNN-<name>` (a global 4-digit ordinal assigned at creation, mirroring
+  `ADR-NNNN`; next = highest existing `.wi/goals/` ordinal + 1, else `0001`, never renumbered), so runs
+  list in implementation order. Same convention as the dev flow (`wi-directory.md`).
 - **Project-level files persist & compound** across runs: `rpa-constitution.md`, `sdd-template.md` (if
   present), `inputs.md`, `components.md`, `orchestrator.md`, `glossary.md`, `learnings.md`, `learnings/`. Never pruned. Build + compound write
   back (especially new reusable components → `components.md`).
