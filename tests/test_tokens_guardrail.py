@@ -164,3 +164,61 @@ class CheckTokensCliTests(unittest.TestCase):
             p.write_text(_resolve_orchestrator(_with_row_and_sum(p.read_text(encoding="utf-8"))), encoding="utf-8")
             r = run(CHECK, p)
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+
+def fixture_transcript(d):
+    f = Path(d) / "t.jsonl"
+    f.write_text(
+        '{"message":{"usage":{"input_tokens":10,"output_tokens":20,'
+        '"cache_creation_input_tokens":0,"cache_read_input_tokens":5}}}\n'
+        '{"usage":{"input_tokens":1,"output_tokens":2,'
+        '"cache_creation_input_tokens":0,"cache_read_input_tokens":0}}\n',
+        encoding="utf-8",
+    )
+    return f
+
+
+class TokenReportWriteTests(unittest.TestCase):
+    def _ledger_with_rows(self, d):
+        p = init_ledger(d)
+        text = p.read_text(encoding="utf-8").replace(
+            "| orchestrator |",
+            "| build W1 | task-runner: t1 | 100 | exact |\n"
+            "| build W1 | task-runner: t2 | 50 | exact |\n| orchestrator |",
+        )
+        p.write_text(text, encoding="utf-8")
+        return p
+
+    def test_write_fills_orchestrator_and_sum_and_passes_gate(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._ledger_with_rows(d)
+            r = run(REPORT, "--write", p, "--transcript", fixture_transcript(d))
+            self.assertEqual(r.returncode, 0, r.stderr)
+            out = p.read_text(encoding="utf-8")
+            self.assertNotIn("PENDING", out)
+            self.assertIn("output tokens (generated): 22", out)   # 20 + 2
+            self.assertIn("**Subagents (exact): 150.**", out)     # 100 + 50
+            self.assertEqual(run(CHECK, p).returncode, 0)
+
+    def test_write_unavailable_on_unparseable_transcript(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._ledger_with_rows(d)
+            empty = Path(d) / "empty.jsonl"
+            empty.write_text("", encoding="utf-8")
+            r = run(REPORT, "--write", p, "--transcript", empty)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            out = p.read_text(encoding="utf-8")
+            self.assertIn("Orchestrator: unavailable for this run", out)
+            self.assertNotIn("PENDING", out)
+            self.assertEqual(run(CHECK, p).returncode, 0)         # honest unavailable passes
+
+    def test_write_missing_file_errors_and_creates_nothing(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "nope" / "tokens.md"
+            r = run(REPORT, "--write", p, "--transcript", fixture_transcript(d))
+            self.assertNotEqual(r.returncode, 0)
+            self.assertFalse(p.exists())
+
+
+if __name__ == "__main__":
+    unittest.main()
