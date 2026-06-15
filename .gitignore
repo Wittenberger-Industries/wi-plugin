@@ -13,6 +13,7 @@
 !/hooks/**
 !/scripts/**
 !/docs/**
+!/tests/**
 !/AGENTS.md
 !/README.md
 !/.gitignore
