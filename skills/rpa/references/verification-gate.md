@@ -12,6 +12,10 @@ The bar a built UiPath solution must clear before it ships. It uses UiPath's own
 CLI / the `uipath-platform` skill — wi doesn't invent checks. Run every command **non-interactively and
 time-bounded** (a hands-off run must never stall on a prompt; a hang is a blocker to surface).
 
+**Publishing is not part of this gate.** Pushing the package to a tenant (`progress.md` → `Publish: feed |
+deploy`) is a separate, **post-gate** ship action that runs only on an already-green build with the PR open
+(see rpa/SKILL.md step 7) — it never gates "done" and never runs on a red build.
+
 ## Run, in this order (per process/project)
 
 0. **Approved paradigm (format) — check first, no tooling needed.** The build must match the **paradigm the

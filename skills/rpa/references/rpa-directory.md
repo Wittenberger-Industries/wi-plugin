@@ -155,6 +155,7 @@ timestamp: <YYYY-MM-DD>
 - **Phase:** ingest   <!-- bootstrap | ingest | brainstorm | plan | design-gate | build | ship | done -->
 - **Gate mode:** interactive   <!-- interactive | auto-approve (/wi:rpa --auto) -->
 - **Build paradigm:** xaml-only   <!-- xaml-only (pure activities, NO Invoke Code) | coded-allowed (.cs) — user-approved at the design gate -->
+- **Publish:** none   <!-- none | feed (publish package to tenant feed) | deploy (feed + deploy/activate to a folder) — approved at the design gate; prod folder needs explicit approval -->
 - **SDD ToC source:** base | project sdd.md | .wi/sdd-template.md
 - **Worktree:** <path or ->   **Branch:** <branch or ->
 

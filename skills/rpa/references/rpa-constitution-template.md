@@ -35,6 +35,10 @@ timestamp: <YYYY-MM-DD>
 - **Prefer Integration Service connectors / APIs over UI** where one exists — for maintainability
   (selectors break, APIs are stable). **UI automation is valid** when there's no API or the interaction is
   inherently UI; flag UI steps in the SDD as higher-maintenance.   (confirm)
+- **Publish (default `none`):** after a green build + PR, wi can publish to a connected Orchestrator tenant
+  — `none` (no push, default), `feed` (publish the package to the tenant feed), or `deploy` (`feed` +
+  deploy/activate as a Process in a folder). The design gate confirms it each run; `--auto` uses this
+  default. **No production-folder deploy without explicit approval at the gate.**   (confirm)
 
 ## Naming & structure
 - Workflows: PascalCase, descriptive (GetTransactionData, Process). Annotation on every workflow.
