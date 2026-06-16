@@ -42,19 +42,24 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/brainstorm-protocol.md`: take the PDD's **existing ToBe as
    the baseline**, refine it (gaps, missing/redundant steps, branches, exceptions), clarify each open step
    as UI activity / API / connector **inline** (no bias — UI is valid), decompose the PDD into its **1..N
-   processes**, and for each define the transaction and dispatcher/performer shape, and **elicit the Orchestrator
+   processes**, **propose the framework** (`reframework` | `maestro`) from the process shape (heuristic in
+   `brainstorm-protocol.md` / the constitution) and record it in `progress.md` (`Framework:`), and for each
+   define the transaction + dispatcher/performer shape (REFramework) **or** the flow's node shape (Maestro),
+   and **elicit the Orchestrator
    provisioning** (org/tenant/folder link, UiPath Agent name(s), and the queue / asset / storage-bucket /
    published-process names) into `.wi/orchestrator.md`. **Stamp the brainstorm mode** in `progress.md`
    (`brainstorm via superpowers:brainstorming` | `via wi fallback`). Log every gap you fill as an assumption.
    Parse `--auto` here (Gate mode).
 4. **Plan — write the artifacts** (layout + OKF frontmatter stubs:
    `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/rpa-directory.md` — each file opens with its `type`):
-   - **`architecture.md`** — the whole-solution **Runtime diagram** (Dispatcher + every Performer, incl. a
-     2nd/3rd, + queues + systems + Orchestrator; see `references/refr-architecture.md`), validated with
-     `${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py`.
+   - **`architecture.md`** — framework-aware, validated with
+     `${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py`: **REFramework** → the Runtime diagram
+     (Dispatcher + every Performer + queues + systems + Orchestrator; see `references/refr-architecture.md`);
+     **Maestro** → the flow diagram (trigger + nodes + systems/agents; see `references/maestro-architecture.md`).
    - **`sdd.md`** — one Solution Design Document. **Choose the ToC** per the precedence in
-     `references/sdd-template.md`: an existing project SDD's ToC wins → `.wi/sdd-template.md` → the bundled
-     base ToC. §7.1.x repeats per process; §7.1.3 is each process's flow diagram (kept in its `tobe.md`);
+     `references/sdd-template.md` (an existing project SDD's ToC wins → `.wi/sdd-template.md` → the bundled
+     base ToC) — and **shape it to the `Framework`** (REFramework vs Maestro sections, per that template).
+     §7.1.x repeats per process; §7.1.3 is each process's flow diagram (kept in its `tobe.md`);
      §1.3/§3.1/§7.2–7.6 are filled from `.wi/orchestrator.md` (the elicited resource names).
    - per process: **`tobe.md`** (refined from the PDD's ToBe + its flow diagram); `assumptions.md` and
      `process-inventory.md` at run level.
@@ -72,7 +77,9 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    dependencies `D1..Dn`** inline (use the same gate format as `wi:research` — including its **Leaner path** and **Checker (plan mode)** lines, mapped to the RPA artifacts); the user must **resolve or
    knowingly defer each open dep** — no silent "later". Confirm: approve / amend / stop — **and have the user approve the build
    paradigm: XAML-only (pure activities, default) or coded `.cs`** (a HARD binary — **no Invoke-Code middle
-   ground**), recorded in `progress.md` (`Build paradigm:`). **Also approve the publish decision** —
+   ground**) — **first confirm the framework** (`reframework` | `maestro`, proposed in brainstorm, recorded
+   in `progress.md` as `Framework:`); the **build paradigm applies only when `Framework: reframework`**,
+   recorded in `progress.md` (`Build paradigm:`). **Also approve the publish decision** —
    `Publish: none | feed | deploy` (+ target folder for `deploy`): `none` = build to PR only; `feed` =
    pack + publish the package(s) to the connected tenant's feed; `deploy` = `feed` + deploy/activate as a
    Process in that folder; a **prod** folder must be explicitly approved here (never auto-selected),
@@ -84,16 +91,20 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    front and back halves often run in **different environments**, so without a gate-time harvest a
    front-half-only run leaves no compounded knowledge; ship later confirms these against the build and
    promotes the general ones to `.wi/rpa-constitution.md` / `.wi/glossary.md`.
-6. **Build.** Follow `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/build-uipath.md`: create the worktree,
-   **reuse components from `.wi/components.md` before building new**, delegate **low-code XAML REFramework**
+6. **Build.** Create the worktree, **reuse components from `.wi/components.md` before building new**, then
+   build per the **`Framework`**: **REFramework** → `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/build-uipath.md`,
+   delegating to `uipath-rpa-workflows`; **Maestro** → `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/build-maestro.md`,
+   delegating to `uipath-maestro-flow`. (REFramework:) delegate **low-code XAML REFramework**
    generation to `uipath-rpa-workflows` per process/sub-workflow in **parallel waves** (state the paradigm in
    the prompt — the **approved paradigm**: XAML-only → pure drag-drop activities, **no Invoke Code and no `.cs`**;
    coded-allowed → `.cs` workflows ok; scaffold each unit as REFramework per the SDD, never Blank),
    append each unit's tokens to `tokens.md` (scaffold it first if absent:
    `python3 ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/goals/<slug>/tokens.md`), and
    register any new reusable component back into `.wi/components.md`.
-7. **Verify & ship.** Gate = `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/verification-gate.md` (**paradigm =
-   XAML REFramework** + Workflow Analyzer + `uip` validate + `tokens.md` passes `check_tokens.py` + the **goal-level checker · result mode** over `sdd.md` §13). Then reuse the **ship**
+7. **Verify & ship.** Gate = `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/verification-gate.md`, **branched on
+   `Framework`**: REFramework → approved paradigm + Workflow Analyzer + `uip` validate; Maestro →
+   `uip maestro flow validate` (+ `eval` if eval sets exist). Both → `tokens.md` passes `check_tokens.py`
+   + the **goal-level checker · result mode** over `sdd.md` §13. Then reuse the **ship**
    skill (`wi:ship`) for the docs-sync, PR (`PR.md` committed, then `gh pr create --body-file`), close-out
    checklist, **compound/learnings** (confirm + promote the candidate `.wi/learnings/<slug>.md` written at
    the gate; update its `.wi/learnings.md` index line), and the **token report (`tokens.md` — finalized
