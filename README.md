@@ -204,6 +204,10 @@ If none are installed, wi still runs the whole loop on its own.
 
 ## Roadmap
 
+- **rpa tenant publish** (v0.11.0) shipped — `wi:rpa` can publish a verified, PR'd build to a connected
+  Orchestrator tenant: the design gate approves `Publish: none | feed | deploy` (+ folder, prod-guarded),
+  and ship delegates `pack`/`publish`/`deploy`/`activate` to `uipath-solution` — best-effort, hands-off-safe.
+  Next: Maestro flow as a build paradigm. Design and plan in `docs/specs/` and `docs/plans/`.
 - **Numbered goal directories** (v0.10.5) shipped — new goals get a global 4-digit ordinal prefix as part
   of the slug (`0001-<name>`, mirroring `ADR-NNNN`), so `.wi/goals/` lists in implementation order — visible
   in the directory, the branch name, and the PR. dev + rpa; existing goals untouched. Design and plan in
