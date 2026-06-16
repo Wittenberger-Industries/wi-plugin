@@ -27,6 +27,14 @@ Clients have different SDD standards, so the structure is **overridable**. Pick 
 Whichever you use, fill every section from the design; if a section can't be filled, that's a brainstorm
 gap to resolve, not a TODO to leave.
 
+**The ToC is framework-aware** (`progress.md` → `Framework:`). The base ToC below is the **REFramework**
+shape. On the **Maestro** path, reshape these sections: **§2** becomes the **flow diagram** (from
+`maestro-architecture.md`); **§3.1** the Maestro project/flow layout (the `.flow` files, not REFramework);
+**§7.1.x** the flow's **nodes** (each node's type — connector / approval / script / subflow / agent / ixp —
+its inputs/outputs, and the connection/agent it uses), **not** a transaction + queue-item schema; **§7.2–7.6**
+become Maestro **connections, triggers, and agent registrations** — Orchestrator **queues** and `Config.xlsx`
+do not apply. §7.1.3 stays the per-process flow diagram for both.
+
 ## Base ToC (UiPath enterprise standard)
 
 Copy to `.wi/goals/<run>/sdd.md` (or the client's structure):
