@@ -72,7 +72,12 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    dependencies `D1..Dn`** inline (use the same gate format as `wi:research` — including its **Leaner path** and **Checker (plan mode)** lines, mapped to the RPA artifacts); the user must **resolve or
    knowingly defer each open dep** — no silent "later". Confirm: approve / amend / stop — **and have the user approve the build
    paradigm: XAML-only (pure activities, default) or coded `.cs`** (a HARD binary — **no Invoke-Code middle
-   ground**), recorded in `progress.md` (`Build paradigm:`). `--auto` records and proceeds on the constitution default (XAML-only). On
+   ground**), recorded in `progress.md` (`Build paradigm:`). **Also approve the publish decision** —
+   `Publish: none | feed | deploy` (+ target folder for `deploy`): `none` = build to PR only; `feed` =
+   pack + publish the package(s) to the connected tenant's feed; `deploy` = `feed` + deploy/activate as a
+   Process in that folder; a **prod** folder must be explicitly approved here (never auto-selected),
+   recorded in `progress.md` (`Publish:`). `--auto` records and proceeds on the constitution defaults
+   (paradigm XAML-only; publish per the constitution, default `none`). On
    approval, **harvest the design-phase learnings** into `.wi/learnings/<slug>.md` (+ its line in the
    `.wi/learnings.md` index) — non-obvious decisions,
    gap resolutions, and domain rules surfaced in the brainstorm, marked *candidate (pre-build)*. wi:rpa's
@@ -93,6 +98,15 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    checklist, **compound/learnings** (confirm + promote the candidate `.wi/learnings/<slug>.md` written at
    the gate; update its `.wi/learnings.md` index line), and the **token report (`tokens.md` — finalized
    before the dossier commit, mandatory)**.
+   **Publish to the tenant (if approved) — after the PR is open.** If `progress.md` `Publish: ≠ none` and
+   `uip` is authenticated to the `orchestrator.md` tenant, delegate to **`uipath-solution`**: `pack` +
+   `publish` the package(s) to the feed, and for `deploy` also `deploy` + `activate` as a Process in the
+   gate-approved folder. **Not connected** → skip, and record in `progress.md` that publish was approved
+   but no tenant is connected (recovery: `uip cloud login`) — not a failure; the PR shipped. **On error** →
+   record the exact recovery `uip` command in `progress.md` and report; never fail the run over publish. A
+   **prod** target needs the gate's explicit approval, and publish is **post-gate** — it never runs on a
+   red build. Record the published package name + version (+ folder) into `orchestrator.md` and the final
+   report.
    **Ship is dev-shaped — map its artifacts to the RPA ones:** gate → the RPA verification gate above;
    `spec.md` (acceptance criteria, review) → **`sdd.md`** (acceptance + §7 process details); `pitfalls.md` →
    the **`assumptions.md`** register; `brief.md` → **`pdd.md`**; `repo-map.md` → n/a. The dev "7-file dossier"
