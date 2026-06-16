@@ -8,9 +8,10 @@ tags: [rpa, reference]
 
 # REFramework architecture & the solution runtime diagram
 
-The house default is the **Robotic Enterprise Framework** (REFramework): a state-machine template with
-queue-based transaction processing and built-in retry/exception handling. There are **two** architecture
-artifacts, mapping to the SDD:
+Used when **`Framework: reframework`** (the Maestro path is `maestro-architecture.md`). The house default is
+the **Robotic Enterprise Framework** (REFramework): a state-machine template with queue-based transaction
+processing and built-in retry/exception handling. There are **two** architecture artifacts, mapping to the
+SDD:
 
 - **`architecture.md` (run/solution level) = the "Runtime diagram" (SDD §2):** the **whole solution** —
   the Dispatcher, **every Performer (including a 2nd/3rd)**, all queues, the external systems, and the

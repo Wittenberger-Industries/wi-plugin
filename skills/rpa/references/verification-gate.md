@@ -16,7 +16,15 @@ time-bounded** (a hands-off run must never stall on a prompt; a hang is a blocke
 deploy`) is a separate, **post-gate** ship action that runs only on an already-green build with the PR open
 (see rpa/SKILL.md step 7) — it never gates "done" and never runs on a red build.
 
-## Run, in this order (per process/project)
+## Framework branch (check `progress.md` → `Framework:` first)
+
+This gate is **framework-aware**. The steps below are the **REFramework** gate. On the **Maestro** path
+(`Framework: maestro`) the gate is instead: `uip maestro flow validate` (mandatory) **+** `uip maestro flow
+eval` **when eval sets exist** (run-if-present, reported) — there is **no** Workflow Analyzer or
+approved-paradigm check (those are REFramework-specific). The goal-level **checker (result mode)** below runs
+on **both** paths.
+
+## Run, in this order (per process/project) — REFramework
 
 0. **Approved paradigm (format) — check first, no tooling needed.** The build must match the **paradigm the
    user approved at the design gate** (`progress.md` → `Build paradigm:`). It is always REFramework

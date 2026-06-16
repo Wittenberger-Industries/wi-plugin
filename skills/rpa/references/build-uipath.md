@@ -8,6 +8,8 @@ tags: [rpa, reference]
 
 # Build — delegate XAML generation to the UiPath skills
 
+Used when **`Framework: reframework`** (the Maestro path is `build-maestro.md`).
+
 Build runs after the design gate. wi does **not** write XAML — it orchestrates `uipath-rpa-workflows`
 (the REFramework generator) with the SDD as the spec, in parallel waves, reusing components. Same
 discipline as `wi:build`: isolate in a worktree, delegate, summarize, commit small.
