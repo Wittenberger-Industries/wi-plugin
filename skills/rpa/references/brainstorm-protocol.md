@@ -27,6 +27,11 @@ skill starts self-answering, stop and put the questions to the user yourself. **
 **Must-ask before the design gate (interactive mode never skips these — `--auto` self-resolves each as a logged
 assumption, and says so):**
 1. **Scope** — confirm in/out (§1).
+1. **Framework** — **REFramework or Maestro flow?** Propose from the process shape: **Maestro** for
+   orchestration-shaped work (approvals/HITL, Integration Service connectors, UiPath Agent calls,
+   long-running/wait-heavy, ixp, branching across systems); **REFramework** for high-volume queue-based
+   batch transactions (dispatcher/performer). State a one-line rationale; record in `progress.md`
+   (`Framework:`). `--auto` takes the constitution default (`reframework`).
 2. **ToBe correctness** — the PDD's ToBe + diagram are a *draft*; confirm what's wrong or missing (§0, §2).
 3. **Dispatcher/Performer split + the queue handoff** (§5).
 4. **Naming conventions** and **Orchestrator env / variables** (§6).
