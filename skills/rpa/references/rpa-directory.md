@@ -41,6 +41,8 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
 
 ## Conventions
 
+- **Framework references:** REFramework uses `refr-architecture.md` + `build-uipath.md`; Maestro uses
+  `maestro-architecture.md` + `build-maestro.md`; the gate (`verification-gate.md`) branches on `Framework:`.
 - **Run-slugs are numbered** — `NNNN-<name>` (a global 4-digit ordinal assigned at creation, mirroring
   `ADR-NNNN`; next = highest existing `.wi/goals/` ordinal + 1, else `0001`, never renumbered), so runs
   list in implementation order. Same convention as the dev flow (`wi-directory.md`).
@@ -154,7 +156,8 @@ timestamp: <YYYY-MM-DD>
 - **Created:** <YYYY-MM-DD>
 - **Phase:** ingest   <!-- bootstrap | ingest | brainstorm | plan | design-gate | build | ship | done -->
 - **Gate mode:** interactive   <!-- interactive | auto-approve (/wi:rpa --auto) -->
-- **Build paradigm:** xaml-only   <!-- xaml-only (pure activities, NO Invoke Code) | coded-allowed (.cs) — user-approved at the design gate -->
+- **Framework:** reframework   <!-- reframework | maestro — proposed at brainstorm, confirmed at the design gate -->
+- **Build paradigm:** xaml-only   <!-- REFramework only: xaml-only (pure activities, NO Invoke Code) | coded-allowed (.cs) — user-approved at the design gate -->
 - **Publish:** none   <!-- none | feed (publish package to tenant feed) | deploy (feed + deploy/activate to a folder) — approved at the design gate; prod folder needs explicit approval -->
 - **SDD ToC source:** base | project sdd.md | .wi/sdd-template.md
 - **Worktree:** <path or ->   **Branch:** <branch or ->

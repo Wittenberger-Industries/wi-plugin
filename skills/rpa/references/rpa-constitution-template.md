@@ -23,7 +23,13 @@ timestamp: <YYYY-MM-DD>
 # RPA constitution — <project>
 
 ## Framework & approach
-- **Framework:** REFramework (state machine, queue-based) by default.   (confirm)
+- **Framework (default `reframework`):** **`reframework`** (state machine, queue-based) or **`maestro`** (a
+  UiPath Maestro flow — orchestration of connector/approval/script/subflow/agent/ixp nodes, built via
+  `uipath-maestro-flow`). The design gate confirms it each run; `--auto` uses this default. Maestro suits
+  approvals/HITL + connectors + agents + long-running work; REFramework suits high-volume queue batches.   (confirm)
+- **Maestro specifics (when `maestro`):** prefer Integration Service **connectors** over script nodes; make
+  **approval/HITL** points explicit; no `Config.xlsx`/queues (connections + Orchestrator assets by name); if
+  eval sets exist, the gate runs `uip maestro flow eval`.
 - **Build paradigm (HARD — two options, no middle ground):** **XAML-only** = every step a real drag-drop
   activity, with **NO Invoke Code activity (no VB/C# code blocks) and no `.cs` / `.codedworkflows`** — none,
   ever. **coded-allowed** = `.cs` coded workflows. There is **no Invoke-Code 'hybrid'** in either. The **design
