@@ -123,9 +123,10 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    report.
    **Ship is dev-shaped — map its artifacts to the RPA ones:** gate → the RPA verification gate above;
    `spec.md` (acceptance criteria, review) → **`sdd.md`** (acceptance + §7 process details); `pitfalls.md` →
-   the **`assumptions.md`** register; `brief.md` → **`pdd.md`**; `repo-map.md` → n/a. The dev "7-file dossier"
-   tidy becomes the **RPA dossier**: `progress.md`, `pdd.md`, `sdd.md`, `architecture.md`, `assumptions.md`,
-   `process-inventory.md`, `orchestrator.md`, per-process `tobe.md`, `tasks.md`, `tokens.md`, `PR.md`. One PR
+   the **`assumptions.md`** register; `brief.md` → **`pdd.md`**; `repo-map.md` → n/a. The dev dossier
+   tidy becomes the **RPA dossier** (rpa-directory.md's run manifest): `progress.md`, `pdd.md`, `sdd.md`,
+   `architecture.md`, `assumptions.md`, `process-inventory.md`, per-process `tobe.md`, `tasks.md`,
+   `tokens.md`, `PR.md` — `orchestrator.md` is project-level (updated in place, never swept). One PR
    per run by default (per-process PRs are an option for large solutions).
 
 ## What carries over from the wi spine

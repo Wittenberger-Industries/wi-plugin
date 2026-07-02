@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""MoA cross-provider check — wi-code-checker's result-mode independent review.
+"""MoA cross-provider check — an independent diff-review layer beside wi-code-checker's result mode.
 
 Reads the target project's `.wi/moa.md` (the MoA model-assignment config), and — when a second
 provider is configured — sends the diff + spec context to that model, possibly a different
-provider/architecture than the session (e.g. GPT via OPENAI_API_KEY), as wi-code-checker's
-result-mode check. Writes the findings to a file. Stdlib only; no third-party deps.
+provider/architecture than the session (e.g. GPT via OPENAI_API_KEY). A layer on top of
+wi-code-checker's result-mode pass, never a replacement for it. Writes the findings to a file.
+Stdlib only; no third-party deps.
 
 Usage:
     python3 moa_review.py --config .wi/moa.md --diff diff.patch \
@@ -14,8 +15,8 @@ Exit codes:
     0  review ran, verdict `## REVIEW PASSED`
     1  review ran, verdict `## ISSUES FOUND`
     2  config/usage error (bad file, cross-provider not configured, API failure)
-    3  no API key in the configured env var — caller falls back to a
-       Claude checker-tier review instead
+    3  no API key in the configured env var — the cross-provider layer is
+       skipped; the wi-code-checker result pass runs regardless
 """
 
 import argparse
@@ -104,7 +105,7 @@ def parse_moa_config(text):
 
 
 def cross_provider_configured(cfg):
-    """wi-code-checker's cross-provider result-mode path runs only when a provider is named."""
+    """The cross-provider review layer runs only when a provider is named."""
     provider = (cfg or {}).get("cross_provider", {}).get("provider", "none")
     return provider not in ("", "none", "off", "disabled")
 
@@ -169,7 +170,7 @@ def run_review(cfg, diff_text, context_blobs, out_path):
     if not api_key:
         print(
             f"moa_review: no API key in ${provider['api_key_env']} — "
-            "fall back to a Claude checker-tier review",
+            "cross-provider layer skipped; the wi-code-checker result pass still runs",
             file=sys.stderr,
         )
         return 3
