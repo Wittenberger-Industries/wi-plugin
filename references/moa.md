@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: "MoA — tiered model assignments for wi's dispatched agents"
-description: "Configurable Mixture-of-Agents: each wi-dispatched sub-agent (wi-code-checker, wi-researcher, wi-task-runner) gets its own tiered default, with wi-code-checker running an independent cross-provider check at result time when a second provider is configured. Config in .wi/moa.md, set up on first run."
+description: "Configurable Mixture-of-Agents: each wi-dispatched sub-agent (wi-code-checker, wi-researcher, wi-task-runner) gets its own tiered default, with an independent cross-provider diff review layered on top of wi-code-checker's result-mode pass when a second provider is configured. Config in .wi/moa.md, set up on first run."
 timestamp: 2026-07-02
 tags: [moa, models, reference]
 ---
@@ -10,9 +10,9 @@ tags: [moa, models, reference]
 
 wi dispatches three kinds of sub-agents — **wi-researcher**, **wi-task-runner**, **wi-code-checker** — plus
 the **orchestrator**, which is just the session itself (the agent reading this file, planning and routing
-the run). MoA lets a project tune what each of the three sub-agents runs on, and gives wi-code-checker an
-**independent cross-provider check** — ideally a *different provider/architecture* (different training,
-different blind spots) — for its result-mode verification. Scope: **wi-dispatched agents only**
+the run). MoA lets a project tune what each of the three sub-agents runs on, and adds an
+**independent cross-provider diff review** — ideally a *different provider/architecture* (different training,
+different blind spots) — as a layer on top of wi-code-checker's result-mode verification. Scope: **wi-dispatched agents only**
 (wi-researcher, wi-task-runner, wi-code-checker, RPA build delegations); wi never re-models other plugins'
 or the user's own agents.
 
@@ -40,7 +40,7 @@ timestamp: <YYYY-MM-DD>
 | Role | Model | Notes |
 |------|-------|-------|
 | orchestrator | <fable\|opus\|sonnet\|haiku> | informational — session model, set via /model; wi warns on mismatch |
-| wi-code-checker | <fable\|opus\|sonnet\|haiku\|inherit> | same-family fallback tier — never below orchestrator's tier |
+| wi-code-checker | <fable\|opus\|sonnet\|haiku\|inherit> | the checker's Claude dispatch tier — never below orchestrator's tier |
 | wi-researcher | <fable\|opus\|sonnet\|haiku\|inherit> | one Claude tier below orchestrator |
 | wi-task-runner | <opus\|sonnet\|haiku\|inherit> | default for every wi-task-runner dispatch |
 
@@ -74,7 +74,7 @@ model). The cross-provider model is the *provider's* model id, independent of th
 
 Each role's default follows a rule, not an arbitrary pick:
 
-- **`wi-code-checker`** is the same-family fallback tier and is **never weaker than the orchestrator** —
+- **`wi-code-checker`** dispatches at this same-family Claude tier and is **never weaker than the orchestrator** —
   smart's orchestrator is already top-tier (`fable`), so checker matches it there; simple's orchestrator
   is `opus`, so checker matches that (not a downgrade to `sonnet`/`haiku`). Verification is the one place
   not to cut corners.
@@ -108,20 +108,26 @@ assignment.
 
 ## wi-code-checker's two modes
 
-`wi-code-checker` (`agents/wi-code-checker.md`) runs in two modes, and only one of them can go
-cross-provider:
+`wi-code-checker` (`agents/wi-code-checker.md`) always runs **twice per goal** — plan mode before the
+design gate, result mode before shipping — and both are Agent-tool dispatches at the `wi-code-checker`
+role's Claude tier:
 
-- **PLAN mode** (pre-gate, before a diff exists — verifies spec/task coverage): always dispatched via the
-  Agent tool at the `wi-code-checker` role's Claude tier. There's no diff yet to hand a cross-provider
-  script, so this mode is same-family only.
-- **RESULT mode** (ship, and — when `check_points: per-wave` — each build wave-end gate): this is where the
-  independent cross-provider check happens, described next.
+- **PLAN mode** (pre-gate, before a diff exists — verifies spec/task coverage). There's no diff yet to
+  hand a cross-provider script, so this mode is same-family only.
+- **RESULT mode** (ship, and — when `check_points: per-wave` — each build wave-end gate): confirms every
+  acceptance criterion + locked decision is delivered and **wired**, refreshing `verification.md`. When a
+  cross-provider is configured, the independent diff review described next runs **beside** this dispatch —
+  never instead of it.
 
-### The cross-provider check (wi-code-checker's result-mode path)
+### The cross-provider diff review (a layer beside wi-code-checker's result mode)
 
 Not a per-tool-call interceptor (rejected as cost-prohibitive — see issue #12's scope revision): it's an
-**independent third-party review of the finished work**, run by ship §2 — and, when
-`check_points: per-wave`, additionally at each build wave-end gate over that wave's diff. Mechanics:
+**independent third-party line-level review of the finished diff**, run by ship §2 conceptually beside its
+self-review — and, when `check_points: per-wave`, additionally at each build wave-end gate over that
+wave's diff. The point is **model diversity**: the checker itself is Claude-family (subagents can only run
+Claude models); this script is how another model family gets a look at the diff. It is a different check,
+not a substitute — the script only receives the diff + spec text (no Read/Grep/Bash against the repo), so
+it cannot verify things are actually wired, and it does not write `verification.md`. Mechanics:
 
 1. Produce the diff (`git diff <base>...HEAD` for at-finish; the wave's commits for per-wave) to a temp
    file, plus context: `spec.md` (or `sdd.md` §13) and the relevant constitution rules.
@@ -129,12 +135,13 @@ Not a per-tool-call interceptor (rejected as cost-prohibitive — see issue #12'
    --diff <patch> --context <spec> --out .wi/goals/<slug>/moa-review.md` (`python` assumed on PATH; where it
    does not resolve, fall back to `py -3` on Windows or `python3` on Linux/macOS).
 3. Exit `0` = `## REVIEW PASSED`; `1` = `## ISSUES FOUND` — treat findings like any checker finding:
-   BLOCKER → fix (loop back to build), WARNING/INFO → address or record. **Max 2 review→fix rounds**
-   (the issue's revision cap); whatever remains after round 2 is surfaced, with severity, in `PR.md`'s
-   Verification section. `3` = no API key in `api_key_env` → **fall back** to dispatching
-   `wi-code-checker` at its Roles-table tier with the same review charter (log `checker cross-provider via
-   fallback (<reason>)`); `2` = config or API error → same fallback. The cross-provider script works
-   alone — the orchestrator hands it the diff and takes back findings; it does not steer the review.
+   BLOCKER → fix (loop back to build), WARNING/INFO → address or record. Both layers share the **max 2
+   review→fix rounds** budget (the issue's revision cap); whatever remains after round 2 is surfaced, with
+   severity, in `PR.md`'s Verification section. `3` = no API key in `api_key_env` and `2` = config or API
+   error govern only whether **this layer** runs — log `cross-provider layer skipped (<reason>)` and
+   continue; wi-code-checker's result-mode dispatch is unconditional and runs regardless. The
+   cross-provider script works alone — the orchestrator hands it the diff and takes back findings; it does
+   not steer the review.
 4. `moa-review.md` is **ephemeral** like `verification.md`: distill the verdict into `PR.md`, prune at
    close-out.
 

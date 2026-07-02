@@ -40,18 +40,26 @@ Self-review the diff with fresh eyes, specifically against:
 the review through it (log `review via superpowers:requesting-code-review`); unaided self-review is the
 fallback only when it's absent.
 
-**Goal-level check (wi-code-checker · result mode).** Dispatch **wi-code-checker**
+**Goal-level check (wi-code-checker · result mode) — always runs.** Dispatch **wi-code-checker**
 (`agents/wi-code-checker.md`) in `result` mode against `spec.md`'s acceptance criteria + locked decisions
-(ADRs, constitution); it confirms each is delivered and **wired**, not just present, refreshing
-`verification.md`. If `.wi/moa.md`'s `## Cross-provider config` names a provider (≠ `none`) and its API
-key is present, this pass runs as an **independent cross-provider check** per
-`${CLAUDE_PLUGIN_ROOT}/references/moa.md`: full goal diff + `spec.md` through
-`skills/ship/scripts/moa_review.py` → `.wi/goals/<slug>/moa-review.md`. Otherwise (unconfigured, or exit 2
-config/API error, or exit 3 missing API key) it falls back to dispatching `wi-code-checker` on the
-`wi-code-checker` role's model — log `checker cross-provider via fallback (<reason>)` when that fallback
-fires. Findings are handled uniformly: BLOCKER — an unmet criterion, a decision silently reduced to a
-stub — sends the goal **back to build**, **max 2 review→fix rounds**; whatever remains goes with its
-severity into `PR.md`'s Verification. `moa-review.md` is ephemeral (pruned in §5). Ship never opens the PR
+(ADRs, constitution); it confirms each is delivered and **wired**, not just present — it reads the actual
+repo — refreshing `verification.md`. This dispatch is unconditional (on the `wi-code-checker` role's model
+when `.wi/moa.md` exists, else inherit); no cross-provider configuration demotes or replaces it.
+
+**Cross-provider layer (only when configured).** If `.wi/moa.md`'s `## Cross-provider config` names a
+provider (≠ `none`) and its API key is present, **additionally** run an independent cross-provider
+**line-level diff review** — a second opinion from another model family, sitting conceptually beside this
+section's self-review — per `${CLAUDE_PLUGIN_ROOT}/references/moa.md`: full goal diff + `spec.md` through
+`skills/ship/scripts/moa_review.py` → `.wi/goals/<slug>/moa-review.md`. The script only receives the
+diff + spec text — no Read/Grep/Bash against the repo — so it cannot verify anything is actually wired, and
+it never writes `verification.md`: the cross-provider path is a layer on top of checker, never a replacement.
+Unconfigured, exit 2 (config/API error), or exit 3 (missing API key) governs only whether this layer runs
+— log `cross-provider layer skipped (<reason>)` and continue; the checker dispatch above ran regardless.
+
+Findings from **both** layers feed the same loop: a BLOCKER — an unmet criterion, a decision silently
+reduced to a stub — sends the goal **back to build**, **max 2 review→fix rounds** shared across both;
+whatever remains goes with its severity into `PR.md`'s Verification. A BLOCKER from either layer blocks
+the PR. `moa-review.md` is ephemeral (pruned in §5). Ship never opens the PR
 on a goal wi-code-checker says isn't met.
 
 Address findings before proceeding; note anything deliberately deferred.
@@ -146,7 +154,7 @@ Commit: `docs(<slug>): learnings` (or fold into the docs-sync commit).
      loose in `.wi/` or elsewhere (scratch notes, drafts, working files) moves into the slug folder or is
      deleted if worthless. Project-level files stay where they are: `constitution.md`, `repo-map.md`,
      `overview.md`, `architecture.md`, `glossary.md`, `roadmap.md`, `adr/`, `learnings.md`, `learnings/`.
-  2. *Prune the ephemera:* delete `research/` working notes, **the cross-provider check's `moa-review.md`**,
+  2. *Prune the ephemera:* delete `research/` working notes, **the cross-provider diff review's `moa-review.md`**,
      **and wi-code-checker's `verification.md`** —
      their value must already be distilled (research → the ADR and `spec.md`; the verification verdict →
      the `### Verification` block in `PR.md`). If something in them is still load-bearing, fold it in

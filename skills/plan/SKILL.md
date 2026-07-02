@@ -59,9 +59,10 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
    service), the structure docs (`.wi/architecture.md`, `.wi/overview.md`) go stale — ship's docs-sync
    updates them, but when the doc work is substantial give it its own `[docs]` task.
 
-5. **Mirror the task titles** into `progress.md`, set Phase = `design-gate`, and stop. The research skill now presents
-   the architecture (ADR) + design (spec) + wave overview to the user for confirmation — no code before
-   their explicit go.
+5. **Mirror the task titles** into `progress.md`, **leave Phase = `plan`**, and stop. plan does not own the
+   design-gate transition: the research skill flips Phase = `design-gate` only after its plan-mode checker
+   pass (research §2) has run over the finished plan. It then presents the architecture (ADR) + design
+   (spec) + wave overview to the user for confirmation — no code before their explicit go.
 
 ## `tasks.md` format
 

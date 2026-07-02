@@ -30,8 +30,13 @@ Then work happens in `../<repo>-wi-<slug>` on branch `wi/<slug>`. Record both in
 - **Branch:** wi/<slug>
 ```
 
-If `.wi/` should be visible inside the worktree (it is, since it's committed), nothing extra is needed.
-The goal folder travels with the branch.
+The goal folder does **not** arrive with the checkout: through brainstorm/research/plan it lives
+**untracked** in the main checkout, and `git worktree add` checks out HEAD — untracked files don't follow.
+So build's first act after creating the worktree is to **move** `.wi/goals/<slug>/` from the main checkout
+into the worktree and commit it as the branch's first commit (`chore(<slug>): goal dossier`). The move
+leaves main's working tree clean (the files were untracked there); from then on the worktree's copy is
+canonical, and main's copy catches up when the branch merges. Resume-safe: if the goal folder already
+exists in the worktree, the move already happened — skip it.
 
 ### Finish / clean up (done by the ship phase)
 
@@ -79,8 +84,8 @@ is unreliable across builds).
 You are implementing ONE task from the plan. Stay strictly within its scope.
 
 Environment: file access = <exact tools/paths the runner must use>; do NOT git commit/checkout/reset/
-stash — the orchestrator commits. Test execution this wave: <allowed — sole test-runner | authored-not-run
-— the orchestrator verifies serially>.
+stash and do NOT write progress.md — the orchestrator commits and ticks. Test execution this wave:
+<allowed — sole test-runner | authored-not-run — the orchestrator verifies serially>.
 
 Repo / worktree: <path>   Branch: <wi/slug>
 Constitution (obey these rules): <paste the relevant lines from .wi/constitution.md>
@@ -101,7 +106,8 @@ Report back: files changed, the Verify command + its result, and anything that s
 the plan needs amending. Keep the report under ~15 lines. Do not touch files outside this task.
 ```
 
-The subagent returns that short report; you tick `progress.md`, commit, and move on. You never pull the
+The subagent returns that short report; you tick `progress.md` (you are its single writer during build —
+runners report, they never write it), commit, and move on. You never pull the
 subagent's full transcript into your context — the report is enough.
 
 ### Parallel dispatch (the default)

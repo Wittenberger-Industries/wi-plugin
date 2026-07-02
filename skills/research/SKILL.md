@@ -33,7 +33,10 @@ keep-alive loop (`/goal` or Autopilot) if the user armed it.
 
 ### 0 - Engage & resume
 First act, always: append a Log line to `progress.md` — `research engine engaged (wi <version>)`, reading
-<version> from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (don't guess; if that file isn't reachable — e.g. a per-skill Copilot install — omit the version rather than inventing one) — so it's auditable on disk. Then scaffold the token ledger (idempotent — no-op if it exists): `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/goals/<slug>/tokens.md` (`python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3` on Linux/macOS). Then re-enter the phase it names (research | plan | design-gate).
+<version> from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (don't guess; if that file isn't reachable — e.g. a per-skill Copilot install — omit the version rather than inventing one) — so it's auditable on disk. Then scaffold the token ledger (idempotent — no-op if it exists): `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/goals/<slug>/tokens.md` (`python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3` on Linux/macOS). Then re-enter the phase it names (research | plan | design-gate). **Design-gate re-entry
+guard:** resuming at `design-gate` requires a fresh plan-mode `verification.md` (`type: Verification`) in
+the goal folder; if it is missing or predates the current `spec.md`/`tasks.md`, run the §2 pre-gate checker
+pass first, then present the gate.
 
 ### 1 - Research -> pick the approach
 
@@ -77,7 +80,9 @@ in `plan` mode over `spec.md` + `tasks.md` + `pitfalls.md` + `constitution.md` +
 BLOCKER/WARNING/INFO findings, writing `verification.md`. Feed them back: a BLOCKER — an unmapped
 acceptance criterion, a silently down-scoped decision — loops to plan to fix, then the checker re-checks
 (**max 2 rounds**). Whatever remains is **carried into the gate summary** with its severity, so the user
-decides with eyes open. Then Phase = `design-gate`.
+decides with eyes open. Then Phase = `design-gate` — this flip is **research's alone**: plan ends with
+Phase still `plan`, so an interrupted run can never resume into the gate without this checker pass having
+run.
 
 ### 3 - Design gate
 The user decides **from the console**. Render the summary inline in your response — never just point at

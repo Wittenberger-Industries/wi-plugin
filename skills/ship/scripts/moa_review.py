@@ -183,7 +183,7 @@ def run_review(cfg, diff_text, context_blobs, out_path):
     try:
         reply = call(provider, api_key, REVIEW_SYSTEM_PROMPT, user)
     except (urllib.error.URLError, KeyError, json.JSONDecodeError, TimeoutError) as e:
-        print(f"moa_review: reviewer API call failed: {e}", file=sys.stderr)
+        print(f"moa_review: cross-provider review API call failed: {e}", file=sys.stderr)
         return 2
 
     with open(out_path, "w", encoding="utf-8", newline="\n") as f:

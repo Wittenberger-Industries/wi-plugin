@@ -22,7 +22,9 @@ Precondition: the design gate passed (SDD + assumptions confirmed, or `--auto`),
 
 Create the worktree + branch (`wi/<run-slug>`) exactly as `wi:build` does
 (`${CLAUDE_PLUGIN_ROOT}/skills/build/references/worktrees-and-subagents.md`; use
-`superpowers:using-git-worktrees` if installed). Record path + branch.
+`superpowers:using-git-worktrees` if installed). Record path + branch. Same first step as `wi:build`: the
+run's goal folder is untracked on main, so move `.wi/goals/<slug>/` into the worktree and commit it as the
+branch's first commit (`chore(<slug>): goal dossier`) — skip the move if it's already there (resume).
 
 ## 2. Execute the build DAG in waves (from `tasks.md`)
 

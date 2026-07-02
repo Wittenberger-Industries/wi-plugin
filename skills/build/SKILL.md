@@ -34,6 +34,14 @@ branch in `progress.md`.
 
 Branch name: `wi/<slug>`. Worktree path: a sibling dir, e.g. `../<repo>-wi-<slug>`.
 
+**First step, right after `git worktree add -b wi/<slug>`: bring the goal dossier over.** The goal folder
+is still **untracked** in the main checkout (no phase before build commits it), so the new worktree starts
+without it. Move `.wi/goals/<slug>/` from the main checkout into the worktree's `.wi/goals/<slug>/` and
+commit it there as the branch's **first commit** — `chore(<slug>): goal dossier`. Moving (not copying)
+leaves main's working tree clean: the files were untracked on main, so nothing is lost and nothing
+unmerged stays behind. Resume-safe: if the goal folder is already present in the worktree (build
+re-entered after an interruption), the move already happened — skip it.
+
 ## 2 · Execute in parallel waves (the default)
 
 Don't walk the task list one by one — schedule it. The plan's `Depends on` + `Files` fields define a DAG;
@@ -53,14 +61,16 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
    **Frontend routing is operational, not just asserted:** when a task is tagged `[frontend]`, the dispatch
    MUST name the available design skill in that runner's charter — detect `frontend-design` (per
    `integrations.md`) and tell the runner to build/refine the UI *through it*, not blind. The runner enforces
-   this (`agents/wi-task-runner.md`) and logs `frontend via frontend-design` (or `frontend via wi fallback
-   (frontend-design absent)`) to `progress.md`; markup is authored by hand only when no design skill is
+   this (`agents/wi-task-runner.md`) and states `frontend via frontend-design` (or `frontend via wi fallback
+   (frontend-design absent)`) in its report — log that line to `progress.md` when the report returns (runners
+   never write `progress.md`); markup is authored by hand only when no design skill is
    installed. Still verify behavior. (A `[frontend]` task built blind while `frontend-design` was installed
    is a defect ship's checker flags.)
 4. **As each report returns:** check its Verify result and **honor its `Self-Check` line** — tick
    `progress.md` and commit the task (`<type>: <task title>`) only when the runner reports `Self-Check:
    PASS`; a stub or an unmet Verify means the task is *not* done, no matter what the console printed. You
-   are the only committer, so commits stay serialized and clean. Append the runner's token count as a row to
+   are the only committer and `progress.md`'s only writer during build, so commits and ticks stay
+   serialized and clean. Append the runner's token count as a row to
    the goal's `tokens.md` (it's in the task-completion notification and is NOT retrievable later; if the file
    is somehow absent, `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/goals/<slug>/tokens.md`
    first — `python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3`
@@ -76,7 +86,8 @@ when the DAG is a chain, never the default: an idle DAG is wasted wall-clock.
 
 Two scheduling refinements proven in dry runs: (a) **wave-end gate** — at each wave boundary run the full
 lint + test commands once, serially, before dispatching the next wave — and when `.wi/moa.md` sets
-`check_points: per-wave`, also run **wi-code-checker's cross-provider check** over the wave's diff there
+`check_points: per-wave`, also run **the cross-provider diff review** — the layer on top of
+wi-code-checker, when configured — over the wave's diff there
 (`${CLAUDE_PLUGIN_ROOT}/references/moa.md`, same bounded 2-round loop as at ship); (b) **sole-runner exception** —
 when exactly one task in a wave executes tests (the rest are docs/config), that runner keeps full TDD
 (watch-fail / watch-pass); only multi-test waves switch to authored-not-run + orchestrator serial Verify.

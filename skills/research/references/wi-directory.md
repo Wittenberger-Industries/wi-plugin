@@ -45,8 +45,11 @@ reasoned about. Keep every file small and current; these are working artifacts, 
   (global across `.wi/goals/`, monotonic, **never renumbered**) so `.wi/goals/` lists in implementation
   order; next number = highest existing `.wi/goals/` ordinal + 1 (else `0001`). Legacy goals — unnumbered or with a non-numeric prefix — are left as-is and
   ignored by the next-number scan (they contribute nothing to the max).
-- **Commit `.wi/`.** It is documentation. Gitignore `research/` only if it gets large or holds scraped
-  material — leave a one-line summary in the ADR/spec instead.
+- **Commit `.wi/`.** It is documentation. Goal-folder lifecycle: untracked in the main checkout through
+  brainstorm/research/plan; build moves it into the goal worktree and commits it as the branch's first
+  commit (`chore(<slug>): goal dossier`); main's copy arrives when the branch merges. Gitignore
+  `research/` only if it gets large or holds scraped material — leave a one-line summary in the ADR/spec
+  instead.
 - **Keep files lean.** Past ~150 lines a file is doing too much; split or summarize. Cheap handoff is the
   whole point.
 - **One writer per phase.** A phase owns its outputs; later phases read but don't silently rewrite them.
@@ -125,7 +128,8 @@ timestamp: <YYYY-MM-DD>
 ```
 
 Update the **Phase** field and append to **Log** at every transition. During build, the **goal
-branch's copy is canonical** — tick tasks and log in the worktree's `.wi/` so updates ride the PR;
+branch's copy is canonical** — build committed the dossier into the worktree as the branch's first
+commit, so tick tasks and log in the worktree's `.wi/` and the updates ride the PR;
 `main`'s copy catches up on merge. The build phase ticks the task
 checkboxes here, so a resumed (or handed-off) run knows exactly what's left. Record the chosen approach and
 any blocker here too — it's what the user reads after a hands-off run.

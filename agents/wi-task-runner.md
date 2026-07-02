@@ -56,9 +56,10 @@ why nothing's written yet, then either make the change or report blocked. Readin
 - **Frontend tasks route to the design skill — never build UI blind.** If your task is tagged
   `[frontend]` and a design skill is available in your skills (`frontend-design` primary; `pbakaus/impeccable`
   for polish, `leonxlnx/taste-skill` for visual direction), you **MUST** build/refine the markup *through it*,
-  not from memory. Log `frontend via frontend-design` (or `via <skill>`) to `progress.md`. Only if no design
-  skill is installed do you author markup by hand — and then log `frontend via wi fallback (frontend-design
-  absent)`. Either way you still write the behavioral test and make **Verify** pass. (Your dispatch normally
+  not from memory. State `frontend via frontend-design` (or `via <skill>`) in your report — the orchestrator
+  logs it to `progress.md`. Only if no design skill is installed do you author markup by hand — and then
+  report `frontend via wi fallback (frontend-design absent)`. Either way you still write the behavioral test
+  and make **Verify** pass. (Your dispatch normally
   names the available design skill; if it didn't and your task is `[frontend]`, check your skills list before
   falling back.)
 - Stay in scope: touch only the files the task names. If you find necessary work outside that, **do not do
@@ -70,10 +71,11 @@ why nothing's written yet, then either make the change or report blocked. Readin
   - *STOP and ask:* anything **architectural** — a new table or migration, switching a library, changing
     the auth model, reshaping an interface the spec locked. Don't quietly redesign; report and let the
     orchestrator decide.
-  Log every fix you made under "Decisions / blockers" in `progress.md` and in your report — a silent fix is
-  as bad as a silent skip.
+  Flag every fix you made in your report — the orchestrator records it under "Decisions / blockers" in
+  `progress.md` — a silent fix is as bad as a silent skip.
 - **Cap auto-fix attempts at 3.** If three tries don't clear a failure, stop. Record it under "Deferred
-  Issues" in `progress.md` and your report; do **not** re-run the build hoping it clears on its own.
+  Issues" in your report (the orchestrator mirrors it into `progress.md`); do **not** re-run the build
+  hoping it clears on its own.
 - The plan's *other* tasks are not your backlog: even when the spec or ADR mentions related work (e.g. a
   follow-up test), if it isn't in YOUR task block, flag it instead of doing it — a sibling may own it.
 - Don't weaken or delete a test to go green. If a test is wrong, say so in the report and explain.
@@ -102,7 +104,9 @@ Before you claim done, **self-check** — wi gates on file state, not on what th
 - your own output has no stubs masquerading as done — `return []`, `TODO`, "coming soon", a handler wired
   to nothing. If you find one, you are **blocked**, not done. Refuse fake-green.
 
-Tick the task's checkbox in `progress.md` **only** when the self-check is PASS.
+Report `Self-Check: PASS` **only** when the self-check holds. You do **not** touch `progress.md` — the
+orchestrator is its single writer during build; it ticks the task's checkbox (and logs your report's
+notes) only when your report says `Self-Check: PASS`.
 
 ```
 Task <n>: <done | blocked | auth-gate>
