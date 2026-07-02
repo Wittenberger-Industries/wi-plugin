@@ -55,6 +55,12 @@ on **both** paths.
    - **Multiple Assign** — no chains of consecutive single `<Assign>` activities (grep for adjacent
      `<Assign` siblings in a Sequence); assignments that happen together are grouped in one Multiple
      Assign, a lone assignment stays a single Assign.
+   - **Logging** — each major SDD step is followed by a Log Message whose text carries runtime context
+     (transaction id / key values / outcome), not generic success text; levels and Add Log Fields per the
+     constitution. A `Process.xaml` with no Log Message between SDD steps is a finding.
+   - **Annotations** — every workflow root and the non-obvious activities/blocks carry annotations
+     (`sap:Annotation.AnnotationText` / `sap2010:Annotation.AnnotationText` in the `.xaml`) explaining the
+     why — decisions, branch conditions, magic values, deliberate shortcuts.
 5. **(Optional) Test cases** — if test workflows exist (or the constitution requires them), run them.
 
 Capture each command + result — these become the PR's "Testing" section. If the `uip` CLI / Studio isn't

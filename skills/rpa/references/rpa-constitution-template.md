@@ -74,7 +74,13 @@ timestamp: <YYYY-MM-DD>
 ## Exceptions & logging
 - Business rejects → `BusinessRuleException` (no retry; route to exception queue / notify).
 - System errors → retry per Config (default 3); screenshot on error.
-- Log Message at each major step + Add Log Fields (transaction id, ...); business → Warn, system → Error.
+- **Log Message after every major process step, with runtime context** — transaction id, the key values,
+  the outcome ("Posted invoice 4711 → IDoc 0815", not "step done"); Info for milestones, business → Warn,
+  system → Error. Add Log Fields (transaction id, …) so entries correlate — robot logs stream to
+  **Orchestrator**, so write each message to be read there, mid-run, without the workflow open.
+- **Annotations on every workflow and on non-obvious activities/blocks** — the *why* behind a decision, a
+  branch condition, a magic value, a workaround/shortcut and its ceiling; a reviewer follows the flow
+  without the PDD open. Obvious steps don't need one — load-bearing logic does.
 
 ## Locale & data formats
 - Source files may not be UTF-8 (German data is often **latin-1 / Windows-1252**) and CSVs may be

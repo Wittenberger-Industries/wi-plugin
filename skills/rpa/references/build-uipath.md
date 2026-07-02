@@ -61,6 +61,10 @@ DAG allows (independent processes and independent sub-workflows in parallel):
    - **Multiple Assign for grouped assignments:** assignments that happen together go in **one Multiple
      Assign** activity; a lone assignment stays a single Assign. A vertical chain of consecutive single
      Assigns is a gate finding.
+   - **Logging & annotations:** a **Log Message with runtime context** (transaction id, key values,
+     outcome — not generic success text) follows each major process step, levels per the constitution
+     (they stream to Orchestrator — write them to be read there); **annotations** on every workflow and on
+     non-obvious activities/blocks (the why behind decisions, branches, magic values, workarounds).
 3. **Per-unit verify.** After each unit, the work isn't done until it at least validates (see the
    verification gate); a generated `Process.xaml` must reflect the SDD steps.
 4. **Commit small + record tokens.** One workflow/process per focused commit (`feat(<process>): ...`); tick
