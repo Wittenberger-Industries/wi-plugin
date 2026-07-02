@@ -23,6 +23,12 @@ Checks (from the repo root, detected automatically):
      `.wi/` files) each open with frontmatter carrying a non-empty `type`, so a generated file can't ship
      type-less. Reserved `index.md`/`log.md` listings are exempt; console/shell examples (non-`markdown`
      fences) are skipped.
+  7. Mechanical lints, scoped to skills/ · agents/ · references/ · .claude-plugin/ (never docs/ or tests/,
+     which legitimately archive the very strings banned in shipped text): every SKILL.md `description`
+     stays under the 1024-char agent-skills cap; skill + reference descriptions don't trail off mid-thought
+     (a truncated/lazy `...` or `..`); and two dead strings are banned — the retired `uipath-rpa-workflows`
+     slug, and `python3` launching a bundled `${CLAUDE_PLUGIN_ROOT}` script (the broken Windows Store stub;
+     prose `python3`/`py -3` fallback notes are not flagged, only actual invocations).
 
 Exit 0 if all pass; non-zero otherwise. Stdlib only (PyYAML optional).
 """
@@ -227,10 +233,62 @@ for f in tmpl_files:
             errors.append(f"{rel}: OKF template (line {open_ln}) — missing 'type'")
         i = nxt
 
+# 7. Mechanical lints: description hygiene + dead strings ------------------
+# Scope is deliberately skills/ · agents/ · references/ · .claude-plugin/ — never docs/ or tests/ (generated
+# plan/spec archives and test fixtures legitimately hold strings we ban in shipped text).
+def _fm_desc(txt):
+    """Return the frontmatter `description` string, or None if absent/unparseable (or PyYAML missing)."""
+    if not (HAVE_YAML and txt.startswith("---")):
+        return None
+    parts = txt.split("---", 2)
+    if len(parts) < 3:
+        return None
+    try:
+        d = yaml.safe_load(parts[1])
+    except Exception:
+        return None
+    if isinstance(d, dict) and isinstance(d.get("description"), str):
+        return d["description"]
+    return None
+
+DESC_CAP = 1024
+# 7a. Every SKILL.md `description` stays under the agent-skills 1024-char cap.
+for f in sorted(ROOT.glob("skills/**/SKILL.md")):
+    desc = _fm_desc(f.read_text(encoding="utf-8"))
+    if desc is not None and len(desc) > DESC_CAP:
+        errors.append(f"{f.relative_to(ROOT)}: SKILL description is {len(desc)} chars (> {DESC_CAP}-char cap)")
+
+# 7b. Skill + reference descriptions must not trail off mid-thought (OKF indexes reuse them verbatim).
+desc_files = sorted(ROOT.glob("skills/**/SKILL.md")) + sorted(ROOT.glob("skills/**/references/*.md"))
+for f in desc_files:
+    desc = _fm_desc(f.read_text(encoding="utf-8"))
+    if desc is not None and desc.rstrip().endswith(("..", "…")):
+        errors.append(f"{f.relative_to(ROOT)}: description ends mid-thought (trailing '..'/'…') — write a real one-line summary")
+
+# 7c. Dead strings: a retired external slug, and python3-launched bundled scripts (broken on Windows).
+DEAD_SLUG = re.compile(r"uipath-rpa-workflows")
+PY3_INVOKE = re.compile(r"python3[ \t]+\$\{CLAUDE_PLUGIN_ROOT\}")  # an invocation — bare prose `python3` won't match
+lint_scope = (
+    sorted(ROOT.glob("skills/**/*.md"))
+    + sorted(ROOT.glob("agents/*.md"))
+    + sorted(ROOT.glob("references/*.md"))
+    + sorted(ROOT.glob(".claude-plugin/*.json"))
+)
+for f in lint_scope:
+    if not f.is_file():
+        continue
+    txt = f.read_text(encoding="utf-8")
+    rel = f.relative_to(ROOT)
+    if DEAD_SLUG.search(txt):
+        errors.append(f"{rel}: dead skill slug 'uipath-rpa-workflows' (the UiPath authoring skill is 'uipath-rpa')")
+    if PY3_INVOKE.search(txt):
+        errors.append(f"{rel}: 'python3 ${{CLAUDE_PLUGIN_ROOT}}' invocation — use 'python' (python3 is the broken Store stub on Windows)")
+
 # Report -------------------------------------------------------------------
 note = "" if HAVE_YAML else "  [PyYAML absent → YAML parse skipped; `pip install pyyaml` for the full check]"
 print(f"validate.py — {len(manifests)} manifest(s), {len(fm_files)} frontmatter file(s), "
-      f"{okf_checked} OKF concept doc(s), {tmpl_checked} OKF template(s){note}")
+      f"{okf_checked} OKF concept doc(s), {tmpl_checked} OKF template(s), "
+      f"{len(lint_scope)} mechanical-lint file(s){note}")
 if errors:
     print(f"\n[FAIL] {len(errors)} issue(s):")
     for e in errors:
