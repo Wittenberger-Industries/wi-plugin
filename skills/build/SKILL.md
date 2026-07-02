@@ -42,7 +42,7 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
 1. **Compute the ready set:** every unticked task whose dependencies are all done and whose `Files` don't
    overlap those of another ready/running task. File overlap serializes; everything else runs together.
    (`tasks.md`'s Waves section is the plan's precomputed answer — trust it unless reality diverged.)
-2. **Dispatch the whole ready set at once** — one fresh `task-runner` (see `agents/task-runner.md`) per
+2. **Dispatch the whole ready set at once** — one fresh `wi-task-runner` (see `agents/wi-task-runner.md`) per
    task, all in the same turn. Each gets exactly what it needs and nothing more: its task block, the
    relevant constitution rules, and the repo commands. Fresh agents keep context from rotting across a
    long build; parallel dispatch keeps wall-clock short.
@@ -50,7 +50,7 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
    **Frontend routing is operational, not just asserted:** when a task is tagged `[frontend]`, the dispatch
    MUST name the available design skill in that runner's charter — detect `frontend-design` (per
    `integrations.md`) and tell the runner to build/refine the UI *through it*, not blind. The runner enforces
-   this (`agents/task-runner.md`) and logs `frontend via frontend-design` (or `frontend via wi fallback
+   this (`agents/wi-task-runner.md`) and logs `frontend via frontend-design` (or `frontend via wi fallback
    (frontend-design absent)`) to `progress.md`; markup is authored by hand only when no design skill is
    installed. Still verify behavior. (A `[frontend]` task built blind while `frontend-design` was installed
    is a defect ship's checker flags.)

@@ -1,6 +1,6 @@
 ---
 type: Agent
-name: task-runner
+name: wi-task-runner
 model: inherit            # X3: a dispatch may pin a cheaper tier for simple/parallel tasks; inherit is the portable default
 color: green
 tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]

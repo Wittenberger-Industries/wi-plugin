@@ -1,6 +1,6 @@
 ---
 type: Agent
-name: checker
+name: wi-code-checker
 model: inherit            # X3: a dispatch may pin a cheaper tier for this read-only pass; inherit is the portable default
 color: magenta
 tools: ["Read", "Grep", "Glob", "Bash"]
