@@ -27,16 +27,22 @@ skill starts self-answering, stop and put the questions to the user yourself. **
 **Must-ask before the design gate (interactive mode never skips these — `--auto` self-resolves each as a logged
 assumption, and says so):**
 1. **Scope** — confirm in/out (§1).
-1. **Framework** — **REFramework or Maestro flow?** Propose from the process shape: **Maestro** for
+2. **Framework** — **REFramework or Maestro flow?** Propose from the process shape: **Maestro** for
    orchestration-shaped work (approvals/HITL, Integration Service connectors, UiPath Agent calls,
    long-running/wait-heavy, ixp, branching across systems); **REFramework** for high-volume queue-based
    batch transactions (dispatcher/performer). State a one-line rationale; record in `progress.md`
    (`Framework:`). `--auto` takes the constitution default (`reframework`).
-2. **ToBe correctness** — the PDD's ToBe + diagram are a *draft*; confirm what's wrong or missing (§0, §2).
-3. **Dispatcher/Performer split + the queue handoff** (§5).
-4. **Naming conventions** and **Orchestrator env / variables** (§6).
-5. **Every open dependency `D`** — resolve it now, or have the user *explicitly* defer it (§7 + the gate).
-6. **Rename / rebrand / migration only** — run the **Runtime State Inventory** (§6a): the old name almost
+3. **ToBe correctness** — the PDD's ToBe + diagram are a *draft*; confirm what's wrong or missing (§0, §2).
+4. **Dispatcher/Performer split + the queue handoff** (§5).
+5. **Naming conventions** and **Orchestrator env / variables** (§6).
+6. **Email / notification approach — never defaulted.** *Only when the process sends email or
+   notifications:* if the PDD/inputs name the method, use exactly that; otherwise put the options to the
+   user — **IMAP/SMTP, desktop Outlook activities, Microsoft 365, Exchange, or an Integration Service
+   connector** — and record the confirmed choice (an assumption row + the SDD). Unresolved at the gate = an
+   **open dependency `D`** (blocking, §7). `--auto` does **not** pick an email framework — this is the one
+   must-ask it never self-resolves: it **mocks the send** (§2 mock boundary) and records the open dep.
+7. **Every open dependency `D`** — resolve it now, or have the user *explicitly* defer it (§7 + the gate).
+8. **Rename / rebrand / migration only** — run the **Runtime State Inventory** (§6a): the old name almost
    always lives on in Orchestrator resources and in-flight queue items a repo grep can't see.
 
 ## 0. Baseline — and challenge it

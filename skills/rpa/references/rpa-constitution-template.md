@@ -41,6 +41,11 @@ timestamp: <YYYY-MM-DD>
 - **Prefer Integration Service connectors / APIs over UI** where one exists — for maintainability
   (selectors break, APIs are stable). **UI automation is valid** when there's no API or the interaction is
   inherently UI; flag UI steps in the SDD as higher-maintenance.   (confirm)
+- **Email / notifications — no implicit default.** The project uses exactly the approach the PDD/docs
+  specify: **IMAP/SMTP, desktop Outlook activities, Microsoft 365, Exchange, or an Integration Service
+  connector**. Unspecified → an open dependency resolved at the design gate (never assumed); `--auto` mocks
+  the send rather than pick a framework. The build states the confirmed approach in every delegation and
+  the gate checks no other email tech crept in.   (confirm)
 - **Publish (default `none`):** after a green build + PR, wi can publish to a connected Orchestrator tenant
   — `none` (no push, default), `feed` (publish the package to the tenant feed), or `deploy` (`feed` +
   deploy/activate as a Process in a folder). The design gate confirms it each run; `--auto` uses this
@@ -48,9 +53,14 @@ timestamp: <YYYY-MM-DD>
 
 ## Naming & structure
 - Workflows: PascalCase, descriptive (GetTransactionData, Process). Annotation on every workflow.
+- **Every activity carries an explicit DisplayName saying what the step does** — "Assign invoiceTotal from
+  line items", "If vendor number is missing", "Log transaction posted". A default activity name left as-is
+  ("Assign", "If", "Sequence", "Log Message", "Invoke Workflow File", …) is a gate finding; containers
+  (Sequence / Flowchart / Try Catch) are named too.
 - Arguments: `in_/out_/io_` prefixes; variables camelCase, meaningful.
-- **Prefer a Multiple Assign over a chain of single Assign activities** — group related assignments into
-  one block; it reads far cleaner than a vertical stack of separate Assigns.
+- **Assignments that happen together go in one Multiple Assign** — a lone assignment stays a single
+  Assign, but a chain of consecutive single Assign activities is a gate finding: group them into one block
+  (functionally equivalent, far less activity clutter).
 - Standard REFramework folders (Framework/, Data/, Tests/). **Process sub-workflows live under `Process/`,
   grouped into subfolders by system/concern** (`Process/DocuWare/`, `Process/MasterData/`, `Process/IDoc/`, …),
   each holding that area's workflows — not flat at the project root.
@@ -64,7 +74,13 @@ timestamp: <YYYY-MM-DD>
 ## Exceptions & logging
 - Business rejects → `BusinessRuleException` (no retry; route to exception queue / notify).
 - System errors → retry per Config (default 3); screenshot on error.
-- Log Message at each major step + Add Log Fields (transaction id, ...); business → Warn, system → Error.
+- **Log Message after every major process step, with runtime context** — transaction id, the key values,
+  the outcome ("Posted invoice 4711 → IDoc 0815", not "step done"); Info for milestones, business → Warn,
+  system → Error. Add Log Fields (transaction id, …) so entries correlate — robot logs stream to
+  **Orchestrator**, so write each message to be read there, mid-run, without the workflow open.
+- **Annotations on every workflow and on non-obvious activities/blocks** — the *why* behind a decision, a
+  branch condition, a magic value, a workaround/shortcut and its ceiling; a reviewer follows the flow
+  without the PDD open. Obvious steps don't need one — load-bearing logic does.
 
 ## Locale & data formats
 - Source files may not be UTF-8 (German data is often **latin-1 / Windows-1252**) and CSVs may be
