@@ -52,6 +52,9 @@ on **both** paths.
      (`DisplayName="Assign"`, `"If"`, `"Sequence"`, `"Log Message"`, `"Invoke Workflow File"`, …) **and**
      for common activities carrying no `DisplayName` attribute at all (Studio shows those under the default
      name too); every activity is explicitly named for what it does.
+   - **Multiple Assign** — no chains of consecutive single `<Assign>` activities (grep for adjacent
+     `<Assign` siblings in a Sequence); assignments that happen together are grouped in one Multiple
+     Assign, a lone assignment stays a single Assign.
 5. **(Optional) Test cases** — if test workflows exist (or the constitution requires them), run them.
 
 Capture each command + result — these become the PR's "Testing" section. If the `uip` CLI / Studio isn't

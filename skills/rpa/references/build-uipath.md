@@ -39,7 +39,7 @@ DAG allows (independent processes and independent sub-workflows in parallel):
    approved at the design gate** (`progress.md` → `Build paradigm:`): **XAML-only** → every step is a real
    drag-drop XAML **activity** — **no `.cs` / `.codedworkflows` AND no Invoke Code activity** (no procedural VB/C#
    code blocks, ever; **HARD rule, no middle ground**). Normal **VB expressions** in Assign / If / conditions /
-   BuildDataTable etc. are expected and fine — the ban is only the *Invoke Code activity*. State this explicitly to `uipath-rpa-workflows`. **Readability:** prefer a **Multiple Assign** over a chain of single Assign activities — one grouped block beats a vertical stack of separate Assigns (pass this preference to the generator alongside the constitution rules). If a
+   BuildDataTable etc. are expected and fine — the ban is only the *Invoke Code activity*. State this explicitly to `uipath-rpa-workflows`. If a
    step genuinely can't be built from activities, that's the signal to pick the **coded** paradigm at the gate
    — never to smuggle code into an Invoke Code. **coded-allowed** → a REFramework project with coded `.cs`
    workflows is fine. Any `.cs` **or any Invoke Code** when the user approved **XAML-only** is **wrong and
@@ -58,6 +58,9 @@ DAG allows (independent processes and independent sub-workflows in parallel):
    - **Explicit activity names:** every activity — containers included — gets a DisplayName that says what
      the step does in process terms; no activity ships with its default name ("Assign", "If", "Sequence",
      "Log Message", …).
+   - **Multiple Assign for grouped assignments:** assignments that happen together go in **one Multiple
+     Assign** activity; a lone assignment stays a single Assign. A vertical chain of consecutive single
+     Assigns is a gate finding.
 3. **Per-unit verify.** After each unit, the work isn't done until it at least validates (see the
    verification gate); a generated `Process.xaml` must reflect the SDD steps.
 4. **Commit small + record tokens.** One workflow/process per focused commit (`feat(<process>): ...`); tick

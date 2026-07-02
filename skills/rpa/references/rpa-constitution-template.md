@@ -58,8 +58,9 @@ timestamp: <YYYY-MM-DD>
   ("Assign", "If", "Sequence", "Log Message", "Invoke Workflow File", …) is a gate finding; containers
   (Sequence / Flowchart / Try Catch) are named too.
 - Arguments: `in_/out_/io_` prefixes; variables camelCase, meaningful.
-- **Prefer a Multiple Assign over a chain of single Assign activities** — group related assignments into
-  one block; it reads far cleaner than a vertical stack of separate Assigns.
+- **Assignments that happen together go in one Multiple Assign** — a lone assignment stays a single
+  Assign, but a chain of consecutive single Assign activities is a gate finding: group them into one block
+  (functionally equivalent, far less activity clutter).
 - Standard REFramework folders (Framework/, Data/, Tests/). **Process sub-workflows live under `Process/`,
   grouped into subfolders by system/concern** (`Process/DocuWare/`, `Process/MasterData/`, `Process/IDoc/`, …),
   each holding that area's workflows — not flat at the project root.
