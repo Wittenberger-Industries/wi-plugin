@@ -196,6 +196,10 @@ If none are installed, wi still runs the whole loop on its own.
   `${CLAUDE_PLUGIN_ROOT}` reference resolves, and every concept doc is **OKF**-conformant (typed YAML
   frontmatter) with no truncated-write signatures — a missing trailing newline or unbalanced code fences.
   `pip install pyyaml` enables the full frontmatter parse.
+- **Version tracks skill/agent changes:** any change under `skills/` or `agents/` bumps `version` in the
+  same PR (both `.claude-plugin/plugin.json` and the `marketplace.json` plugin entry). The installed cache
+  is keyed by version, so shipping new bytes under an unchanged version leaves sessions serving stale
+  skills/agents — "same version, different bytes" makes support and repro guesswork.
 - **Claude local-marketplace updates:** bump `version` in `.claude-plugin/plugin.json` (+ the marketplace
   entry), then `/plugin marketplace update wi` and `/reload-plugins` (or restart). Codex and Copilot
   re-read the repo through their own install/update flows.
