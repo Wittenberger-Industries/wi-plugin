@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""MoA reviewer — independent, cross-provider code review for wi (issue #12).
+"""MoA cross-provider check — wi-code-checker's result-mode independent review (issue #12).
 
-Reads the goal project's `.wi/moa.md` (the MoA model-assignment config), sends the
-diff + spec context to the configured reviewer model — possibly a different
-provider/architecture than the session (e.g. GPT via OPENAI_API_KEY) — and writes
-the findings to a file. Stdlib only; no third-party deps.
+Reads the goal project's `.wi/moa.md` (the MoA model-assignment config), and — when a second
+provider is configured — sends the diff + spec context to that model, possibly a different
+provider/architecture than the session (e.g. GPT via OPENAI_API_KEY), as wi-code-checker's
+result-mode check. Writes the findings to a file. Stdlib only; no third-party deps.
 
 Usage:
     python3 moa_review.py --config .wi/moa.md --diff diff.patch \
@@ -13,7 +13,7 @@ Usage:
 Exit codes:
     0  review ran, verdict `## REVIEW PASSED`
     1  review ran, verdict `## ISSUES FOUND`
-    2  config/usage error (bad file, reviewer disabled, API failure)
+    2  config/usage error (bad file, cross-provider not configured, API failure)
     3  no API key in the configured env var — caller falls back to a
        Claude checker-tier review instead
 """
@@ -31,7 +31,7 @@ PROVIDER_DEFAULTS = {
     "base_url": "https://api.openai.com/v1",
     "model": "gpt-5",
     "api_key_env": "OPENAI_API_KEY",
-    "review_points": "at-finish",
+    "check_points": "at-finish",
 }
 
 REVIEW_SYSTEM_PROMPT = (
@@ -69,7 +69,7 @@ def _section(body, heading):
 
 
 def parse_moa_config(text):
-    """Parse `.wi/moa.md` into {preset, roles, reviewer_provider, overrides}."""
+    """Parse `.wi/moa.md` into {preset, roles, cross_provider, overrides}."""
     preset = "custom"
     body = text
     if text.startswith("---"):
@@ -86,7 +86,7 @@ def parse_moa_config(text):
             roles[cells[0].strip("*` ")] = cells[1].strip("*` ")
 
     provider = dict(PROVIDER_DEFAULTS)
-    for cells in _parse_table(_section(body, "Reviewer provider")):
+    for cells in _parse_table(_section(body, "Cross-provider config")):
         if len(cells) >= 2 and cells[1]:
             provider[cells[0].strip("*` ")] = cells[1].strip("*` ")
 
@@ -98,27 +98,24 @@ def parse_moa_config(text):
     return {
         "preset": preset,
         "roles": roles,
-        "reviewer_provider": provider,
+        "cross_provider": provider,
         "overrides": overrides,
     }
 
 
-def reviewer_enabled(cfg):
-    """The MoA reviewer runs only when the reviewer role names a model."""
-    model = (cfg or {}).get("roles", {}).get("reviewer", "none")
-    return model not in ("", "none", "off", "disabled")
+def cross_provider_configured(cfg):
+    """wi-code-checker's cross-provider result-mode path runs only when a provider is named."""
+    provider = (cfg or {}).get("cross_provider", {}).get("provider", "none")
+    return provider not in ("", "none", "off", "disabled")
 
 
 def model_for(agent, cfg):
-    """Model for a wi-dispatched agent: per-agent override > role > inherit."""
+    """Model for a wi-dispatched agent: per-agent override > its own role > inherit."""
     if not cfg:
         return "inherit"
     if agent in cfg.get("overrides", {}):
         return cfg["overrides"][agent]
-    roles = cfg.get("roles", {})
-    if agent in ("wi-code-checker", "checker"):
-        return roles.get("checker", "inherit")
-    return roles.get("execution", "inherit")
+    return cfg.get("roles", {}).get(agent, "inherit")
 
 
 def _call_openai(provider, api_key, system, user):
@@ -167,7 +164,7 @@ def _call_anthropic(provider, api_key, system, user):
 
 
 def run_review(cfg, diff_text, context_blobs, out_path):
-    provider = cfg["reviewer_provider"]
+    provider = cfg["cross_provider"]
     api_key = os.environ.get(provider["api_key_env"], "")
     if not api_key:
         print(
@@ -210,8 +207,11 @@ def main(argv=None):
     except OSError as e:
         print(f"moa_review: cannot read config: {e}", file=sys.stderr)
         return 2
-    if not reviewer_enabled(cfg):
-        print("moa_review: reviewer role is 'none' — nothing to run", file=sys.stderr)
+    if not cross_provider_configured(cfg):
+        print(
+            "moa_review: cross-provider not configured — nothing to run",
+            file=sys.stderr,
+        )
         return 2
 
     try:
