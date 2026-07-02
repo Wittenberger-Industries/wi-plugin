@@ -53,6 +53,10 @@ timestamp: <YYYY-MM-DD>
 
 ## Naming & structure
 - Workflows: PascalCase, descriptive (GetTransactionData, Process). Annotation on every workflow.
+- **Every activity carries an explicit DisplayName saying what the step does** — "Assign invoiceTotal from
+  line items", "If vendor number is missing", "Log transaction posted". A default activity name left as-is
+  ("Assign", "If", "Sequence", "Log Message", "Invoke Workflow File", …) is a gate finding; containers
+  (Sequence / Flowchart / Try Catch) are named too.
 - Arguments: `in_/out_/io_` prefixes; variables camelCase, meaningful.
 - **Prefer a Multiple Assign over a chain of single Assign activities** — group related assignments into
   one block; it reads far cleaner than a vertical stack of separate Assigns.

@@ -55,6 +55,9 @@ DAG allows (independent processes and independent sub-workflows in parallel):
      (recorded in the SDD / assumptions at the gate — IMAP/SMTP, desktop Outlook, Microsoft 365, Exchange,
      or an IS connector). Name it in the prompt; the generator must not substitute another email tech, and
      if none was confirmed the send is a **mock** (open dep), not a silently chosen framework.
+   - **Explicit activity names:** every activity — containers included — gets a DisplayName that says what
+     the step does in process terms; no activity ships with its default name ("Assign", "If", "Sequence",
+     "Log Message", …).
 3. **Per-unit verify.** After each unit, the work isn't done until it at least validates (see the
    verification gate); a generated `Process.xaml` must reflect the SDD steps.
 4. **Commit small + record tokens.** One workflow/process per focused commit (`feat(<process>): ...`); tick

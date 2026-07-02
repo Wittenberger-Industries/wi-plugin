@@ -48,6 +48,10 @@ on **both** paths.
      (SDD / assumptions); grep for email activities/connectors of any *other* stack (a silent
      SMTP→Outlook swap is a red gate). No confirmed approach on record → the send must be a mock tied to
      an open dep, not an implicitly chosen framework.
+   - **No default activity names** — grep the `.xaml` for default DisplayNames
+     (`DisplayName="Assign"`, `"If"`, `"Sequence"`, `"Log Message"`, `"Invoke Workflow File"`, …) **and**
+     for common activities carrying no `DisplayName` attribute at all (Studio shows those under the default
+     name too); every activity is explicitly named for what it does.
 5. **(Optional) Test cases** — if test workflows exist (or the constitution requires them), run them.
 
 Capture each command + result — these become the PR's "Testing" section. If the `uip` CLI / Studio isn't
