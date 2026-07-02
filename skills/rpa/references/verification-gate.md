@@ -50,7 +50,7 @@ claim green you didn't verify).
 
 ## Goal-level check (checker · result mode)
 
-Beyond the tooling above, dispatch the **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/checker.md`) in `result`
+Beyond the tooling above, dispatch the **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `result`
 mode against **`sdd.md` §13** (acceptance criteria) + the locked decisions (the SDD's §1-§7, the
 `rpa-constitution`, any ADR) — it confirms each is **delivered and wired in the generated project**, not just
 present, refreshing `verification.md`. Goal/coverage-level, distinct from the Analyzer's line-level rules. A

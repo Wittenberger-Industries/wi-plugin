@@ -64,7 +64,7 @@ trees) well. This file is the fallback.
 ## Subagent dispatch
 
 Each task runs in a **fresh** subagent so context doesn't accumulate across a long build. Use the
-`task-runner` agent (`agents/task-runner.md`). Scope its prompt tightly — give it the task and its
+`wi-task-runner` agent (`agents/wi-task-runner.md`). Scope its prompt tightly — give it the task and its
 immediate context, not the whole project.
 
 The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` /

@@ -51,7 +51,7 @@ or **`[tech-choice]`** (new capability / greenfield / the existing pattern looks
 must survey the current state of the art + best practices on the web, not answer from priors). Write them
 to `research/questions.md`, one line each — that's the dispatch plan, and plan checks leftovers against it.
 
-**c · Dispatch with disjoint charters.** One **researcher** (`agents/researcher.md`) per unknown — in
+**c · Dispatch with disjoint charters.** One **researcher** (`agents/wi-researcher.md`) per unknown — in
 parallel, in the same turn. Each charter names: its single question **and mode** (the mode sets how hard
 the researcher hits the web — see the agent), what is OUT of scope (the sibling charters, by name), and
 any standing ADR it must respect. Ship each researcher `brief.md` + the relevant constitution rules +
@@ -70,7 +70,7 @@ ADR template). Set Phase = `plan`.
 Run **plan** (`wi:plan`): brief + research -> `spec.md` (testable acceptance criteria), `tasks.md` (small
 ordered tasks with files + verify, plus the Waves section), `pitfalls.md`.
 
-**Pre-gate check (checker · plan mode).** Before the gate, dispatch the **checker** (`agents/checker.md`)
+**Pre-gate check (checker · plan mode).** Before the gate, dispatch the **checker** (`agents/wi-code-checker.md`)
 in `plan` mode over `spec.md` + `tasks.md` + `pitfalls.md` + `constitution.md` + the relevant ADRs (and any
 **Runtime State Inventory** rows). It builds a goal-backward coverage matrix and returns
 BLOCKER/WARNING/INFO findings, writing `verification.md`. Feed them back: a BLOCKER — an unmapped

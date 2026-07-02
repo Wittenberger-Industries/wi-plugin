@@ -1,6 +1,6 @@
 ---
 type: Agent
-name: researcher
+name: wi-researcher
 model: inherit            # X3: a dispatch may pin a cheaper tier for cheap/parallel charters; inherit is the portable default
 color: cyan
 tools: ["Read", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"]

@@ -40,7 +40,7 @@ Self-review the diff with fresh eyes, specifically against:
 the review through it (log `review via superpowers:requesting-code-review`); unaided self-review is the
 fallback only when it's absent.
 
-**Goal-level check (checker · result mode).** Dispatch the **checker** (`agents/checker.md`) in `result`
+**Goal-level check (checker · result mode).** Dispatch the **checker** (`agents/wi-code-checker.md`) in `result`
 mode against `spec.md`'s acceptance criteria + locked decisions (ADRs, constitution); it confirms each is
 delivered and **wired**, not just present, refreshing `verification.md`. This is goal/coverage-level,
 distinct from the line-level review above. A result-mode **BLOCKER** — an unmet criterion, or a decision

@@ -66,7 +66,7 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    - **`tasks.md`** = the multi-process build DAG: shared components first, then processes, then each
      process's independent sub-workflows — parallel where the DAG allows.
 5. **Design gate.** **Pre-gate check (checker · plan mode):** before rendering the gate, dispatch the
-   **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/checker.md`) in `plan` mode over `sdd.md` (acceptance criteria
+   **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `plan` mode over `sdd.md` (acceptance criteria
    §13 + locked decisions), `tasks.md`, `assumptions.md`, `orchestrator.md`, `rpa-constitution.md`, and any
    Runtime State Inventory rows — it builds a goal-backward coverage matrix and returns BLOCKER/WARNING/INFO,
    writing `verification.md`. A BLOCKER (an uncovered SDD criterion, a silently down-scoped decision, an

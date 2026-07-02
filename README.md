@@ -198,7 +198,7 @@ If none are installed, wi still runs the whole loop on its own.
   State Inventory + worktree-safety wiring is **additive and behavior-only** — no data or migration impact.
   If `/wi:rpa` starts failing because of it, revert the whole layer: `git revert <the v0.10.1 rpa-parity
   squash-merge commit>` (find it via `git log --oneline --grep "rpa flow to parity"`). It touches exactly
-  six files — `agents/checker.md`, `skills/rpa/SKILL.md`, and under `skills/rpa/references/`:
+  six files — `agents/wi-code-checker.md`, `skills/rpa/SKILL.md`, and under `skills/rpa/references/`:
   `verification-gate.md`, `brainstorm-protocol.md`, `rpa-constitution-template.md`, `build-uipath.md` — so a
   manual revert of those restores the prior rpa behavior. The dev spine is unaffected.
 
