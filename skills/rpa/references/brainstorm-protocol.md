@@ -12,26 +12,33 @@ This is the interactive phase and the value of `wi:rpa`: a PDD is usually AS-IS-
 it into a buildable TO-BE. **Refine the PDD's own ToBe — but do NOT trust it** (see §0). Assume gaps *and
 errors* exist even when the PDD looks complete.
 
-**This is a real conversation with the USER — not a monologue.** In interactive mode (no `--auto`) you **put
-the open questions to the user and WAIT for their answers** before writing the decision artifacts. Asking
-yourself a question and answering it (`… → my answer`) and logging it as an assumption is the **`--auto`
-behaviour, NOT interactive** — doing that and then asking for one bulk "approve" at the gate **defeats the
-brainstorm**. Batch related questions so it's a handful of exchanges, not dozens, but the answers come from the
-user.
+**This is a real conversation with the USER — not a monologue, and `--auto` does not change that.** The
+flag collapses the stops *after* brainstorm (handoff confirmation, design gate) — the user who typed the
+command is present for this conversation, so **put the open questions to them and WAIT for their answers**
+before writing the decision artifacts. Asking yourself a question and answering it (`… → my answer`) and
+logging it as an assumption is the **headless fallback, NOT a `--auto` behaviour** — it applies only when
+no user can answer at all (an unattended dispatch: CI, a subagent, a scheduled run). Self-answering while
+a user is available, then asking for one bulk "approve" at the gate, **defeats the brainstorm**. Batch
+related questions so it's a handful of exchanges, not dozens, but the answers come from the user.
 
 **Step 0 — delegation check (mandatory).** If `superpowers:brainstorming` is installed, drive the dialogue with
 it; else run this protocol directly. **Either engine, the dialogue is with the USER** — if the brainstorming
-skill starts self-answering, stop and put the questions to the user yourself. **Stamp the mode in `progress.md`**
-(`brainstorm via superpowers:brainstorming` | `via wi fallback`).
+skill starts self-answering, stop and put the questions to the user yourself. A **headless run** still
+invokes the engine when present (it structures the questions; the answers are then self-resolved under the
+headless rule above and the stamp records both) — if the engine cannot run without a user, run this
+protocol directly and stamp `via wi fallback, self-answered (headless)`. **Stamp the mode in `progress.md`**
+— engine **and** interactivity: `brainstorm via superpowers:brainstorming | via wi fallback`, suffixed
+`, dialogue` | `, self-answered (headless)` (e.g. `brainstorm via wi fallback, self-answered (headless)`).
 
-**Must-ask before the design gate (interactive mode never skips these — `--auto` self-resolves each as a logged
-assumption, and says so):**
+**Must-ask before the design gate (never skipped in dialogue — only a headless run self-resolves each as a
+logged assumption, and says so):**
 1. **Scope** — confirm in/out (§1).
 2. **Framework** — **REFramework or Maestro flow?** Propose from the process shape: **Maestro** for
    orchestration-shaped work (approvals/HITL, Integration Service connectors, UiPath Agent calls,
    long-running/wait-heavy, ixp, branching across systems); **REFramework** for high-volume queue-based
    batch transactions (dispatcher/performer). State a one-line rationale; record in `progress.md`
-   (`Framework:`). `--auto` takes the constitution default (`reframework`).
+   (`Framework:`). A headless run records the shape-heuristic proposal (or the constitution default,
+   `reframework`, when the shape is ambiguous) as an assumption.
 3. **ToBe correctness** — the PDD's ToBe + diagram are a *draft*; confirm what's wrong or missing (§0, §2).
 4. **Dispatcher/Performer split + the queue handoff** (§5).
 5. **Naming conventions** and **Orchestrator env / variables** (§6).
@@ -39,8 +46,8 @@ assumption, and says so):**
    notifications:* if the PDD/inputs name the method, use exactly that; otherwise put the options to the
    user — **IMAP/SMTP, desktop Outlook activities, Microsoft 365, Exchange, or an Integration Service
    connector** — and record the confirmed choice (an assumption row + the SDD). Unresolved at the gate = an
-   **open dependency `D`** (blocking, §7). `--auto` does **not** pick an email framework — this is the one
-   must-ask it never self-resolves: it **mocks the send** (§2 mock boundary) and records the open dep.
+   **open dependency `D`** (blocking, §7). A headless run does **not** pick an email framework — this is the
+   one must-ask it never self-resolves: it **mocks the send** (§2 mock boundary) and records the open dep.
 7. **Every open dependency `D`** — resolve it now, or have the user *explicitly* defer it (§7 + the gate).
 8. **Rename / rebrand / migration only** — run the **Runtime State Inventory** (§6a): the old name almost
    always lives on in Orchestrator resources and in-flight queue items a repo grep can't see.
@@ -75,8 +82,8 @@ feeds the build DAG.
 
 ## 2. Refine each process's TO-BE — the findings pass
 
-Walk the steps and surface, proposing a resolution for each (confirm with the user, or under `--auto`
-record as an assumption):
+Walk the steps and surface, proposing a resolution for each (confirm with the user; a headless run
+records an assumption):
 
 - **PDD contradictions / wrong diagram** — where the written steps, the To-Be diagram, the Enrichment Matrix,
   and the data inputs **disagree**, flag it; the PDD's own ToBe is the *most likely* thing to be wrong. Don't
@@ -138,6 +145,13 @@ become new sub-workflows.
   carried as a source field; a value the process itself **generates** (e.g. a new unique IDoc id) is created,
   not looked up. Only attribute a field to a source you've actually confirmed holds it (don't assume the
   queue/DocuWare/Agent carries it).
+- **Dev-run verification without a tenant — decide it NOW, not at build.** A queue-shaped design needs its
+  queue to *run*, and the end-to-end verification task is the natural checker of most acceptance criteria.
+  When the Orchestrator link is an open dep (no tenant connected), pick the strategy here and record it:
+  either the e2e task **defers its queue-dependent runtime checks with that dep** (file-level assertions
+  still run), or the plan names an explicit, temporary **local queue substitute** (same handoff contract,
+  fed from a local file) as its own task. Either way it lands in the SDD's test strategy + `tasks.md`, so
+  the design gate approves *how the build will verify*, and the checker doesn't discover the gap for you.
 
 ## 6. Orchestrator provisioning & naming
 
@@ -160,7 +174,7 @@ Capture answers into `.wi/orchestrator.md`:
   input/output contract (point at the sample output registered in `.wi/inputs.md`).
 - **Triggers** — time or queue, schedule, concurrency.
 
-Under `--auto` (or when the user doesn't have them yet) **propose convention-based names**
+In a headless run (or when the user doesn't have them yet) **propose convention-based names**
 (`<Solution>_<Process>_<Queue|Asset|Bucket>`) and log them as assumptions to confirm — a named default beats a
 blank §7. Secrets stay names-only (constitution rule).
 
@@ -235,7 +249,8 @@ impact, and who/what resolves it. **Open deps are blocking by default:** at the 
 to the user as a question and either **resolve it** (→ a confirmed assumption, e.g. "D4 store-key → A14") or get
 the user's **explicit decision to defer** (build the stub/mock, accept the risk). Do **not** silently proceed
 into the build with a `Dn` quietly marked "needs input later / before production" — **deferral is the user's
-call, not a default.** (`--auto` records each for after-the-fact review and says so.)
+call, not a default.** (`--auto` auto-approves the gate and a headless run has no user at all — both record
+each open dep for after-the-fact review and say so.)
 
 ## `tobe.md` format (per process)
 

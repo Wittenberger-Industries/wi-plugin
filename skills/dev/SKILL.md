@@ -69,10 +69,19 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
    broken condition is guaranteed waste, so check two things before printing anything:
    - **The gate commands are real.** The lint + test commands about to be embedded in the condition must
      exist in `repo-map.md` and not be `UNKNOWN — ask` (greenfield gaps). UNKNOWN → resolve it now (one
-     question, or scan's guided setup); never arm a condition no checker can verify.
+     question, or scan's guided setup); never arm a condition no checker can verify. A command genuinely
+     absent from the project (no linter configured) is recorded as `n/a — not configured` and **passes**
+     the preflight — the keep-alive condition renders without that clause (keep-alive.md's fill rule);
+     only `UNKNOWN` blocks.
    - **The brief answers the must-asks.** Scope/non-goals, desired behavior, acceptance, hard constraints
-     are actually answered in `brief.md` — not blank, not self-answered. A hole → one more brainstorm
-     round to fill it. (Both checks resolve inside the brainstorm stop — they are not a new gate.)
+     are actually answered in `brief.md` — not blank, not self-answered. One carve-out: a **headless run**
+     (brainstorm's headless rule) is *sanctioned* self-answering — there the check becomes "every must-ask
+     has its logged assumption, and the stamp says `self-answered (headless)`". A hole → one more
+     brainstorm round to fill it.
+   - **A PR-open condition needs a remote.** `git remote` prints nothing → do **not** print or arm the
+     keep-alive at all: the condition can never hold and an armed loop would spin forever. Note in
+     progress.md that the run ends at ship's no-remote close-out (ship §7) and the keep-alive applies once
+     a remote exists. (All checks resolve inside the brainstorm stop — they are not a new gate.)
    Both green → recap the brief in 3-5 lines, then print the keep-alive handoff for the current platform:
    Claude Code & Codex CLI arm their built-in `/goal` with the PR-open condition; Copilot CLI relaunches
    under Autopilot. The exact command templates — and the unattended-run warning that must accompany the

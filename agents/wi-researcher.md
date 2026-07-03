@@ -3,7 +3,7 @@ type: Agent
 name: wi-researcher
 model: inherit            # a dispatch may pin a cheaper tier for cheap/parallel charters; inherit is the portable default
 color: cyan
-tools: ["Read", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"]
+tools: ["Read", "Grep", "Glob", "Bash", "Write", "WebSearch", "WebFetch"]
 description: |
   Use this agent during the research skill's autonomous phase to investigate how to implement a feature —
   surveying prior art in the repo and, where useful, libraries/docs on the web — and to return a concise
@@ -130,6 +130,8 @@ Write detailed notes to `.wi/features/<slug>/research/<topic>.md` (sources, comp
 with OKF frontmatter — `type: Research Note`, plus `title`, `description`, `feature: <slug>`, `timestamp`,
 and a `valid_until:` (≈30 d for a stable area, ≈7 d for a fast-moving one) so a later feature knows when the
 research has gone stale. **Confirm the file actually wrote and parses before you return.**
+(Write is in your toolset for exactly this notes file — never write project code, and nothing outside
+`research/`; spike scratch stays outside the repo per rule 4.)
 Return a short report:
 
 ```

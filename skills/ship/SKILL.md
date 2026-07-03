@@ -211,7 +211,11 @@ findings with severity. Distilled from verification.md; the dossier tidy (§6) t
      bullet; rpa: rpa-directory.md's run-dossier bullet); prune exactly that list, nothing more. Their
      value must already be distilled — §5 folded the checker/diff-review verdicts into `PR.md`'s
      Verification; research notes live on in the ADR and `spec.md`. If something is still load-bearing,
-     fold it in first. (Skip pruning if the constitution says to keep them.)
+     fold it in first. Prune tracked ephemera with `git rm -f` (the §2 result-mode checker refreshed
+     `verification.md` *after* the commit that last touched it, so a plain `git rm` refuses on the local
+     modifications); a never-committed one (`moa-review.md` is written at §2 and typically never
+     committed) is untracked — plain-delete it, `git rm` has no pathspec to match.
+     (Skip pruning if the constitution says to keep them.)
   3. *Finalize `tokens.md` — NOW, not at close-out.* The file must be complete **inside the dossier
      commit**, or it never rides the PR. The ledger was scaffolded at research/build start and its
      subagent rows appended live; finalize the orchestrator total with one command:
@@ -253,19 +257,32 @@ done**: record in `progress.md`'s Decisions/blockers the exact recovery command 
 above) —
 `body=$(mktemp); awk '{sub(/\r$/,"")} NR==1&&$0=="---"{f=1;next} f&&$0=="---"{f=0;next} !f' .wi/features/<slug>/PR.md > "$body"; gh pr create --title "<…>" --body-file "$body"`
 — plus the failure reason, and tell the user in the final report that the PR still needs creating. Never silently stop at the push. **Never
-force-push.** If `superpowers:finishing-a-development-branch` is installed, use it for the close-out.
+force-push.** If `superpowers:finishing-a-development-branch` is installed, consult it for the close-out
+**decision** (merge / PR / keep) in interactive runs — in an autonomous run that decision is already made
+(the PR). The worktree and branch **mechanics stay wi's own (§8)**: wi's sibling-dir worktrees fail that
+skill's `.worktrees/`-only provenance rule, so never delegate the removal itself.
+
+**No remote at all** (`git remote` prints nothing — a local-only repo): pushing and `gh pr create` are
+*impossible*, not failed — don't loop on them. Record `Close-out: local (no remote)` in `progress.md`'s
+Decisions/blockers together with the recovery pair to run once a remote exists — the
+`git push -u origin wi/<slug>` and the frontmatter-stripped `gh pr create` command above — then proceed
+to §8; its PR checkbox passes on that recorded substitute. Everything else in ship (gate, docs-sync,
+dossier, tokens) already ran for real, so the branch is merge-ready the moment a remote appears.
 
 ## 8 · Close out — checklist, then the report
 
-After the PR is open (or merged), clean up: remove the worktree (safe once the branch is pushed), and
+After the PR is open (or merged, or the §7 no-remote close-out is recorded), clean up: remove the
+worktree (safe once the branch is pushed — or, under a no-remote close-out, once the dossier commit is on
+the local branch), and
 delete the **local** branch only if it is fully merged (`git branch -d`, which refuses otherwise — see
 the worktree reference); the remote branch and an open PR are never deleted. Then run the
 **close-out checklist** — every box, against the actual repo state, not memory. `progress.md` Phase =
 `done` is **earned by this checklist**; an unticked box means ship is not finished, no matter what the
 console already said:
 
-- [ ] PR is **open** and its URL is logged in `progress.md` (sole substitute: branch pushed + failure
-      reason + the frontmatter-stripped `gh pr create …` recovery command (§7) recorded as a blocker)
+- [ ] PR is **open** and its URL is logged in `progress.md` (two substitutes, §7: branch pushed + failure
+      reason + the frontmatter-stripped `gh pr create …` recovery command recorded as a blocker; or — no
+      remote exists — `Close-out: local (no remote)` + the push/PR recovery pair recorded)
 - [ ] `.wi/features/<slug>/PR.md` exists and is committed on the branch
 - [ ] `tokens.md` passes the structural gate — run
       `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py .wi/features/<slug>/tokens.md`; a

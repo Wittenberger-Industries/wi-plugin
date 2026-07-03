@@ -15,7 +15,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 
 ```
 .wi/
-├── index.md                # OKF root index (optional): directory listing + okf_version. No frontmatter.
+├── index.md                # OKF root index (optional): directory listing; the one reserved index that MAY carry frontmatter (okf_version only).
 ├── constitution.md         # project ground rules. Written once by scan, read by every phase.
 ├── repo-map.md             # cached scan facts: stack, commands, conventions, frontend/backend.
 ├── overview.md             # readable docs of an EXISTING project (scan; absent for greenfield).
@@ -76,7 +76,9 @@ reasoned about. Keep every file small and current; these are working artifacts, 
   gets smarter per feature.
 - **Learnings recall is via the index.** Phases read `.wi/learnings.md` (one line + hook per feature) and
   open a `learnings/<slug>.md` detail file only when its hook is relevant to the current feature — never
-  bulk-read the directory.
+  bulk-read the directory. Timing note: ship commits a feature's learnings (+ its index line) on the
+  **feature branch**, so main's `learnings.md` lacks in-flight features' lines until their PRs merge —
+  `scan --refresh` on main reads that as normal lag, not drift.
 
 ## OKF frontmatter & conventions
 
@@ -95,9 +97,11 @@ version:
   `Task List`, `pitfalls.md` → `Pitfalls`, `verification.md` → `Verification`, `tokens.md` →
   `Token Ledger`, `PR.md` → `PR Description`, `research/*.md` → `Research Note`,
   `research/runtime-state-inventory.md` → `Runtime State Inventory`.
-- **Index files** carry no frontmatter — except the optional root `.wi/index.md`, which may declare
-  `okf_version: "0.1"`. `learnings.md` and `adr/index.md` are typed indexes whose entries reuse each
-  concept's `description`.
+- **Index files.** OKF-reserved `index.md` / `log.md` files carry **no frontmatter** — `adr/index.md` is
+  one (the ADR template's bare index is correct; `validate.py` exempts the reserved names) — except the
+  optional root `.wi/index.md`, which may declare `okf_version: "0.1"`. `learnings.md` is *not* a reserved
+  index (it's a named file) and **is** typed (`Learnings Index`). Entries in both reuse each concept's
+  `description`.
 - **Log.** `progress.md`'s `## Log` uses ISO dates and a leading bold keyword (`**Created**`,
   `**Update**`, `**Decision**`); it stays append-order as a resumable run timeline.
 - **Citations.** External sources go under a numbered `## Citations` heading at the foot of the doc.

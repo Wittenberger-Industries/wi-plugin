@@ -184,7 +184,7 @@ timestamp: <YYYY-MM-DD>
 
 ## Log
 - <date> bootstrap: markitdown present; uipath plugin installed; discovery delegated
-- <date> brainstorm via superpowers:brainstorming   <!-- or: via wi fallback -->
+- <date> brainstorm via superpowers:brainstorming, dialogue   <!-- engine: … | via wi fallback; interactivity: , dialogue | , self-answered (headless) -->
 - ...
 
 ## Decisions / assumptions / blockers

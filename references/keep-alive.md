@@ -15,7 +15,11 @@ Codex CLI use their built-in `/goal`; Copilot CLI has no predicate `/goal` and r
 — dev §4 and research §4 print from here; edit the block here, never a copy in a skill.
 
 Before printing, fill `<slug>` and `<lint + test commands>` with the exact commands from `repo-map.md` —
-never arm a condition no checker can verify (dev's preflight guards this).
+never arm a condition no checker can verify (dev's preflight guards this). A command repo-map records as
+`n/a — not configured` (e.g. no linter exists) is **dropped from the condition**, not a blocker: render
+with the commands that do exist — a test-only condition is valid. Only `UNKNOWN — ask` blocks arming.
+No git remote at all → **don't arm anything**: the PR-open condition can never hold on a remote-less
+repo (ship closes out locally instead — ship §7); dev's preflight checks this before printing.
 
 - **Claude Code / Codex CLI** (both have a built-in `/goal`):
 

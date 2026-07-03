@@ -16,7 +16,8 @@ TDD build with real parallel task-runners → ship with a green verification gat
 the imposed no-push boundary; `/wi:rpa --auto` ran cleanly through ingest → TO-BE → SDD → checker →
 auto-gate → worktree handoff to the build-delegation edge. Zero hard failures, zero boundary
 violations. The runs surfaced **24 spec findings** (12 per flow, §4) — text-level ambiguities and
-contract collisions, none of which broke either run.
+contract collisions, none of which broke either run. **All 24 were fixed the same day and re-verified
+against the edited text (§6), plus 11 second-order findings the re-verification itself surfaced.**
 
 ## 1 · Procedure
 
@@ -296,3 +297,47 @@ Evidence from this run (ephemeral — lives under the background job's tmp dir a
 it): `dryrun-dev/notes-cli` (branch `wi/0001-search-command` @ `2d0cca2`, kept unmerged) and
 `dryrun-rpa/invoice-intake` + its `…-wi-0001-vendor-invoice-intake` worktree (branch tip
 `206516e`).
+
+## 6 · Fix sweep + re-verification (same day)
+
+All 24 findings were fixed in one sweep. Three needed a decision first, locked as: **V5** — a repo
+with no `origin` closes out locally (`Close-out: local (no remote)` marker + recorded push/PR
+recovery pair; Phase=done reachable, and the keep-alive is *never armed* on such a repo); **R10** —
+the no-tenant dev-verification strategy is decided at brainstorm and gate-approved (defer
+queue-dependent checks with the dep, or a named local substitute); **V11** — moa.md now states the
+pricing policy: dispatches run at the **configured** tier, never auto-escalated to the session
+model; `simple` (opus/sonnet, the `--auto` default) is capped at opus by design; tiers above opus
+enter a run only via the interactively-chosen `smart` preset or hand-written overrides.
+
+The headline semantic fix (R1/R2 + mirrors): **`--auto` never collapses brainstorm — the user who
+typed the command is present for it; self-answering with logged assumptions is a separate
+*headless* fallback** (unattended dispatch: CI, a subagent, a scheduled run), stamped
+`, self-answered (headless)` alongside the engine. That is exactly the behavior the README already
+advertised — the sweep aligned the reference text to it.
+
+**Re-verification** — two fresh agents ran against the edited (then-uncommitted) tree:
+
+- *dev slice* (steps 1–4 executed in a pristine linter-less sandbox + consistency read of the
+  rest): **all 12 V-findings FIXED**. The preflight passed by the letter with lint recorded
+  `n/a — not configured` and rendered a clean test-only `/goal` condition; the fable session over
+  the simple preset correctly produced no warning and no escalation.
+- *rpa front half* (steps 1–5 executed, real MoA-tiered checker): **all 10 in-slice R-findings
+  FIXED** (R8/R9 verified by read, not runtime — the gate itself wasn't run). The run exercised the
+  new machinery live: ingest created the first-run constitution and the exact empty-registry state;
+  the ledger was scaffolded pre-checker and carries the round-1 exact row (54,251); the checker's
+  WARNING→revise→re-check loop converged (0 BLOCKER both rounds → CHECK PASSED).
+
+The re-verification surfaced **11 second-order findings** (6 dev, 5 rpa) — interactions the first
+edits introduced or exposed — all fixed in the same sweep. The sharpest: an armed `/goal` PR-open
+condition could spin forever on a no-remote repo (dev's preflight now refuses to arm without a
+remote); dev's "not self-answered" preflight clause contradicted the new headless rule (carve-out
+added); a checker **re-check round can return without a completion notification** (a resumed agent)
+— the ledger now records `unavailable` for that row, never an estimate; the WARNING-only re-check
+loop is now explicitly the orchestrator's call (BLOCKER loops stay mandatory); and the last
+surviving `--auto`↔headless conflation (rpa-constitution-template's email rule) plus two stale
+templates (scan's repo-map lint cell now teaches the verbatim `n/a — not configured` token;
+rpa-directory's stamp example carries the interactivity suffix) were aligned.
+
+Re-run evidence (ephemeral): `dryrun-dev2/notes-cli` (stopped at Phase=research per the slice
+boundary) and `dryrun-rpa2/invoice-intake` (stopped at Phase=design-gate, gate auto-approved,
+`## CHECK PASSED`).

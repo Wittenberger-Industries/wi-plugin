@@ -38,7 +38,8 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    markitdown (skip if it's already Markdown). Run the **MoA first-run setup** here too
    (`${CLAUDE_PLUGIN_ROOT}/references/moa.md`): `.wi/moa.md` absent → one preset question (`--auto` →
    simple preset, logged); present → apply, warn once on an orchestrator-tier mismatch. The config's
-   `wi-task-runner` tier then rides every build delegation (agent `rpa-build`), and at ship the
+   `wi-task-runner` tier then rides every build delegation (override key `rpa-build` — a MoA role label
+   for those delegations, not a registered agent; there is no `agents/rpa-build.md`), and at ship the
    cross-provider diff review layers on top of wi-code-checker's result-mode pass, per the same rules as
    `wi:ship`. The project-level `.wi/` outputs of steps 1–3 (`inputs.md`, `components.md`,
    `orchestrator.md`, `moa.md`, a first-run `rpa-constitution.md`) are **committed where written**
@@ -52,9 +53,10 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    define the transaction + dispatcher/performer shape (REFramework) **or** the flow's node shape (Maestro),
    and **elicit the Orchestrator
    provisioning** (org/tenant/folder link, UiPath Agent name(s), and the queue / asset / storage-bucket /
-   published-process names) into `.wi/orchestrator.md`. **Stamp the brainstorm mode** in `progress.md`
-   (`brainstorm via superpowers:brainstorming` | `via wi fallback`). Log every gap you fill as an assumption.
-   Parse `--auto` here (Gate mode).
+   published-process names) into `.wi/orchestrator.md`. **Stamp the brainstorm mode** in `progress.md` —
+   engine + interactivity (`brainstorm via superpowers:brainstorming` | `via wi fallback`, suffixed
+   `, dialogue` | `, self-answered (headless)` — brainstorm-protocol.md). Log every gap you fill as an
+   assumption. Parse `--auto` here (Gate mode).
 4. **Plan — write the artifacts** (layout + OKF frontmatter stubs:
    `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/rpa-directory.md` — each file opens with its `type`):
    - **`architecture.md`** — framework-aware, validated with
@@ -69,8 +71,22 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    - per process: **`tobe.md`** (refined from the PDD's ToBe + its flow diagram); `assumptions.md` and
      `process-inventory.md` at run level.
    - **`tasks.md`** = the multi-process build DAG: shared components first, then processes, then each
-     process's independent sub-workflows — parallel where the DAG allows.
-5. **Design gate.** **Pre-gate check (checker · plan mode):** before rendering the gate, dispatch the
+     process's independent sub-workflows — parallel where the DAG allows. Include the **dev-verification
+     strategy** decided in brainstorm (protocol §5) when the tenant link is an open dep — defer the
+     queue-dependent runtime checks with that dep, or the named local substitute as its own task — so the
+     gate approves *how the build will verify*, not just what it builds.
+   - **ADR(s)** — the hard-to-reverse choices this run locked (framework `reframework` | `maestro`, the
+     dispatcher/performer split, the queue model) each go to the project-wide `.wi/adr/` log as the next
+     `ADR-NNNN` + its index row, committed where written (`docs(wi): ADR-NNNN <title>` — rpa-directory.md's
+     rule, same as the dev flow); the gate's **Approach (ADR-NNNN)** line cites it. Nothing hard to
+     reverse → no ADR (plan §2's rule: don't manufacture decisions).
+5. **Design gate.** **Pre-gate check (checker · plan mode):** first scaffold the token ledger (idempotent):
+   `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md`
+   — the checker is a subagent and its exact token count exists **only in its completion notification**;
+   append that row the moment it arrives (mirrors the dev flow's research-start scaffold; step 6's
+   scaffold-if-absent remains the fallback). Each checker round appends its own row; a re-check round that
+   returns without a completion notification (e.g. a resumed agent) records `unavailable` — never an
+   estimate. Then, before rendering the gate, dispatch the
    **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `plan` mode over `sdd.md` (its
    acceptance-criteria section — §10 in the base ToC — plus locked decisions), `tasks.md`, `assumptions.md`,
    `orchestrator.md`, `rpa-constitution.md`, and any
@@ -89,8 +105,9 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    `Publish: none | feed | deploy` (+ target folder for `deploy`): `none` = build to PR only; `feed` =
    pack + publish the package(s) to the connected tenant's feed; `deploy` = `feed` + deploy/activate as a
    Process in that folder; a **prod** folder must be explicitly approved here (never auto-selected),
-   recorded in `progress.md` (`Publish:`). `--auto` records and proceeds on the constitution defaults
-   (paradigm XAML-only; publish per the constitution, default `none`). On
+   recorded in `progress.md` (`Publish:`). `--auto` records and proceeds on the defaults — framework: **as
+   proposed at brainstorm** and recorded in `progress.md` (`Framework:`); paradigm XAML-only; publish per
+   the constitution, default `none`. On
    approval, **harvest the design-phase learnings** into `.wi/learnings/<run-slug>.md` (+ its line in the
    `.wi/learnings.md` index) — non-obvious decisions,
    gap resolutions, and domain rules surfaced in the brainstorm, marked *candidate (pre-build)*. wi:rpa's

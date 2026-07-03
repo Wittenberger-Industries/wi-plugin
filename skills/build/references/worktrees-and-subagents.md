@@ -74,9 +74,12 @@ immediate context, not the whole project.
 
 The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` /
 `copilot-tools.md`): Claude uses the Agent/Task tool, Copilot uses the `task` tool and `/fleet` for waves,
-Codex uses `spawn_agent` bounded by `[agents] max_threads`. On every platform, pass the task-runner prompt
-**inline** to a generic worker — don't depend on a pre-registered named agent (Codex named-role dispatch
-is unreliable across builds).
+Codex uses `spawn_agent` bounded by `[agents] max_threads`. The prompt **content** is inline on every
+platform — the skeleton below gives each runner its task block + context in full. The dispatch *target*
+differs: on Claude Code, dispatch the **registered `wi-task-runner` agent** (build §2's instruction — the
+plugin registers it, and MoA model routing rides the dispatch); only on platforms without reliable
+named-agent registration (Codex — named-role dispatch is unreliable across builds there) pass the prompt
+to a generic worker carrying the `agents/wi-task-runner.md` contract inline.
 
 ### Task-runner prompt skeleton
 

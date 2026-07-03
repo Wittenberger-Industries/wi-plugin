@@ -63,7 +63,11 @@ on **both** paths.
      why — decisions, branch conditions, magic values, deliberate shortcuts.
 5. **(Optional) Test cases** — if test workflows exist (or the constitution requires them), run them.
 
-Capture each command + result — these become the PR's "Testing" section. If the `uip` CLI / Studio isn't
+Capture each command + result — these become the PR's "Testing" section. The `uip` steps above are
+deliberately generic — the UiPath skills own the literal subcommands (borrow, don't reinvent). The first
+time this gate runs for a project, resolve each step to its exact command via `uipath-rpa` /
+`uipath-platform` and **record the resolved commands in `progress.md`'s Log** — reruns (and the keep-alive
+loop) then replay them deterministically instead of re-deriving. If the `uip` CLI / Studio isn't
 available in the run environment, the gate degrades to: **artifacts complete + the SDD lists the Analyzer
 ruleset/criteria to pass**, and the actual Analyzer run is deferred to the user (say so explicitly — don't
 claim green you didn't verify).

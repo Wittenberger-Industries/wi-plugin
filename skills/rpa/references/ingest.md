@@ -18,7 +18,8 @@ this step is what makes the later UiPath handoff complete.
   mirroring `ADR-NNNN`: global across `.wi/features/`, monotonic, assigned once at creation, never renumbered.
   Next = highest existing `.wi/features/` ordinal + 1 (else `0001`); legacy unnumbered runs are left as-is.
 - If the PDD is `.docx`/`.pdf`/`.pptx`: `markitdown <pdd> -o .wi/features/<run-slug>/pdd.md`.
-- If it's already `.md`: copy/reference it as `pdd.md` as-is (don't re-process).
+- If it's already `.md`: copy/reference it as `pdd.md` as-is (don't re-process the **body** — the
+  frontmatter added next is metadata *around* it, not a rewrite of it).
 - **Prepend OKF frontmatter** so `pdd.md` is a typed concept like the rest of the bundle: open the file
   with `type: PDD` (+ `title`, `description`, `feature: <run-slug>`, `timestamp` — stub in `rpa-directory.md`)
   above the converted body. The frontmatter is metadata; the body stays faithful to the source.
@@ -89,7 +90,21 @@ This registry is **project-level and persists across runs** — build reads it f
 any new reusable component it creates. That is how the second process in a project starts ahead of the
 first.
 
+**Zero components found** (typical on a fresh repo): still create the file — keep the table header and one
+line, `_none found yet (fresh repo; the registry fills as builds register new components)_`. The file's
+existence is what later phases check; an absent registry reads as "ingest never ran".
+
+## 4. First-run constitution → `.wi/rpa-constitution.md` (project-level)
+
+If `.wi/rpa-constitution.md` is absent, **create it now** from
+`${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/rpa-constitution-template.md` (copy the template; fill what
+the PDD/inputs already settle, leave the rest on its defaults) and commit it with the other project-level
+outputs. Every later step assumes it exists — brainstorm reads it as baseline (§0), the gate takes its
+defaults, the verification gate's house-rules sweep enforces it. **This step owns its creation**; nothing
+else creates it.
+
 ## Output
 
-`pdd.md` (per run), and the project-level `inputs.md` + `components.md` created/updated. Report a 3-5 line
-summary: PDD pages/sections found, N supporting inputs registered, M reusable components found.
+`pdd.md` (per run), and the project-level `inputs.md` + `components.md` (+ a first-run
+`rpa-constitution.md` when absent) created/updated. Report a 3-5 line summary: PDD pages/sections found,
+N supporting inputs registered, M reusable components found.

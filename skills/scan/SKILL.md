@@ -157,8 +157,11 @@ timestamp: <YYYY-MM-DD>
 ## Commands  (verified runnable)
 - **Install:** `<cmd>`
 - **Test (all):** `<cmd>`     - **Test (one):** `<cmd e.g. pytest path::test_name>`
-- **Lint:** `<cmd>`           - **Format:** `<cmd>`
-- **Typecheck:** `<cmd>`      - **Run / dev:** `<cmd>`     - **Build:** `<cmd or n/a>`
+- **Lint:** `<cmd | n/a — not configured>`           - **Format:** `<cmd | n/a — not configured>`
+- **Typecheck:** `<cmd | n/a — not configured>`      - **Run / dev:** `<cmd>`     - **Build:** `<cmd or n/a>`
+  (write the `n/a — not configured` token verbatim when a tool genuinely isn't set up — dev's handoff
+  preflight and keep-alive.md's fill rule key on that exact string; never leave the cell blank or `UNKNOWN`
+  when you've *verified* the tool is absent)
 - **Tests parallel-safe:** <yes / no / unknown — shared db file? fixed ports? pytest-xdist?>
 
 ## CI
@@ -247,7 +250,8 @@ flowchart TD
   ext[/"external service"/] -.-> service
 ```
 
-Rules: ~10-25 nodes; group with `subgraph` by layer/area; nodes are modules/components, **not files**;
+Rules: scale to the codebase — ~10-25 nodes on a typical repo, fewer on a small one (5 honest nodes beat
+12 padded ones); group with `subgraph` by layer/area; nodes are modules/components, **not files**;
 edges are real dependencies / data flow; `[( )]` = datastore, `/ /` = external system; solid = calls/
 depends, dashed = optional/async.
 

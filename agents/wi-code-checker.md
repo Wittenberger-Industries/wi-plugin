@@ -93,7 +93,9 @@ a BLOCKER** — under-grading severity is the named soft-failure that makes veri
 
 ## Bounded loop (plan mode)
 
-Return findings → plan revises → you re-check. **Max 2 rounds.** After that, stop re-checking and escalate
+Return findings → plan revises → you re-check. **Max 2 rounds.** A **BLOCKER makes the loop mandatory**
+(the skills' rule); for WARNING-only findings the fix-and-re-check is the orchestrator's call inside the
+same budget — INFO never loops. After round 2, stop re-checking and escalate
 the remaining findings, with their severity, to the human **design gate** — the gate decides; you do not
 loop forever. (Result-mode BLOCKERs go back to build; lesser findings are surfaced for waiver at ship.)
 
