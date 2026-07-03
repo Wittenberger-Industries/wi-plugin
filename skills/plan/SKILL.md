@@ -40,17 +40,24 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
    that appears in no artifact was dropped — that's a defect, not a judgment call.
 
 4. **Break it into tasks** → `tasks.md` (format below). Aim for small, independently verifiable steps.
-   Each task names the files it touches and the exact command/test that proves it. Default to TDD: the
-   first task for a piece of behavior writes the failing test. **Delegation check:** if
+   Each task names the files it touches and the exact command/test that proves it. Default to TDD — **red
+   and green live inside one task**: the task's runner writes the failing test first, then implements to
+   green (`agents/wi-task-runner.md`); never plan a *separate* failing-test task — it can't "end green",
+   and in a parallel wave it races any sibling whose Verify runs the tests. **Delegation check:** if
    `superpowers:writing-plans` is in your available skills you MUST use it for the decomposition —
    capturing the result in this format — and log `plan via superpowers:writing-plans` to progress.md.
    The inline format below is the fallback only when it's absent (log `plan via wi fallback`).
+   **Scope of that delegation:** wi's `tasks.md` **is** the plan artifact — no `docs/superpowers/plans/`
+   file — and the delegate's end-of-plan "execute now?" choice doesn't apply: build owns execution, and
+   only after the design gate.
 
    **Shape the plan for parallelism.** build dispatches every unblocked task concurrently, so the
    dependency graph is the speed limit. Keep `Files` precise and disjoint between tasks wherever possible
    (the scheduler uses them for conflict detection); don't add `Depends on` edges that aren't real; and
    when several tasks share a foundation (a schema, an interface, a fixture), make the foundation its own
-   early task so the rest fan out as one wide wave.
+   early task so the rest fan out as one wide wave. Scope each task's **Verify** to its *own* named
+   tests/commands, never the full suite — build's wave-end gate runs the suite serially at each boundary;
+   a full-suite Verify inside a parallel wave races its siblings' red phases.
 
    **Docs follow structure.** If a task changes the architecture (new module, dependency, layer, external
    service), the structure docs (`.wi/architecture.md`, `.wi/overview.md`) go stale — ship's docs-sync

@@ -24,12 +24,21 @@ focused rounds, but the answers come from the user.
 
 Look for `superpowers:brainstorming` in your available skills. **If present, you MUST invoke it** to run
 the dialogue — wi's job is then only to capture the outcome into `.wi/features/<slug>/brief.md` in the
-format below. Log the mode to `progress.md` either way: `brainstorm via superpowers:brainstorming` or
-`brainstorm via wi fallback (superpowers absent)`. Running the fallback while superpowers is installed
-is a defect, not a preference — wi exists to orchestrate the best installed tool, and the delegation log
-gets checked after runs. **Either way, the dialogue is with the USER** — if `superpowers:brainstorming` starts
-answering its own questions, stop and put them to the user yourself; "capture the outcome" means capture *the
-user's* answers, not a self-generated brief.
+format below. Log the mode to `progress.md` either way — engine plus interactivity:
+`brainstorm via superpowers:brainstorming` or `brainstorm via wi fallback (superpowers absent)`, suffixed
+`, dialogue` | `, self-answered (headless)` (headless rule below). Running the fallback while superpowers
+is installed is a defect, not a preference — wi exists to orchestrate the best installed tool, and the
+delegation log gets checked after runs. **Either way, the dialogue is with the USER** — if
+`superpowers:brainstorming` starts answering its own questions, stop and put them to the user yourself;
+"capture the outcome" means capture *the user's* answers, not a self-generated brief.
+
+**Scope of the delegation — wi supersedes the delegate's pipeline.** `superpowers:brainstorming` supplies
+the *dialogue method*; its own artifact and handoff contract do not apply under wi. The outcome is
+captured in wi's `brief.md` (no `docs/superpowers/specs/` design doc, and no separate spec-review gate
+beyond the must-asks below), and its "the only skill you invoke next is writing-plans" ending is replaced
+by wi's own pipeline (dev owns the handoff; research/plan fire in their phases — plan's delegation check
+invokes writing-plans there). Where the delegate's checklist demands those steps, satisfy them with the wi
+equivalents and move on.
 
 ## Must-ask before handoff (interactive — never skipped)
 
@@ -41,6 +50,15 @@ Whoever runs the dialogue (superpowers or the fallback), the brief isn't done un
 
 Capture answers in `brief.md`; if the user genuinely can't answer one, log it under *Open questions for
 research* — don't invent it.
+
+**Headless runs** (no user can answer at all — an unattended dispatch: CI, a subagent, a scheduled run):
+the must-asks still hold, but each is self-resolved with the smallest reasonable choice and logged as an
+assumption in `brief.md`, and the stamp says so (`, self-answered (headless)`). The step-0 delegation
+still applies: invoke `superpowers:brainstorming` when present (it structures the questions; its
+questions are then self-answered under this rule) and stamp the engine as usual — if the engine cannot
+run without a user, fall back and stamp `via wi fallback, self-answered (headless)`. This is a fallback
+for *absence*, not a `--auto` behavior — `--auto` collapses the stops *after* brainstorm, never this
+conversation: the user who typed the command is present for it.
 
 ## Glossary & term-sharpening (both paths)
 

@@ -18,7 +18,12 @@ or the user's own agents.
 
 **The orchestrator model is informational.** A plugin cannot set the session model — the user picks it
 with `/model`. wi records the intended tier and, at run start, **warns once** if the session model is
-below it (e.g. config says `fable`, session runs `haiku`); it never blocks.
+below it (e.g. config says `fable`, session runs `haiku`); it never blocks. The reverse is **not** a
+mismatch and gets no warning: a session running *above* the configured tier (say a `fable` session over
+the simple preset) still dispatches every role at its **configured** tier — premium tiers are priced
+accordingly, so wi never auto-escalates a dispatch above config. A tier above `opus` enters a run only
+when the user put it there: choosing **smart** interactively, or writing it into custom rows / per-agent
+overrides.
 
 ## The config file — `.wi/moa.md`
 
@@ -77,16 +82,21 @@ Each role's default follows a rule, not an arbitrary pick:
 - **`wi-code-checker`** dispatches at this same-family Claude tier and is **never weaker than the orchestrator** —
   smart's orchestrator is already top-tier (`fable`), so checker matches it there; simple's orchestrator
   is `opus`, so checker matches that (not a downgrade to `sonnet`/`haiku`). Verification is the one place
-  not to cut corners.
+  not to cut corners. The floor is the **configured** orchestrator tier, never the live session model —
+  a top-tier session over the simple preset still dispatches the checker at `opus`, by design (pricing;
+  see the no-auto-escalation rule above).
 - **`wi-researcher`** is one Claude tier below the orchestrator (`fable→opus→sonnet→haiku`, floor at
   `haiku`) — cheaper exploratory work doesn't need the top tier.
 - **`wi-task-runner`** scales with the preset directly (smart → `opus`, simple → `sonnet`) — it's the
   highest-volume dispatch (one per plan task), so its cost profile should track the preset's overall
   intent.
 
-**smart** = top-tier checker + strong researcher/task-runner + cross-architecture check. **simple** = lean
-pass-through, no cross-provider check. Presets only *pre-fill* the table — every cell stays individually
-overridable.
+**smart** = top-tier checker + strong researcher/task-runner + cross-architecture check — the only preset
+that reaches **above `opus`**, and it is never a default: it must be chosen interactively (or written by
+hand). **simple** = the `opus`/`sonnet` lean pass-through, no cross-provider check — the `--auto` default;
+its ceiling is `opus` **by design** (pricing — top tiers are never a default anywhere in wi). Presets only
+*pre-fill* the table — every cell stays individually overridable (a hand-written override may name any
+tier, including `fable`).
 
 ## First-run setup (dev / rpa entry points)
 
@@ -103,7 +113,9 @@ the file exists, skip setup entirely — just apply it.
 
 At every wi Agent dispatch, resolve the model as **per-agent override → the agent's own role → `inherit`**
 (`wi-code-checker` reads the `wi-code-checker` role, `wi-researcher` reads `wi-researcher`, `wi-task-runner`
-reads `wi-task-runner`) and pass it as the dispatch's model parameter. No `.wi/moa.md` → everything
+reads `wi-task-runner`; RPA build delegations resolve `rpa-build` override → `wi-task-runner` role →
+`inherit` — `rpa-build` is a **role label** for those delegations, not a registered agent; there is no
+`agents/rpa-build.md`) and pass it as the dispatch's model parameter. No `.wi/moa.md` → everything
 inherits, exactly wi's pre-MoA behavior. **Fallback:** a configured model that errors as unavailable at
 dispatch time → re-dispatch with `inherit` and note it in `progress.md`; never stall a run on a model
 assignment.

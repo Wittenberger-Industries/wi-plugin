@@ -79,7 +79,9 @@ in `plan` mode over `spec.md` + `tasks.md` + `pitfalls.md` + `constitution.md` +
 **Runtime State Inventory** rows). It builds a feature-backward coverage matrix and returns
 BLOCKER/WARNING/INFO findings, writing `verification.md`. Feed them back: a BLOCKER — an unmapped
 acceptance criterion, a silently down-scoped decision — loops to plan to fix, then the checker re-checks
-(**max 2 rounds**). Whatever remains is **carried into the gate summary** with its severity, so the user
+(**max 2 rounds**; each round appends its own `tokens.md` row — a re-check round that returns without a
+completion notification records `unavailable`, never an estimate). Whatever remains is **carried into the
+gate summary** with its severity, so the user
 decides with eyes open. Then Phase = `design-gate` — this flip is **research's alone**: plan ends with
 Phase still `plan`, so an interrupted run can never resume into the gate without this checker pass having
 run.
@@ -124,11 +126,13 @@ Then check **Gate mode** in `progress.md`:
 Only an explicit approve (or auto-approve) advances to implementation.
 
 ### 4 - Hand off to implementation
-If persistence wasn't armed at handoff, print the ready-made keep-alive again (the user is present —
-they just approved) for the current platform: Claude Code & Codex CLI arm their built-in `/goal` with the
-PR-open condition; Copilot CLI relaunches under Autopilot. The exact command templates — and the
-unattended-run warning that must accompany the Copilot one — live in
-`${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`; print them from there verbatim.
+**Interactive gate only:** if persistence wasn't armed at handoff, print the ready-made keep-alive again
+(the user is present — they just approved) for the current platform: Claude Code & Codex CLI arm their
+built-in `/goal` with the PR-open condition; Copilot CLI relaunches under Autopilot. The exact command
+templates — and the unattended-run warning that must accompany the Copilot one — live in
+`${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`; print them from there verbatim. Under **auto-approve**
+skip the re-print — nobody is at the console (the gate was recorded, not asked), the handoff already
+recorded the line, and arming is the user's act, never wi's.
 
 Then proceed: **build** (`wi:build`) — worktree + parallel waves — then **ship** (`wi:ship`), which ends
 with the PR and the final report (token table included). The keep-alive loop (/goal or Autopilot) is the
