@@ -66,7 +66,9 @@ proceed on the best evidence available and log the gap in `progress.md`. Carry e
 `Risks / unknowns` line forward to plan — each must end up resolved, spiked, or in `pitfalls.md`;
 dropping one silently is a defect. If the decision is **hard to reverse**, record it as the next
 **ADR-NNNN** in the project-wide `.wi/adr/` log (global numbering + an index.md row, per the plan skill's
-ADR template). Set Phase = `plan`.
+ADR template). Commit the ADR + its index row now (`docs(wi): ADR-NNNN <title>`) — research runs on main
+before build branches, so the committed ADR rides the branch and the PR (the project-level rule in
+`wi-directory.md`). Set Phase = `plan`.
 
 ### 2 - Plan
 Run **plan** (`wi:plan`): brief + research -> `spec.md` (testable acceptance criteria), `tasks.md` (small
@@ -109,6 +111,9 @@ inlined from the ADR/spec/tasks you just wrote):
 
 Full detail: .wi/features/<slug>/ (spec.md, tasks.md, pitfalls.md, verification.md) and .wi/adr/ADR-NNNN-*.md
 ```
+
+No ADR (nothing hard to reverse)? Render the line as **Approach:** <the decision> *(no ADR — nothing hard
+to reverse)* and drop the ADR path from the footer line.
 
 Then check **Gate mode** in `progress.md`:
 - **interactive** (default): ask with AskUserQuestion: **approve** / **amend the approach** (loop to

@@ -110,7 +110,9 @@ timestamp: <YYYY-MM-DD>
   query when D3 resolves").
 
 ## Gate (definition of done)
-- Output matches the **gate-approved paradigm** — always REFramework XAML; `.cs` / `.codedworkflows` only if the user approved **coded-allowed**.
+- **REFramework runs:** output matches the **gate-approved paradigm** — XAML activities by default;
+  `.cs` / `.codedworkflows` only if the user approved **coded-allowed**. **Maestro runs:** the paradigm
+  check is n/a — the gate is `uip maestro flow validate` (+ eval when sets exist).
 - `uip` restore + validate succeed; **Workflow Analyzer: zero error-level violations**.   (confirm)
 - `tokens.md` (token ledger) passes `check_tokens.py` — rows + filled sum + resolved Orchestrator.
 - Every SDD acceptance criterion verified; every assumption confirmed or logged for sign-off.

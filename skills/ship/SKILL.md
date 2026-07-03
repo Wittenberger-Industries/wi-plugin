@@ -55,8 +55,8 @@ Unconfigured, exit 2 (config/API error), or exit 3 (missing API key) governs onl
 Findings from **both** layers feed the same loop: a BLOCKER — an unmet criterion, a decision silently
 reduced to a stub — sends the feature **back to build**, **max 2 review→fix rounds** shared across both;
 whatever remains goes with its severity into `PR.md`'s Verification. A BLOCKER from either layer blocks
-the PR. `moa-review.md` is ephemeral (pruned in §5). Ship never opens the PR
-on a feature wi-code-checker says isn't delivered.
+the PR. `moa-review.md` is ephemeral (pruned in §6, after §5 distills it into `PR.md`). Ship never opens
+the PR on a feature wi-code-checker says isn't delivered.
 
 Address findings before proceeding; note anything deliberately deferred.
 
@@ -67,6 +67,8 @@ The feature is built and verified — make the docs match reality before the PR.
 - **Architecture diagram:** if the change added or removed a module, dependency, layer, or external
   service, update `.wi/architecture.md` (the mermaid graph + legend) to match. If it doesn't exist yet
   (e.g. a greenfield project's first feature), create it now from the new structure using scan's template.
+  (Scan's docs are committed where written — `wi-directory.md`'s project-level rule — so a scanned repo's
+  worktree already carries them; absence really does mean greenfield.)
   Then validate it for real before committing:
   `python ${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py .wi/architecture.md` — the bundled
   checker catches reserved-word node IDs, unquoted labels, and unbalanced `subgraph`/`end` (and renders
@@ -136,7 +138,53 @@ resolved term → `.wi/glossary.md`. That is how the next feature starts smarter
 
 Commit: `docs(<slug>): learnings` (or fold into the docs-sync commit).
 
-## 5 · Tidy the history & the feature dossier
+## 5 · PR description — write `.wi/features/<slug>/PR.md`
+
+Write it from the feature's own artifacts — they were made for exactly this. The description is a **file,
+not console output**: save it as `.wi/features/<slug>/PR.md` and commit it (`docs(<slug>): PR description`).
+It is part of the dossier in both flows and exists **whether or not** a PR can be opened this run — it is
+what `gh pr create --body-file` consumes, and what a human uses if they must create the PR by hand. It
+opens with OKF frontmatter (`type: PR Description`); the PR **body** is everything *below* that
+frontmatter, so the frontmatter is stripped before feeding `gh` (§7) — it's dossier metadata, not PR text.
+Template:
+
+```markdown
+---
+type: PR Description
+title: <feature title>
+description: <2-4 word summary of the change>
+feature: <slug>
+timestamp: <YYYY-MM-DD>
+---
+
+## <type>: <feature title>
+
+### Summary
+<2-4 sentences: what changed and why. Pulled from spec.md Summary.>
+
+### Acceptance criteria
+- [x] <criterion 1>  (verified by <test/command>)
+- [x] <criterion 2>
+
+### Changes
+- <key change 1>
+- <key change 2>
+
+### Testing
+<what was run and the result: test suite, lint, typecheck. Note new tests added.>
+
+### Verification
+<checker result-mode verdict: every acceptance criterion + locked decision delivered and wired; any waived
+findings with severity. Distilled from verification.md; the dossier tidy (§6) then prunes it.>
+
+### Risk & rollout
+<feature flag? migration order? back-out plan. From spec.md Rollout.>
+
+### Decisions
+<link any ADRs: .wi/adr/ADR-NNNN-*.md>
+```
+
+## 6 · Tidy the history & the feature dossier
 
 - Ensure each commit is coherent (`<type>: <subject>`). Squash only if the project prefers a single commit
   per PR (check the constitution).
@@ -176,55 +224,9 @@ Commit: `docs(<slug>): learnings` (or fold into the docs-sync commit).
   4. *What remains is the fixed dossier for this flow* — take the manifest from the flow's directory
      reference, not from memory: `dev` → wi-directory.md's seven-file dossier (progress, brief, spec,
      tasks, pitfalls, tokens, PR); `rpa` → rpa-directory.md's run dossier (the SDD pack plus per-process
-     `tobe.md`). Either way it is the durable record of the feature (`PR.md` is written in the next step,
-     before this commit is pushed).
+     `tobe.md`). Either way it is the durable record of the feature (`PR.md` was written in §5, so this
+     tidy commit carries the complete dossier).
   5. Commit it: `chore(<slug>): tidy feature dossier`.
-
-## 6 · PR description — write `.wi/features/<slug>/PR.md`
-
-Write it from the feature's own artifacts — they were made for exactly this. The description is a **file,
-not console output**: save it as `.wi/features/<slug>/PR.md` and commit it (`docs(<slug>): PR description`).
-It is part of the dossier in both flows and exists **whether or not** a PR can be opened this run — it is
-what `gh pr create --body-file` consumes, and what a human uses if they must create the PR by hand. It
-opens with OKF frontmatter (`type: PR Description`); the PR **body** is everything *below* that
-frontmatter, so the frontmatter is stripped before feeding `gh` (§7) — it's dossier metadata, not PR text.
-Template:
-
-```markdown
----
-type: PR Description
-title: <feature title>
-description: <2-4 word summary of the change>
-feature: <slug>
-timestamp: <YYYY-MM-DD>
----
-
-## <type>: <feature title>
-
-### Summary
-<2-4 sentences: what changed and why. Pulled from spec.md Summary.>
-
-### Acceptance criteria
-- [x] <criterion 1>  (verified by <test/command>)
-- [x] <criterion 2>
-
-### Changes
-- <key change 1>
-- <key change 2>
-
-### Testing
-<what was run and the result: test suite, lint, typecheck. Note new tests added.>
-
-### Verification
-<checker result-mode verdict: every acceptance criterion + locked decision delivered and wired; any waived
-findings with severity. Distilled from verification.md, which is pruned at close-out.>
-
-### Risk & rollout
-<feature flag? migration order? back-out plan. From spec.md Rollout.>
-
-### Decisions
-<link any ADRs: .wi/adr/ADR-NNNN-*.md>
-```
 
 ## 7 · Open the PR (autonomous)
 
@@ -255,10 +257,12 @@ force-push.** If `superpowers:finishing-a-development-branch` is installed, use 
 
 ## 8 · Close out — checklist, then the report
 
-After the PR is open (or merged), clean up: remove the worktree and delete the merged branch (see the
-worktree reference). Then run the **close-out checklist** — every box, against the actual repo state, not
-memory. `progress.md` Phase = `done` is **earned by this checklist**; an unticked box means ship is not
-finished, no matter what the console already said:
+After the PR is open (or merged), clean up: remove the worktree (safe once the branch is pushed), and
+delete the **local** branch only if it is fully merged (`git branch -d`, which refuses otherwise — see
+the worktree reference); the remote branch and an open PR are never deleted. Then run the
+**close-out checklist** — every box, against the actual repo state, not memory. `progress.md` Phase =
+`done` is **earned by this checklist**; an unticked box means ship is not finished, no matter what the
+console already said:
 
 - [ ] PR is **open** and its URL is logged in `progress.md` (sole substitute: branch pushed + failure
       reason + the frontmatter-stripped `gh pr create …` recovery command (§7) recorded as a blocker)
@@ -273,7 +277,8 @@ finished, no matter what the console already said:
       dossier in wi-directory.md; rpa: the run dossier in rpa-directory.md; **RPA runs: see rpa/SKILL §7
       mapping**); ephemera pruned (`research/`, `verification.md`, `moa-review.md`); no strays anywhere
       in `.wi/`
-- [ ] worktree removed; merged branch deleted
+- [ ] worktree removed; local branch deleted only if fully merged (`git branch -d` refuses otherwise) —
+      the remote branch / open PR never deleted
 
 All green: set Phase = `done`, add a final Log line with the PR link, and if `roadmap.md` exists mark this
 feature done and surface the next one.

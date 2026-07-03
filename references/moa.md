@@ -90,10 +90,12 @@ overridable.
 
 ## First-run setup (dev / rpa entry points)
 
-When `.wi/moa.md` is **absent** at a wi entry skill (dev step 2, rpa step 2): **interactive** → ask once
+When `.wi/moa.md` is **absent** at a wi entry skill (dev step 1, rpa step 2): **interactive** → ask once
 — *"MoA models: smart, simple, or custom?"* — pre-fill from the chosen preset (`wi-researcher`'s literal
 is computed once as one tier below the chosen orchestrator tier), confirm the per-role rows (and any
-per-agent override), write the file. **`--auto`** → write the **simple** preset and log it as an
+per-agent override), write the file **and commit it** (`chore(wi): moa config` — the project-level rule
+in `wi-directory.md`: committed where written, so post-worktree phases read the same tracked copy).
+**`--auto`** → write + commit the **simple** preset and log it as an
 assumption. Either way the file persists and is **never re-asked** (edit `.wi/moa.md` to change it). When
 the file exists, skip setup entirely — just apply it.
 
@@ -114,10 +116,11 @@ role's Claude tier:
 
 - **PLAN mode** (pre-gate, before a diff exists — verifies spec/task coverage). There's no diff yet to
   hand a cross-provider script, so this mode is same-family only.
-- **RESULT mode** (ship, and — when `check_points: per-wave` — each build wave-end gate): confirms every
-  acceptance criterion + locked decision is delivered and **wired**, refreshing `verification.md`. When a
-  cross-provider is configured, the independent diff review described next runs **beside** this dispatch —
-  never instead of it.
+- **RESULT mode** (at ship): confirms every acceptance criterion + locked decision is delivered and
+  **wired**, refreshing `verification.md`. When a cross-provider is configured, the independent diff review
+  described next runs **beside** this dispatch — never instead of it — and when `check_points: per-wave`,
+  that diff-review layer additionally runs at each build wave-end gate over the wave's diff (the checker
+  itself still runs twice per feature).
 
 ### The cross-provider diff review (a layer beside wi-code-checker's result mode)
 
@@ -130,7 +133,8 @@ not a substitute — the script only receives the diff + spec text (no Read/Grep
 it cannot verify things are actually wired, and it does not write `verification.md`. Mechanics:
 
 1. Produce the diff (`git diff <base>...HEAD` for at-finish; the wave's commits for per-wave) to a temp
-   file, plus context: `spec.md` (or `sdd.md` §13) and the relevant constitution rules.
+   file, plus context: `spec.md` (or the SDD's acceptance-criteria section) and the relevant
+   constitution rules.
 2. Run `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/moa_review.py --config .wi/moa.md
    --diff <patch> --context <spec> --out .wi/features/<slug>/moa-review.md` (`python` assumed on PATH; where it
    does not resolve, fall back to `py -3` on Windows or `python3` on Linux/macOS).
@@ -142,8 +146,8 @@ it cannot verify things are actually wired, and it does not write `verification.
    continue; wi-code-checker's result-mode dispatch is unconditional and runs regardless. The
    cross-provider script works alone — the orchestrator hands it the diff and takes back findings; it does
    not steer the review.
-4. `moa-review.md` is **ephemeral** like `verification.md`: distill the verdict into `PR.md`, prune at
-   close-out.
+4. `moa-review.md` is **ephemeral** like `verification.md`: ship §5 distills the verdict into `PR.md`,
+   then the dossier tidy (§6) prunes both.
 
 `Cross-provider config` `provider: none` (simple preset) → skip the script entirely; RESULT mode still
 dispatches `wi-code-checker` at its Roles-table tier, same as PLAN mode — the cross-provider path is a

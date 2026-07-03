@@ -6,7 +6,8 @@ validate.py — pre-release check for the wi plugin. Run from anywhere:
 
 Checks (from the repo root, detected automatically):
   1. JSON validity of `.claude-plugin/marketplace.json`, `.claude-plugin/plugin.json`, and
-     `.codex-plugin/plugin.json`; the Codex manifest declares name/version/skills and `skills` resolves.
+     `.codex-plugin/plugin.json`; the Codex manifest declares name/version/skills and `skills` resolves;
+     the three manifest versions agree.
   2. Every `skills/**/SKILL.md` / `agents/*.md` has valid YAML frontmatter with `name` + `description`
      — this catches the col-0 `<example>` / block-scalar bug that stopped the agents loading.
      Needs PyYAML for the full parse (`pip install pyyaml`); without it, the YAML parse is skipped
@@ -26,11 +27,13 @@ Checks (from the repo root, detected automatically):
   7. Mechanical lints, scoped to skills/ · agents/ · references/ · .claude-plugin/ (never docs/ or tests/,
      which legitimately archive the very strings banned in shipped text): every SKILL.md `description`
      stays under the 1024-char agent-skills cap; skill + reference descriptions don't trail off mid-thought
-     (a truncated/lazy `...` or `..`); and three dead strings are banned — the retired `uipath-rpa-workflows`
+     (a truncated/lazy `...` or `..`); and four dead strings are banned — the retired `uipath-rpa-workflows`
      slug, the pre-rename work-unit dir `.wi/goals` (the unit is a feature; the dir is `.wi/features` —
      only the dev/rpa one-time `git mv .wi/goals .wi/features` migration line may name the old path),
-     and `python3` launching a bundled `${CLAUDE_PLUGIN_ROOT}` script (the broken Windows Store stub;
-     prose `python3`/`py -3` fallback notes are not flagged, only actual invocations).
+     `python3` launching a bundled `${CLAUDE_PLUGIN_ROOT}` script (the broken Windows Store stub;
+     prose `python3`/`py -3` fallback notes are not flagged, only actual invocations), and the retired
+     `sdd.md §13` acceptance-criteria anchor (now the semantic 'acceptance-criteria section', §10 in the
+     base ToC).
 
 Exit 0 if all pass; non-zero otherwise. Stdlib only (PyYAML optional).
 """
@@ -76,6 +79,20 @@ if codex.is_file():
             errors.append(f".codex-plugin/plugin.json: skills path '{skills_path}' is not a dir")
     except Exception:
         pass  # JSON validity already reported by the loop above
+
+# Manifest version parity: all three manifests ship the same version (README "Maintaining" rule)
+try:
+    v_plugin = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")).get("version")
+    v_codex = json.loads(codex.read_text(encoding="utf-8")).get("version") if codex.is_file() else None
+    mp = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+    v_market = next((p.get("version") for p in mp.get("plugins", []) if p.get("name") == "wi"), None)
+    if len({v_plugin, v_codex, v_market}) != 1:
+        errors.append(
+            f"manifest version mismatch: .claude-plugin/plugin.json={v_plugin} "
+            f"marketplace.json(wi)={v_market} .codex-plugin/plugin.json={v_codex} — bump all three together"
+        )
+except Exception:
+    pass  # invalid JSON already reported above
 
 # 2. Frontmatter on SKILL.md + agents -------------------------------------
 fm_files = sorted(ROOT.glob("skills/**/SKILL.md")) + sorted(ROOT.glob("agents/*.md"))
@@ -273,6 +290,7 @@ DEAD_SLUG = re.compile(r"uipath-rpa-workflows")
 DEAD_GOALS_DIR = re.compile(r"\.wi/goals")  # goal->feature rename (M1): the work-unit dir is .wi/features
 MIGRATION_CMD = "git mv .wi/goals .wi/features"  # the one sanctioned mention (dev/rpa legacy migration)
 PY3_INVOKE = re.compile(r"python3[ \t]+\$\{CLAUDE_PLUGIN_ROOT\}")  # an invocation — bare prose `python3` won't match
+DEAD_SDD_S13 = re.compile(r"§13")  # the SDD acceptance-criteria anchor is semantic (§10 in the base ToC)
 lint_scope = (
     sorted(ROOT.glob("skills/**/*.md"))
     + sorted(ROOT.glob("agents/*.md"))
@@ -290,6 +308,8 @@ for f in lint_scope:
         errors.append(f"{rel}: dead path '.wi/goals' — the work unit is a feature; use '.wi/features' (goal->feature rename)")
     if PY3_INVOKE.search(txt):
         errors.append(f"{rel}: 'python3 ${{CLAUDE_PLUGIN_ROOT}}' invocation — use 'python' (python3 is the broken Store stub on Windows)")
+    if DEAD_SDD_S13.search(txt):
+        errors.append(f"{rel}: dead anchor '§13' — reference the SDD's acceptance-criteria section semantically (§10 in the base ToC)")
 
 # Report -------------------------------------------------------------------
 note = "" if HAVE_YAML else "  [PyYAML absent → YAML parse skipped; `pip install pyyaml` for the full check]"

@@ -13,14 +13,14 @@ this step is what makes the later UiPath handoff complete.
 
 ## 1. Derive the run-slug, then convert the PDD → `pdd.md`
 
-- **Derive `<slug>` first** — it's the feature-folder name used everywhere below: a kebab name from the
+- **Derive `<run-slug>` first** — it's the feature-folder name used everywhere below: a kebab name from the
   PDD/solution, **prefixed with the next global 4-digit ordinal** (`NNNN-<name>`, e.g. `0001-invoices`),
   mirroring `ADR-NNNN`: global across `.wi/features/`, monotonic, assigned once at creation, never renumbered.
   Next = highest existing `.wi/features/` ordinal + 1 (else `0001`); legacy unnumbered runs are left as-is.
-- If the PDD is `.docx`/`.pdf`/`.pptx`: `markitdown <pdd> -o .wi/features/<slug>/pdd.md`.
+- If the PDD is `.docx`/`.pdf`/`.pptx`: `markitdown <pdd> -o .wi/features/<run-slug>/pdd.md`.
 - If it's already `.md`: copy/reference it as `pdd.md` as-is (don't re-process).
 - **Prepend OKF frontmatter** so `pdd.md` is a typed concept like the rest of the bundle: open the file
-  with `type: PDD` (+ `title`, `description`, `feature: <slug>`, `timestamp` — stub in `rpa-directory.md`)
+  with `type: PDD` (+ `title`, `description`, `feature: <run-slug>`, `timestamp` — stub in `rpa-directory.md`)
   above the converted body. The frontmatter is metadata; the body stays faithful to the source.
 - Keep `pdd.md` faithful to the source — it is the record of *what the business actually wrote*. Refinement
   happens later in `tobe.md`, not by editing `pdd.md`.

@@ -70,7 +70,12 @@ Plus a plugin check that may install the skills wi delegates to.
    `/plugin marketplace add` + `/plugin install` commands. wi works fully without them — this is an
    enhancement, not a requirement.
 
-6. **Report** (4-8 lines): stack, frontend/backend, what docs were written, which plugins are present vs
+6. **Commit the scan outputs** — `repo-map.md`, `overview.md`, `architecture.md`, `constitution.md`, plus
+   the greenfield `.gitignore` when one was created: `chore(wi): scan — repo docs` (the project-level rule
+   in `wi-directory.md`: committed where written; a constitution override can disable wi commits to main).
+   This is what makes the committed-`.wi/` promise true and puts the docs in every future worktree.
+
+7. **Report** (4-8 lines): stack, frontend/backend, what docs were written, which plugins are present vs
    newly installed, and anything left `UNKNOWN`.
 
 ## `--refresh` — drift check + memory hygiene (already-scanned projects)
@@ -124,8 +129,9 @@ ADRs are **immutable history — never pruned** (supersede with a new ADR instea
 
 ### C · Report (refresh)
 
-3-6 lines: what drifted and was fixed (commands, diagram, facts), contradictions flagged for the user,
-learnings merged/promoted/pruned (counts), or "no drift — scan is current."
+Commit what drifted (`chore(wi): scan refresh`). Then report, 3-6 lines: what drifted and was fixed
+(commands, diagram, facts), contradictions flagged for the user, learnings merged/promoted/pruned
+(counts), or "no drift — scan is current."
 
 ## `repo-map.md` template
 

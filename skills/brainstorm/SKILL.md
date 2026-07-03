@@ -70,6 +70,9 @@ _Avoid_: <alias1>, <alias2>
 Only project-specific domain terms, not general programming words. Be opinionated: pick the best word,
 list the rest as aliases. A shared vocabulary makes every future brief and spec sharper.
 
+Glossary updates are committed where written (`docs(wi): glossary` — the project-level rule in
+`wi-directory.md`).
+
 ## Fallback dialogue (ONLY when superpowers:brainstorming is absent)
 
 1. **Load context.** Read `constitution.md` + `repo-map.md` (and `overview.md` + `.wi/glossary.md` if

@@ -17,7 +17,7 @@ its own.
 |---------|--------------|
 | **`/wi:scan`** | Documents an existing project — incl. a mermaid architecture diagram — and bootstraps wi (constitution + optional plugin installs). |
 | **`/wi:dev "idea"`** | Brainstorms a feature with you, designs, confirms architecture + design at one gate, then builds and ships hands-off to an open PR. Add `--auto` to auto-approve the gate. |
-| **`/wi:rpa "pdd"`** | Parses a PDD (markitdown), refines the TO-BE, writes an SDD + architecture + assumptions, then builds a REFramework solution via the UiPath skills — XAML-only or coded, your choice at the design gate — to a PR. One run per PDD (1..N processes); `--auto` supported. |
+| **`/wi:rpa "pdd"`** | Parses a PDD (markitdown), refines the TO-BE, writes an SDD + architecture + assumptions, then builds a REFramework or Maestro solution via the UiPath skills — XAML-only or coded, your choice at the design gate — to a PR. One run per PDD (1..N processes); `--auto` supported. |
 
 On Claude the commands are `/wi:scan`, `/wi:dev`, …; on Codex/Copilot the skills invoke as `/scan`, `/dev`,
 … or auto-trigger from natural language.
@@ -67,7 +67,7 @@ cross-platform bootstrap is `AGENTS.md`.
 /wi:scan                  once per project — documents it, bootstraps wi
 /wi:dev "idea"         -> brainstorm (you) -> research -> plan -> check -> DESIGN GATE (you) -> build -> check -> ship -> PR
 /wi:dev "idea" --auto  -> same, gate auto-approved & recorded — fully hands-off
-/wi:rpa "PDD.docx"     -> ingest(markitdown) -> refine TO-BE (you) -> SDD -> check -> DESIGN GATE (you) -> REFramework build -> check -> PR
+/wi:rpa "PDD.docx"     -> ingest(markitdown) -> refine TO-BE (you) -> SDD -> check -> DESIGN GATE (you) -> REFramework/Maestro build -> check -> PR
 ```
 
 The **check** steps are wi's read-only **checker** agent. In *plan mode* (before the gate) it builds a
@@ -94,6 +94,7 @@ robustly through a stalled turn.
 ├── learnings.md         # learnings index: one line + hook per feature — phases read this, not the dir
 ├── learnings/           # substantial per-feature learnings in their own .mds — compounds across features
 ├── roadmap.md           # optional: ordered features for a larger effort
+├── moa.md               # optional: MoA model assignments per dispatched agent (see references/moa.md)
 └── features/<slug>/
     ├── progress.md      # the feature's state machine (source of truth)
     ├── brief.md         # brainstorm output: what you want
@@ -115,12 +116,12 @@ title / description / timestamp), so each phase — and `validate.py` — can pa
 |-------|-----------------|------|
 | `scan` | `/wi:scan` | Document an existing project and bootstrap wi; `--refresh` = drift check + learnings consolidation |
 | `dev` | `/wi:dev "idea"` | The interactive entry: brainstorm, then hand off |
-| `rpa` | `/wi:rpa "pdd"` | RPA entry: ingest PDD -> refine TO-BE -> SDD -> REFramework build via UiPath skills -> PR |
+| `rpa` | `/wi:rpa "pdd"` | RPA entry: ingest PDD -> refine TO-BE -> SDD -> REFramework/Maestro build via UiPath skills -> PR |
 | `brainstorm` | via `dev` | The requirements dialogue (the one interactive phase) + glossary upkeep |
 | `research` | via `dev` | The design half: research -> plan -> design gate (your confirmation) |
 | `plan` | via `research` | spec + tasks + pitfalls (+ ADR) |
 | `build` | post-gate | worktree + parallel waves of task subagents (TDD) |
-| `ship` | post-gate | gate -> review -> docs-sync -> learnings -> tokens -> PR.md -> open PR -> checklist |
+| `ship` | post-gate | gate -> review -> docs-sync -> learnings -> PR.md -> tidy + tokens -> open PR -> checklist |
 
 Agents: **task-runner** (executes one build task in isolation), **researcher** (picks the approach in the
 autonomous phase), and **checker** (read-only verification working backward from the feature's acceptance
@@ -152,10 +153,11 @@ skill auto-triggers from natural language too.
 ## Setup & conventions
 
 - **No required env vars or MCP servers.** `/wi:scan` offers to install the optional skills wi delegates to.
-- **Tiered models (MoA, optional).** `.wi/moa.md` assigns models per role — orchestrator (informational),
-  execution, checker, and an independent cross-provider **reviewer** (e.g. GPT via `OPENAI_API_KEY`) that
-  code-reviews the finished feature. Smart/simple presets, set up once on the first wi run, every cell
-  overridable; see `references/moa.md`. Without the file, everything inherits the session model as before.
+- **Tiered models (MoA, optional).** `.wi/moa.md` assigns a model per dispatched agent — orchestrator
+  (informational), `wi-code-checker`, `wi-researcher`, `wi-task-runner` — plus an independent
+  **cross-provider diff review** (e.g. GPT via `OPENAI_API_KEY`), a layer on top of the checker's
+  result-mode pass at ship. Smart/simple presets, set up once on the first wi run, every cell overridable;
+  see `references/moa.md`. Without the file, everything inherits the session model as before.
 - **Python-first** defaults (uv · pytest · ruff · mypy), stack-agnostic — `scan` records whatever the repo
   uses, and `constitution.md` is where you override.
 - Opening the PR uses `gh` if available; otherwise wi pushes the branch and leaves the PR command for you.
@@ -197,12 +199,13 @@ If none are installed, wi still runs the whole loop on its own.
   frontmatter) with no truncated-write signatures — a missing trailing newline or unbalanced code fences.
   `pip install pyyaml` enables the full frontmatter parse.
 - **Version tracks skill/agent changes:** any change under `skills/` or `agents/` bumps `version` in the
-  same PR (both `.claude-plugin/plugin.json` and the `marketplace.json` plugin entry). The installed cache
+  same PR — all three manifests: `.claude-plugin/plugin.json`, the `marketplace.json` plugin entry, and
+  `.codex-plugin/plugin.json` (`validate.py` enforces the three-way parity). The installed cache
   is keyed by version, so shipping new bytes under an unchanged version leaves sessions serving stale
   skills/agents — "same version, different bytes" makes support and repro guesswork.
 - **Claude local-marketplace updates:** bump `version` in `.claude-plugin/plugin.json` (+ the marketplace
-  entry), then `/plugin marketplace update wi` and `/reload-plugins` (or restart). Codex and Copilot
-  re-read the repo through their own install/update flows.
+  entry and `.codex-plugin/plugin.json`), then `/plugin marketplace update wi` and `/reload-plugins` (or
+  restart). Codex and Copilot re-read the repo through their own install/update flows.
 - **Agent naming:** the `wi-` prefix on `agents/` files is a deliberate cross-platform tag (PR #15); on
   Claude the namespace renders as `wi:wi-<name>` (e.g. `wi:wi-code-checker`) — the stutter is accepted,
   don't "fix" it back. The checker is intentionally `wi-code-checker` (not `wi-checker`); skills and docs

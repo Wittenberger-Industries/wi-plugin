@@ -12,8 +12,8 @@ description: >
 # /wi:dev "<feature idea>" — brainstorm with me, then build it hands-off
 
 This is how a feature starts. Interactive mode has two interactive moments — brainstorm and the design
-gate; **`--auto` collapses everything after brainstorm**, so brainstorm becomes the only stop and the run
-goes straight through to a PR.
+gate — plus a one-line handoff confirmation between them; **`--auto` collapses everything after
+brainstorm**, so brainstorm becomes the only stop and the run goes straight through to a PR.
 
 The contract: brainstorming decides the *what*; the research skill proposes the *how*; the **design
 gate** is where the user confirms it; after their go, nothing more is asked until the PR is up. wi
@@ -98,8 +98,8 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
 - User interactions by mode: **interactive** = brainstorm + a one-line handoff confirmation + the design
   gate; **`--auto`** = brainstorm only (no handoff confirmation, gate auto-approved and recorded). Never
   stop for anything else.
-- If brainstorming reveals several features, capture them in `.wi/roadmap.md` and run each as its own
-  `/wi:dev`. One feature = one PR.
+- If brainstorming reveals several features, capture them in `.wi/roadmap.md` — committed where written
+  (`docs(wi): roadmap`) — and run each as its own `/wi:dev`. One feature = one PR.
 - **Mid-run user input is routed, never absorbed silently.** If the user interjects during the autonomous
   stretch, record the message in progress.md (Decisions/blockers), then route it: small and inside the
   approved spec → append a task to `tasks.md` (build schedules it like any other); out-of-scope → a

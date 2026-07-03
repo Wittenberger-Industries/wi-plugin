@@ -54,8 +54,9 @@ why nothing's written yet, then either make the change or report blocked. Readin
 
 - Obey the constitution rules you were given. They override your habits.
 - **Frontend tasks route to the design skill — never build UI blind.** If your task is tagged
-  `[frontend]` and a design skill is available in your skills (`frontend-design` primary; `pbakaus/impeccable`
-  for polish, `leonxlnx/taste-skill` for visual direction), you **MUST** build/refine the markup *through it*,
+  `[frontend]` and a design skill is available in your skills (`frontend-design` primary; `impeccable` for
+  polish, `taste-skill` for visual direction — skills surface by bare name in a session; the owner-qualified
+  install ids live in integrations.md / plugin-bootstrap.md), you **MUST** build/refine the markup *through it*,
   not from memory. State `frontend via frontend-design` (or `via <skill>`) in your report — the orchestrator
   logs it to `progress.md`. Only if no design skill is installed do you author markup by hand — and then
   report `frontend via wi fallback (frontend-design absent)`. Either way you still write the behavioral test

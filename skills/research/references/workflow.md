@@ -25,8 +25,9 @@ scan (once, project-level)
   still recorded in progress.md).
 ```
 
-`progress.md`'s Phase field names the state. Resume = read it and re-enter that phase. After the
-handoff, the only user interaction is the design gate.
+`progress.md`'s Phase field names the state. Resume = read it and re-enter that phase (design-gate
+re-entry has one guard — see the contracts note below). After the handoff, the only user interaction is
+the design gate.
 
 ## Contracts
 
@@ -39,6 +40,10 @@ handoff, the only user interaction is the design gate.
 | design-gate | research | interactive* | adr, spec, tasks | gate outcome in progress.md | never — it is the second human gate |
 | build | post-gate loop (/goal or Autopilot keeps it alive) | autonomous | tasks, spec, constitution | source, ticked tasks | tasks already all ticked |
 | ship | post-gate loop | autonomous | the diff, spec, constitution | commits, PR | never |
+
+*Design-gate re-entry guard (research §0): resuming into `design-gate` requires a fresh plan-mode
+`verification.md` — missing, or older than `spec.md`/`tasks.md`, means the pre-gate checker pass runs
+first, then the gate renders.*
 
 ## Rules
 

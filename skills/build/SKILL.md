@@ -32,8 +32,9 @@ branch in `progress.md`.
 Branch name: `wi/<slug>`. Worktree path: a sibling dir, e.g. `../<repo>-wi-<slug>`.
 
 **First step, right after `git worktree add -b wi/<slug>`: bring the feature dossier over.** The feature folder
-is still **untracked** in the main checkout (no phase before build commits it), so the new worktree starts
-without it. Move `.wi/features/<slug>/` from the main checkout into the worktree's `.wi/features/<slug>/` and
+is still **untracked** in the main checkout (no phase before build commits the feature folder —
+project-level `.wi/` files, by contrast, are committed by their writing phases per `wi-directory.md`),
+so the new worktree starts without it. Move `.wi/features/<slug>/` from the main checkout into the worktree's `.wi/features/<slug>/` and
 commit it there as the branch's **first commit** — `chore(<slug>): feature dossier`. Moving (not copying)
 leaves main's working tree clean: the files were untracked on main, so nothing is lost and nothing
 unmerged stays behind. Resume-safe: if the feature folder is already present in the worktree (build

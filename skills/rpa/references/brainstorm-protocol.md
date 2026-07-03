@@ -47,8 +47,8 @@ assumption, and says so):**
 
 ## 0. Baseline — and challenge it
 
-Read `pdd.md`, `.wi/inputs.md`, `.wi/components.md`, `.wi/rpa-constitution.md` (+ any recovered diagram
-descriptions in `pdd-images.md`). **Extract the PDD's existing ToBe section as the *starting* `tobe.md`** (only
+Read `pdd.md`, `.wi/inputs.md`, `.wi/components.md`, `.wi/rpa-constitution.md`. **Extract the PDD's
+existing ToBe section as the *starting* `tobe.md`** (only
 *derive* one from the AS-IS when the PDD has none) — **but the PDD's ToBe and its To-Be diagram are a draft,
 often wrong or incomplete, NOT ground truth.** Actively challenge them with the user: does every step match
 reality? what's **missing** (a whole step or process — e.g. a master-data generation/refresh the diagram

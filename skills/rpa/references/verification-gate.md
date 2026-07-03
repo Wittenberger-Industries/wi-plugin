@@ -71,7 +71,7 @@ claim green you didn't verify).
 ## Feature-level check (checker · result mode)
 
 Beyond the tooling above, dispatch the **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `result`
-mode against **`sdd.md` §13** (acceptance criteria) + the locked decisions (the SDD's §1-§7, the
+mode against **the SDD's acceptance-criteria section** (§10 in the base ToC) + the locked decisions (the SDD's §1-§7, the
 `rpa-constitution`, any ADR) — it confirms each is **delivered and wired in the generated project**, not just
 present, refreshing `verification.md`. Feature/coverage-level, distinct from the Analyzer's line-level rules. A
 result-mode **BLOCKER** — an unmet SDD criterion, or a decision silently reduced to a stub/mock not signed
@@ -83,9 +83,9 @@ off — **loops back to build**; ship never opens the PR on a run the checker sa
 - restore + validate succeed; Workflow Analyzer has **zero error-level violations**.
 - the **token ledger `tokens.md` passes `check_tokens.py`** — present, with a row per delegated build unit,
   the Subagents sum filled, and a resolved `## Orchestrator` section (real figure or honest `unavailable`).
-- every SDD acceptance criterion (§13) maps to something that actually passed.
+- every criterion in the SDD's acceptance-criteria section maps to something that actually passed.
 - every assumption is either confirmed (gate) or recorded for sign-off; no unaddressed `NEEDS DECISION`.
-- the **checker (result mode) verdict is PASS** — every SDD §13 criterion and locked decision delivered and wired.
+- the **checker (result mode) verdict is PASS** — every SDD acceptance criterion and locked decision delivered and wired.
 
 ## The iron law (same as wi:dev)
 

@@ -46,10 +46,11 @@ You complement, not duplicate: the human **design gate** decides (you feed it), 
   locked decisions (ADRs, constitution). The question: **did the build actually satisfy them — wired, not
   just present?**
 
-**RPA runs (`wi:rpa`).** Same job, different artifact names — map them: `spec.md` → **`sdd.md`** (acceptance
-criteria in §13; locked decisions across §1-§7), `pitfalls.md` → **`assumptions.md`**, `constitution.md` →
-**`rpa-constitution.md`**, `brief.md` → **`pdd.md`**, plus **`orchestrator.md`** (the resource manifest) and
-any **Runtime State Inventory** rows for a rename/rebrand. In `result` mode the "diff / built tree" is the
+**RPA runs (`wi:rpa`).** Same job, different artifact names — map them: `spec.md` → **`sdd.md`**
+(acceptance criteria in the SDD's acceptance-criteria section — §10 in the base ToC; locked decisions
+across §1-§7), `pitfalls.md` → **`assumptions.md`**, `constitution.md` → **`rpa-constitution.md`**,
+`brief.md` → **`pdd.md`**, plus **`orchestrator.md`** (the resource manifest) and any
+**Runtime State Inventory** rows for a rename/rebrand. In `result` mode the "diff / built tree" is the
 generated REFramework project.
 
 ## How you verify
@@ -100,8 +101,8 @@ loop forever. (Result-mode BLOCKERs go back to build; lesser findings are surfac
 
 Write `.wi/features/<slug>/verification.md` (`type: Verification`) — the coverage matrix plus every finding
 with its severity, mode, and concrete evidence (`file:line`, task #, or "no covering task"). It is
-**ephemeral** — pruned at close-out like research notes; ship folds the verdict + any waived findings into
-`PR.md`, so the fixed seven-file dossier rule is preserved. Frontmatter:
+**ephemeral** — ship folds the verdict + any waived findings into `PR.md` (ship §5), then the dossier
+tidy (§6) prunes it like research notes, so the flow's fixed dossier manifest is preserved. Frontmatter:
 
 ```markdown
 ---

@@ -30,7 +30,7 @@ while the preferred skill is installed is a defect.
 | wi phase | REQUIRED when installed | Fallback (only when absent) |
 |----------|---------------------|----------------------|
 | brainstorm | `superpowers:brainstorming` | the brainstorm skill's own dialogue |
-| research | — (built in; researchers prefer a docs-lookup tool/MCP, e.g. Context7, when the session has one) | the `researcher` agent + light web/repo survey; ADR via plan's template |
+| research | — (built in; researchers prefer a docs-lookup tool/MCP, e.g. Context7, when the session has one) | the `wi-researcher` agent (`agents/wi-researcher.md`) + light web/repo survey; ADR via plan's template |
 | plan | `superpowers:writing-plans` | plan skill's templates (incl. the ADR template) |
 | build | `superpowers:subagent-driven-development`, `using-git-worktrees`, `test-driven-development`, `dispatching-parallel-agents` | build skill + `agents/wi-task-runner.md` |
 | ship | `superpowers:requesting-code-review` + `verification-before-completion` + `finishing-a-development-branch` | ship skill's verification gate |

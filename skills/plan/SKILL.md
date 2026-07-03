@@ -76,7 +76,7 @@ timestamp: <YYYY-MM-DD>
 
 > Ordered. Each task is small enough for one focused sitting and ends green.
 
-## Task 1 — <title>   [backend|frontend|infra|test]
+## Task 1 — <title>   [backend|frontend|infra|test|docs]
 - **Files:** <path/a>, <path/b>
 - **Do:** <precise change to make>
 - **Verify:** <exact test or command that must pass, e.g. `pytest tests/test_auth.py::test_login_ok`>
@@ -94,7 +94,8 @@ timestamp: <YYYY-MM-DD>
 - Wave 3: task 6
 ```
 
-Tag frontend tasks so build routes them to a design skill. Keep verification concrete — "it works" is not
+Tag frontend tasks so build routes them to a design skill (`docs` is a plain label — no routing behavior,
+unlike `frontend`). Keep verification concrete — "it works" is not
 verification; a named test or command is. A plan whose tasks each end in a runnable check is a plan that
 builds and ships without drama.
 

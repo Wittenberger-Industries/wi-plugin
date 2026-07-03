@@ -1,7 +1,7 @@
 ---
 type: Template
 title: SDD template
-description: Base ToC + precedence rules for an OKF-conformant Solution Design Document (.wi/features/<run>/sdd.md).
+description: Base ToC + precedence rules for an OKF-conformant Solution Design Document (.wi/features/<run-slug>/sdd.md).
 timestamp: 2026-06-14
 tags: [sdd, template, okf, rpa]
 ---
@@ -27,17 +27,23 @@ Clients have different SDD standards, so the structure is **overridable**. Pick 
 Whichever you use, fill every section from the design; if a section can't be filled, that's a brainstorm
 gap to resolve, not a TODO to leave.
 
+**The acceptance-criteria section is never omitted, whatever ToC wins.** Client and house ToCs rarely
+carry one — when the chosen ToC has no acceptance-criteria section, **append it as the final section**,
+whatever number it lands on, rather than dropping it: the checker (plan + result mode) and the
+verification gate verify the run against the SDD's acceptance-criteria section, wherever it sits.
+
 **The ToC is framework-aware** (`progress.md` → `Framework:`). The base ToC below is the **REFramework**
 shape. On the **Maestro** path, reshape these sections: **§2** becomes the **flow diagram** (from
 `maestro-architecture.md`); **§3.1** the Maestro project/flow layout (the `.flow` files, not REFramework);
 **§7.1.x** the flow's **nodes** (each node's type — connector / approval / script / subflow / agent / ixp —
 its inputs/outputs, and the connection/agent it uses), **not** a transaction + queue-item schema; **§7.2–7.6**
 become Maestro **connections, triggers, and agent registrations** — Orchestrator **queues** and `Config.xlsx`
-do not apply. §7.1.3 stays the per-process flow diagram for both.
+do not apply. §7.1.3 stays the per-process flow diagram for both, and the acceptance-criteria section
+(§10) applies unchanged on either path.
 
 ## Base ToC (UiPath enterprise standard)
 
-Copy to `.wi/features/<run>/sdd.md` (or the client's structure):
+Copy to `.wi/features/<run-slug>/sdd.md` (or the client's structure):
 
 ```markdown
 ---
@@ -105,7 +111,12 @@ timestamp: <YYYY-MM-DD>
 
 ## 9. UiPath Apps Details
 <any UiPath Apps front-ends, or "none">
+
+## 10. Acceptance criteria
+<one testable criterion per line, each naming its verifying check — the SDD's mirror of spec.md's
+ acceptance criteria. The pre-gate checker (plan mode), the verification gate, and the checker's
+ result mode all verify against THIS section; the run is done when every line demonstrably holds.>
 ```
 
 A good SDD lets a fresh builder (the UiPath skill or a human) implement the solution without re-reading the
-PDD. §2 is the whole-solution architecture; §7.1.3 is per-process flow.
+PDD. §2 is the whole-solution architecture; §7.1.3 is per-process flow. §10 is what "done" means.

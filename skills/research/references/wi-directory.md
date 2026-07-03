@@ -25,6 +25,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 ├── learnings.md            # INDEX of learnings: one line + hook per feature (ship). Read this, not the dir.
 ├── learnings/              # substantial per-feature learnings, each its own .md (ship; indexed above).
 ├── roadmap.md              # optional. Ordered list of features for a larger effort.
+├── moa.md                  # MoA model assignments (optional; references/moa.md) — written+committed at first dev/rpa run
 └── features/
     └── 0001-<slug>/        # one folder per feature; NNNN- global ordinal (creation order) + kebab slug
         ├── progress.md     # the state machine for this feature — single source of truth
@@ -33,9 +34,10 @@ reasoned about. Keep every file small and current; these are working artifacts, 
         ├── spec.md         # plan output: what/why + testable acceptance criteria
         ├── tasks.md        # plan output: small ordered tasks, each with files + verification
         ├── pitfalls.md     # plan output: known failure modes for this change
-        ├── verification.md # checker output (plan mode pre-gate, result mode at ship) — EPHEMERAL; verdict folds into PR.md, pruned at close-out
+        ├── verification.md # checker output (plan mode pre-gate, result mode at ship) — EPHEMERAL; verdict folds into PR.md, pruned at ship's dossier tidy
+        ├── moa-review.md   # cross-provider diff review (ship; only when configured) — EPHEMERAL, pruned with verification.md
         ├── tokens.md       # token ledger: exact subagent usage + orchestrator (finalized by ship pre-PR)
-        └── PR.md           # the PR description (ship §6) — committed, consumed by gh pr create
+        └── PR.md           # the PR description (ship §5) — committed, consumed by gh pr create
 ```
 
 ## Conventions
@@ -47,21 +49,28 @@ reasoned about. Keep every file small and current; these are working artifacts, 
   ignored by the next-number scan (they contribute nothing to the max).
 - **Commit `.wi/`.** It is documentation. Feature-folder lifecycle: untracked in the main checkout through
   brainstorm/research/plan; build moves it into the feature worktree and commits it as the branch's first
-  commit (`chore(<slug>): feature dossier`); main's copy arrives when the branch merges. Gitignore
+  commit (`chore(<slug>): feature dossier`); main's copy arrives when the branch merges. **Project-level
+  files are committed where they're written, by the phase that writes them** — scan its docs (+ the
+  greenfield `.gitignore`), brainstorm glossary updates, research the ADR + its index row, dev/rpa
+  `moa.md` / `roadmap.md`, ship the docs-sync — `chore(wi): …` / `docs(wi): …` subjects; **only the
+  feature folder defers** to build's first branch commit. That is what puts ADRs on the branch (committed
+  on main before build branches from HEAD) and lets every post-worktree phase read the same tracked
+  copies. A team that doesn't want wi committing to main overrides this in the constitution. Gitignore
   `research/` only if it gets large or holds scraped material — leave a one-line summary in the ADR/spec
   instead.
 - **Keep files lean.** Past ~150 lines a file is doing too much; split or summarize. Cheap handoff is the
   whole point.
 - **One writer per phase.** A phase owns its outputs; later phases read but don't silently rewrite them.
 - **No strays.** Everything feature-specific lives under `features/<slug>/` — never loose in `.wi/`. If a phase
-  needs a scratch file, it goes in the slug folder (ship sweeps and deletes strays at close-out).
-- **`research/` and `verification.md` are ephemeral.** Working notes exist to produce the ADR and spec;
-  the checker's `verification.md` exists to feed the design gate (plan mode) and the ship review (result
-  mode). Its verdict + any waived findings fold into `PR.md`, then ship prunes both `research/` and
-  `verification.md` before the PR (unless the constitution says keep them). After `done`, a feature folder
-  holds exactly the seven-file dossier: progress, brief, spec, tasks, pitfalls, tokens, PR.
+  needs a scratch file, it goes in the slug folder (ship sweeps and deletes strays at the dossier tidy).
+- **`research/`, `verification.md`, and `moa-review.md` are ephemeral.** Working notes exist to produce
+  the ADR and spec; the checker's `verification.md` feeds the design gate (plan mode) and the ship review
+  (result mode); `moa-review.md` is the cross-provider diff review's output (ship, only when configured).
+  Their verdicts + any waived findings fold into `PR.md` (ship §5), then the dossier tidy (§6) prunes all
+  three before the PR (unless the constitution says keep them). After `done`, a feature folder holds
+  exactly the seven-file dossier: progress, brief, spec, tasks, pitfalls, tokens, PR.
 - **Project-level memory persists & compounds.** `constitution.md`, `repo-map.md`, `overview.md`,
-  `architecture.md`, `glossary.md`, `adr/`, `roadmap.md`, `learnings.md`, and `learnings/` belong to the
+  `architecture.md`, `glossary.md`, `adr/`, `roadmap.md`, `moa.md`, `learnings.md`, and `learnings/` belong to the
   project — never pruned. Each feature reads them at the start and ship writes back into them, so the project
   gets smarter per feature.
 - **Learnings recall is via the index.** Phases read `.wi/learnings.md` (one line + hook per feature) and
@@ -79,7 +88,8 @@ version:
   `##` sections as they are.
 - **`type` per file:** `constitution.md` → `Constitution`, `repo-map.md` → `Repo Map`, `overview.md` →
   `Overview`, `architecture.md` → `Architecture`, `glossary.md` → `Glossary`, `adr/ADR-*.md` → `ADR`,
-  `learnings.md` → `Learnings Index`, `learnings/<slug>.md` → `Learning`, `roadmap.md` → `Roadmap`; per
+  `learnings.md` → `Learnings Index`, `learnings/<slug>.md` → `Learning`, `roadmap.md` → `Roadmap`,
+  `moa.md` → `MoA Config`; per
   feature: `progress.md` → `Feature Progress`, `brief.md` → `Brief`, `spec.md` → `Spec`, `tasks.md` →
   `Task List`, `pitfalls.md` → `Pitfalls`, `verification.md` → `Verification`, `tokens.md` →
   `Token Ledger`, `PR.md` → `PR Description`, `research/*.md` → `Research Note`,
