@@ -28,9 +28,13 @@ Key rule: **`${CLAUDE_PLUGIN_ROOT}` is the wi plugin root** — the directory ho
 against it.
 
 ## Invoking wi
-- Start a feature: the `dev` skill (`/wi:dev` on Claude, `/dev` or `$dev` elsewhere, or describe the
-  feature and let it auto-trigger).
+- Start a feature: the `dev` skill (`/wi:dev` on Claude; `/wi-dev` on Copilot / `$wi-dev` on Codex once
+  scan's bootstrap has installed the flat aliases into `~/.agents/skills/` — the raw plugin forms
+  `/wi dev` and `$dev` always work; or describe the feature and let it auto-trigger).
 - Bootstrap a repo first with the `scan` skill.
+- Only scan/dev/rpa are user-facing commands. The phase skills (brainstorm, research, plan, build, ship)
+  carry `user-invocable: false` — hidden from slash pickers, still invoked by the orchestrating skill and
+  by natural language ("ship it").
 - Persistence: wi hands off to a keep-alive loop at the end of brainstorm — Claude/Codex use built-in
   `/goal`; Copilot uses Autopilot flags (see the tool map). wi runs without it too, just less robustly.
 

@@ -1,6 +1,7 @@
 ---
 type: Skill
 name: build
+user-invocable: false
 description: >
   Implement an approved plan in an isolated git worktree. Use this skill when the user says "/wi:build",
   "implement the plan", "start building", "execute the tasks", or as the build phase after the design

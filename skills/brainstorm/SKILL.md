@@ -1,6 +1,7 @@
 ---
 type: Skill
 name: brainstorm
+user-invocable: false
 description: >
   Run the interactive dialogue that pins down WHAT a feature should be, before any autonomous work. Use
   this skill when the user types "/wi:brainstorm", as the interactive phase of "/wi:dev", or when they say

@@ -38,7 +38,7 @@ why per-skill `gh skill install` is discouraged: cross-skill refs such as `ship`
 | parallel waves | `/fleet` (monitor with `/tasks`) |
 | WebFetch | `web_fetch` |
 | WebSearch | no equivalent — use `web_fetch` with a search URL |
-| invoke a wi skill | skills load natively — `/<skill-name>` or auto-trigger by description |
+| invoke a wi skill | skills load natively — `/wi <skill>` (plugin), `/wi-scan`/`/wi-dev`/`/wi-rpa` (flat aliases), or auto-trigger by description |
 
 ## /goal keep-alive
 Copilot has no predicate `/goal`. Use **Autopilot**: relaunch with the completion condition in the prompt —
@@ -48,5 +48,11 @@ fully unattended (prompts suppressed, all tools/paths granted); drop `--allow-al
 confirmations.
 
 ## Command namespace
-`/wi:dev` etc. do not exist (Copilot has no custom slash commands). Invoke the skill as `/<skill-name>`
-(e.g. `/dev`, `/scan`) or let it auto-trigger from its `description`.
+`/wi:dev` etc. do not exist. Plugin-installed skills are auto-prefixed with the plugin name — wi's entry
+points invoke as `/wi scan`, `/wi dev`, `/wi rpa` (the prefix is Copilot's, not configurable; a separator
+inside a skill `name` makes it silently fail to load). For a one-token form, scan's bootstrap offers to
+copy the flat aliases from `references/skill-aliases/` into `~/.agents/skills/`, giving `/wi-scan`,
+`/wi-dev`, `/wi-rpa` (flat skills carry no prefix). The clone + `/skills add` fallback registers skills
+flat too. The phase skills (brainstorm, research, plan, build, ship) are `user-invocable: false`: hidden
+from the `/` picker, invoked by the orchestrating skill or by natural language — every skill still
+auto-triggers from its `description`.

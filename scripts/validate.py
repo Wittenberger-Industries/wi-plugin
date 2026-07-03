@@ -8,7 +8,8 @@ Checks (from the repo root, detected automatically):
   1. JSON validity of `.claude-plugin/marketplace.json`, `.claude-plugin/plugin.json`, and
      `.codex-plugin/plugin.json`; the Codex manifest declares name/version/skills and `skills` resolves;
      the three manifest versions agree.
-  2. Every `skills/**/SKILL.md` / `agents/*.md` has valid YAML frontmatter with `name` + `description`
+  2. Every `skills/**/SKILL.md` / `agents/*.md` / `references/skill-aliases/**/SKILL.md` has valid YAML
+     frontmatter with `name` + `description`
      — this catches the col-0 `<example>` / block-scalar bug that stopped the agents loading.
      Needs PyYAML for the full parse (`pip install pyyaml`); without it, the YAML parse is skipped
      and only delimiters + key presence are checked.
@@ -94,8 +95,12 @@ try:
 except Exception:
     pass  # invalid JSON already reported above
 
-# 2. Frontmatter on SKILL.md + agents -------------------------------------
-fm_files = sorted(ROOT.glob("skills/**/SKILL.md")) + sorted(ROOT.glob("agents/*.md"))
+# 2. Frontmatter on SKILL.md + agents (incl. the flat entry-command aliases) ----
+fm_files = (
+    sorted(ROOT.glob("skills/**/SKILL.md"))
+    + sorted(ROOT.glob("agents/*.md"))
+    + sorted(ROOT.glob("references/skill-aliases/**/SKILL.md"))
+)
 for f in fm_files:
     txt = f.read_text(encoding="utf-8")
     rel = f.relative_to(ROOT)
@@ -153,6 +158,7 @@ concept_md = (
     list(ROOT.glob("skills/**/*.md"))
     + list(ROOT.glob("agents/*.md"))
     + list(ROOT.glob("references/*.md"))
+    + list(ROOT.glob("references/skill-aliases/**/*.md"))
     + list(ROOT.glob("docs/**/*.md"))
     + [ROOT / "AGENTS.md", ROOT / "README.md"]
 )
@@ -272,13 +278,17 @@ def _fm_desc(txt):
 
 DESC_CAP = 1024
 # 7a. Every SKILL.md `description` stays under the agent-skills 1024-char cap.
-for f in sorted(ROOT.glob("skills/**/SKILL.md")):
+for f in sorted(ROOT.glob("skills/**/SKILL.md")) + sorted(ROOT.glob("references/skill-aliases/**/SKILL.md")):
     desc = _fm_desc(f.read_text(encoding="utf-8"))
     if desc is not None and len(desc) > DESC_CAP:
         errors.append(f"{f.relative_to(ROOT)}: SKILL description is {len(desc)} chars (> {DESC_CAP}-char cap)")
 
 # 7b. Skill + reference descriptions must not trail off mid-thought (OKF indexes reuse them verbatim).
-desc_files = sorted(ROOT.glob("skills/**/SKILL.md")) + sorted(ROOT.glob("skills/**/references/*.md"))
+desc_files = (
+    sorted(ROOT.glob("skills/**/SKILL.md"))
+    + sorted(ROOT.glob("skills/**/references/*.md"))
+    + sorted(ROOT.glob("references/skill-aliases/**/SKILL.md"))
+)
 for f in desc_files:
     desc = _fm_desc(f.read_text(encoding="utf-8"))
     if desc is not None and desc.rstrip().endswith(("..", "…")):
@@ -295,6 +305,7 @@ lint_scope = (
     sorted(ROOT.glob("skills/**/*.md"))
     + sorted(ROOT.glob("agents/*.md"))
     + sorted(ROOT.glob("references/*.md"))
+    + sorted(ROOT.glob("references/skill-aliases/**/*.md"))
     + sorted(ROOT.glob(".claude-plugin/*.json"))
 )
 for f in lint_scope:

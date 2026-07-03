@@ -19,8 +19,11 @@ its own.
 | **`/wi:dev "idea"`** | Brainstorms a feature with you, designs, confirms architecture + design at one gate, then builds and ships hands-off to an open PR. Add `--auto` to auto-approve the gate. |
 | **`/wi:rpa "pdd"`** | Parses a PDD (markitdown), refines the TO-BE, writes an SDD + architecture + assumptions, then builds a REFramework or Maestro solution via the UiPath skills — XAML-only or coded, your choice at the design gate — to a PR. One run per PDD (1..N processes); `--auto` supported. |
 
-On Claude the commands are `/wi:scan`, `/wi:dev`, …; on Codex/Copilot the skills invoke as `/scan`, `/dev`,
-… or auto-trigger from natural language.
+On Claude the commands are `/wi:scan`, `/wi:dev`, `/wi:rpa`; on Copilot they read `/wi-scan`, `/wi-dev`,
+`/wi-rpa` and on Codex `$wi-scan`, `$wi-dev`, `$wi-rpa` — flat aliases scan's bootstrap offers to install
+to `~/.agents/skills/` (the raw plugin forms `/wi dev` and `$dev` always work) — or, on any harness,
+auto-trigger from natural language. Only these three entry points surface as commands; the phase skills
+are hidden (`user-invocable: false`) and run inside the loop.
 
 ## Install
 
@@ -38,17 +41,13 @@ compatibility work out of the box.
 `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` directly, and `skills/` + `agents/` are
 its default component paths):
 ```
-copilot plugin install Wittenberger-Industries/wi-plugin
+copilot plugin marketplace add Wittenberger-Industries/wi-plugin
+copilot plugin install wi@wi
 ```
-or, mirroring the Claude flow: `copilot plugin marketplace add Wittenberger-Industries/wi-plugin` then
-`/plugin install wi@wi`. Update later with `copilot plugin update wi`. The plugin installs whole, so wi's
-interdependent skills share one root. On CLI versions without plugin support, fall back to clone +
-register the whole skills dir (together, not one at a time):
-```
-git clone https://github.com/Wittenberger-Industries/wi-plugin
-# then, in Copilot CLI:
-/skills add <path-to-clone>/skills
-```
+Copilot prefixes plugin skills automatically (`/wi scan`, `/wi dev`, `/wi rpa`); the first `/wi scan`
+offers to install the one-token aliases `/wi-scan`, `/wi-dev`, `/wi-rpa` (a one-time copy to
+`~/.agents/skills/`, which Codex reads too — there they invoke as `$wi-scan`, `$wi-dev`, `$wi-rpa`).
+
 Persistence uses Autopilot instead of `/goal`: wi's hands-off handoff prints
 `copilot --autopilot --max-autopilot-continues <N> --no-ask-user --allow-all …`. ⚠️ That runs **fully
 unattended** (prompts suppressed, all tools/paths granted) — drop `--allow-all` to keep risky-action
@@ -62,7 +61,7 @@ wi is one source across three harnesses; only the autonomy spine differs:
 |---|---|---|---|
 | Skills | plugin (`.claude-plugin/`) | `.codex-plugin/` (+ reads `.claude-plugin/marketplace.json`) | `plugin install` (reads `.claude-plugin/`); fallback whole-repo `/skills add` |
 | Keep-alive | built-in `/goal` | native `/goal` | Autopilot flags |
-| Command namespace | `/wi:dev` | `$dev` / `/skills` | `/dev` |
+| Command namespace | `/wi:dev` | `$wi-dev` (alias) / `$dev` | `/wi-dev` (alias) / `/wi dev` |
 | `${CLAUDE_PLUGIN_ROOT}` | native | compat var | the installed plugin root (or the clone) |
 | Subagents | Agent/Task | `spawn_agent` | `task` / `/fleet` |
 
@@ -165,6 +164,11 @@ title / description / timestamp), so each phase — and `validate.py` — can pa
 | `build` | post-gate | worktree + parallel waves of task subagents (TDD) |
 | `ship` | post-gate | gate -> review -> docs-sync -> learnings -> PR.md -> tidy + tokens -> open PR -> checklist |
 
+Only `scan`/`dev`/`rpa` are user-invocable commands; the five phase skills carry `user-invocable: false` —
+hidden from every slash picker, reachable through the loop and by natural language ("ship it"). On
+Copilot/Codex the entry points also install as flat one-token aliases (`/wi-dev`, `$wi-dev`, …) from
+`references/skill-aliases/`.
+
 Agents: **task-runner** (executes one build task in isolation), **researcher** (picks the approach in the
 autonomous phase), and **checker** (read-only verification working backward from the feature's acceptance
 criteria — the **check** steps above). The
@@ -185,7 +189,7 @@ skill auto-triggers from natural language too.
 │   └── plugin.json        # Codex plugin manifest
 ├── skills/                # scan, dev, brainstorm, research, plan, build, ship, rpa
 ├── agents/                # task-runner, researcher, checker
-├── references/            # codex-tools.md, copilot-tools.md (tool-name maps)
+├── references/            # codex-tools.md, copilot-tools.md (tool maps); skill-aliases/ (flat /wi-* entry aliases)
 ├── scripts/validate.py    # pre-release check (frontmatter, JSON, cross-refs, OKF)
 ├── docs/                  # specs & plans
 ├── AGENTS.md              # cross-platform bootstrap (Codex + Copilot)
@@ -263,6 +267,20 @@ If none are installed, wi still runs the whole loop on its own.
 
 ## Roadmap
 
+- **One-token entry commands on Copilot/Codex** (v1.2.0) shipped — Copilot auto-prefixes plugin skills
+  (`/wi dev`; the prefix isn't configurable), so wi ships flat forwarding aliases
+  (`references/skill-aliases/`) that scan's bootstrap offers to copy to `~/.agents/skills/`: the entry
+  points read `/wi-scan`, `/wi-dev`, `/wi-rpa` on Copilot and `$wi-*` on Codex — `/wi:*` unchanged on
+  Claude. The five phase skills are now `user-invocable: false`: hidden from slash pickers everywhere,
+  still natural-language- and orchestrator-invocable.
+- **Tiered models (MoA) + cross-provider review** (v1.1.0) shipped — an optional `.wi/moa.md` assigns a
+  model per dispatched agent (`wi-code-checker`, `wi-researcher`, `wi-task-runner`; the `orchestrator` tier
+  is informational, warned-on-mismatch only), chosen once via a **smart / simple / custom** preset and
+  overridable per cell. `smart` layers an **independent cross-provider diff review** — another model family
+  (e.g. GPT via `OPENAI_API_KEY`) — on top of the checker's result-mode pass at ship; `simple` (the `--auto`
+  default) is a lean opus/sonnet pass-through, no top-tier default. A follow-up renamed the roles to wi's
+  real dispatch targets and folded the standalone reviewer into the checker's result mode. Design and plan
+  in `docs/specs/` and `docs/plans/`.
 - **Maestro as a build framework** (v1.0.0) shipped — `wi:rpa` now targets UiPath Maestro flows as a
   first-class framework alongside REFramework: a `Framework: reframework | maestro` choice (above the build
   paradigm) proposed at brainstorm and confirmed at the gate makes the architecture, SDD, build, and

@@ -1,6 +1,7 @@
 ---
 type: Skill
 name: ship
+user-invocable: false
 description: >
   Take a built feature through the verification gate and out as a clean, reviewed pull request. Use this
   skill when the user says "/wi:ship", "ship it", "open the PR", "wrap this up", "finish the branch", or as

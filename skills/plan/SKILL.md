@@ -1,6 +1,7 @@
 ---
 type: Skill
 name: plan
+user-invocable: false
 description: >
   Turn a decided brief into an executable plan. Use this skill when the user says "/wi:plan", "plan this
   out", "write the spec", "break this into tasks", or as the plan phase of the research skill

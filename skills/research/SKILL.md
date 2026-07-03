@@ -1,6 +1,7 @@
 ---
 type: Skill
 name: research
+user-invocable: false
 description: >
   The design half of a wi feature: decide the HOW and get it confirmed at the design gate. Use this skill
   when dev hands off after brainstorming, when the user types "/wi:research", "research the approach",
