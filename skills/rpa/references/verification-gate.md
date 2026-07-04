@@ -129,3 +129,7 @@ run the checker says isn't met.
 No PASS without a fresh run this session — analyzer/validate output from *this* build, not quoted from
 earlier and not "should pass". A red gate stops the ship: fix the workflow (loop back to build) or, if the
 SDD was wrong, amend it deliberately and note it. Never weaken a rule to go green.
+
+This gate is the **local** half: the PR's remote checks are verified at ship §8 — which rpa step 7 reuses
+— after the PR opens, and the final report names the two separately
+(`local gate: green · PR checks: N/N green · deployment: ready`).
