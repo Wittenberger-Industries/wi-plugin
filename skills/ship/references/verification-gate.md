@@ -78,3 +78,9 @@ Stop. A red gate is information, not an obstacle to route around. Options, in or
 The gate proves the feature's acceptance criteria, not the whole codebase's perfection. Resist expanding
 scope to fix unrelated issues you notice — log them (a new feature or a roadmap line) and ship the feature you
 planned.
+
+## This gate is the local half
+
+Passing here proves the worktree, not the PR. The PR's **remote checks** — CI runs and deployment checks
+(e.g. Vercel) — trigger after the push and are verified at ship §8, after the PR opens. The final report
+names the two separately: `local gate: green · PR checks: N/N green · deployment: ready`.

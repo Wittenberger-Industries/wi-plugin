@@ -50,6 +50,22 @@ checker's built-in review when `none`. Findings from both passes land in `verifi
 BLOCKER/WARNING/INFO taxonomy. This dispatch is unconditional (on the `wi-code-checker` role's model
 when `.wi/models.md` exists, else inherit); no cross-provider configuration demotes or replaces it.
 
+**Mixture of Agents layer (only when configured).** If `.wi/models.md` has a `## Mixture of Agents`
+section with `points` including `review` (see `${CLAUDE_PLUGIN_ROOT}/references/moa.md`), dispatch N
+proposer checkers (one per listed `proposers` tier) in parallel, same turn, instead of the one dispatch
+above — IDENTICAL prompts (result mode, both passes, the same `Line review template:` line) plus the
+marker `MoA role: proposer <i>/<N>`.
+Proposers RETURN findings only; they never write `verification.md`. If `layers: 2`, run a second parallel
+round: each proposer receives the union of round-1 findings and returns a refinement (may change position;
+must say why). Then dispatch one aggregator checker (`MoA role: aggregator`, at the `aggregator` tier): it
+receives all findings, dedupes, keeps the MAX severity any proposer assigned, verifies against the repo
+before dropping anything as a false positive, and alone writes `verification.md` (both passes' sections,
+one verdict marker). Append `+ MoA (<N> proposers, <L> layers, aggregator <tier>)` to the review log line
+above (e.g. `review via wi-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`);
+every proposer and aggregator dispatch appends its own `tokens.md` row on completion. The cross-provider
+layer below and the max-2-rounds loop are unchanged — a full MoA pass counts as one round. Without the
+section, or with `review` not in `points`, the single dispatch above runs unchanged.
+
 **Cross-provider layer (only when configured).** If `.wi/models.md`'s `## Cross-provider config` names a
 provider (≠ `none`) and its API key is present, **additionally** run an independent **cross-provider
 diff review** — a second opinion from another model family, a separate optional layer on top of the
@@ -260,7 +276,7 @@ is not guaranteed under Copilot CLI. The leading `{sub(/\r$/,"")}` keeps the fro
 a `core.autocrlf=true` checkout, where the `---` delimiters arrive as `---\r` and a bare line compare would
 miss them.)
 
-Log the PR URL in `progress.md`.
+Log the PR URL in `progress.md`. §8 verifies the PR's remote checks before any cleanup.
 
 **A pushed branch is not a shipped feature.** If `gh` is unavailable or `pr create` fails, the run is **not
 done**: record in `progress.md`'s Decisions/blockers the exact recovery command (frontmatter-stripped, as
@@ -277,11 +293,42 @@ see the precedence rule in `skills/research/references/integrations.md`.)
 *impossible*, not failed — don't loop on them. Record `Close-out: local (no remote)` in `progress.md`'s
 Decisions/blockers together with the recovery pair to run once a remote exists — the
 `git push -u origin wi/<slug>` and the frontmatter-stripped `gh pr create` command above — then proceed
-to §8; its PR checkbox passes on that recorded substitute. Everything else in ship (gate, docs-sync,
-dossier, tokens) already ran for real, so the branch is merge-ready the moment a remote appears.
+to §8; its PR checkbox passes on that recorded substitute, and with no remote there are no remote checks:
+log `remote checks: none configured` and the remote-checks box passes on it under the recorded local
+close-out. Everything else in ship (gate, docs-sync, dossier, tokens) already ran for real, so the branch
+is merge-ready the moment a remote appears.
 
-## 8 · Close out — checklist, then the report
+## 8 · Remote checks, then close out — checklist, then the report
 
+**The remote-checks gate — before any cleanup.** The §1 gate was local; the PR's checks — CI runs and
+deployment checks (e.g. Vercel) — are the authoritative signal, and they run remotely *after* the push.
+The PR must be green, not just the worktree. Give the checks a moment to register, then watch them to
+completion: `gh pr checks <pr-url-or-number> --watch --fail-fast`, bounded by a sane timeout (default
+~15 minutes; the constitution may override). If no checks register after ~2 minutes AND the repo has no
+CI config (no `.github/workflows/`, nothing in `repo-map.md`), log `remote checks: none configured` in
+`progress.md` and proceed to cleanup — the remote-checks box below passes on that recorded substitute.
+
+- **Green** — every reported check (or every **required** check, where branch protection defines them)
+  concluded successfully. Log the evidence in `progress.md`: `remote checks: N/N green` plus the check
+  names, conclusions, and run URLs. It lives there by design: `verification.md` was pruned at §6 and
+  `PR.md` was committed before the push, so neither can carry evidence that only exists after the PR
+  opens — `progress.md` carries it, and the final report repeats it.
+- **Red** — **the run is not done and the keep-alive condition is not satisfied.** Pull the failing logs
+  (`gh run view <run-id> --log-failed`; an external check via its details URL) and diagnose. The worktree
+  still exists — cleanup hasn't run — so fix there, commit, push, re-watch. **Max 2 remote-fix rounds**;
+  a genuine flake (runner died, transient network, timeout with no log) may be re-run without consuming
+  a round. Budget exhausted: interactive → present the concrete failures and let the user decide (keep
+  fixing, or accept red → record `remote checks: red — accepted by user (<reason>)` in `progress.md`'s
+  Decisions); `--auto` → hold the run open: log the failures, Phase stays `ship`, keep the worktree —
+  the keep-alive loop re-enters ship and resumes at this gate. Never accept red autonomously. Accepted
+  red leaves an armed keep-alive condition unsatisfiable — its predicate names green checks — so when
+  the user accepts red, tell them to clear the `/goal` (or stop the Autopilot loop) themselves.
+- **Timeout / a check that never reports** — not green. Log
+  `remote checks: pending after <timeout> (<names>)` and hold like red minus the fix loop; the next
+  re-entry re-checks cheaply.
+
+**Cleanup runs only after the remote gate lands** (green / none configured / user-accepted red) —
+worktree removal comes after remote verification by design: a fix loop needs its workspace.
 After the PR is open (or merged, or the §7 no-remote close-out is recorded), clean up: remove the
 worktree (safe once the branch is pushed — or, under a no-remote close-out, once the dossier commit is on
 the local branch), and
@@ -294,6 +341,8 @@ console already said:
 - [ ] PR is **open** and its URL is logged in `progress.md` (two substitutes, §7: branch pushed + failure
       reason + the frontmatter-stripped `gh pr create …` recovery command recorded as a blocker; or — no
       remote exists — `Close-out: local (no remote)` + the push/PR recovery pair recorded)
+- [ ] Remote checks: N/N green logged with run URLs — or none configured logged, or red — accepted by
+      user (<reason>) recorded in Decisions (--auto never accepts red)
 - [ ] `.wi/features/<slug>/PR.md` exists and is committed on the branch
 - [ ] `tokens.md` passes the structural gate — run
       `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py .wi/features/<slug>/tokens.md`; a
@@ -312,13 +361,17 @@ All green: set Phase = `done`, add a final Log line with the PR link, and if `ro
 feature done and surface the next one.
 
 Then deliver the **final run report** in the console: the approach (cite ADR-NNNN), what was built, the
-gate results, the PR URL, and the **token table read from the finalized `tokens.md`** — the file was
-completed back in the dossier tidy; do not recompute it here. **Subagent rows are exact** (from completion
+gate results with local and remote status reported **separately** —
+`local gate: green · PR checks: N/N green · deployment: ready` — never one undifferentiated "green",
+the PR URL, and the **token table read from the finalized `tokens.md`** — the file was completed back in
+the dossier tidy; do not recompute it here. **Subagent rows are exact** (from completion
 notifications) — that sum is the real, measurable cost of the delegated work; report it as the headline,
 with the orchestrator figure (or `unavailable`) alongside. The two numbers wi trusts: **subagent-exact**
 (completion notifications) and **orchestrator-from-transcript** (`token_report.py`). If a keep-alive loop
-is armed (Claude/Codex `/goal` or Copilot Autopilot), the checklist passing is the state in which its
-condition holds and the loop clears.
+is armed (Claude/Codex `/goal` or Copilot Autopilot), its condition holds only when the checklist
+**including the remote-checks box** passes — that is the state in which the loop clears. Exception:
+user-accepted red — the condition names green checks and stays unsatisfiable; the loop ends only when
+the user clears it (told at the gate above).
 
 ## Offer
 

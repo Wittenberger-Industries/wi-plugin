@@ -66,6 +66,16 @@ timestamp: 2026-07-02
 | provider | none |
 """
 
+MOA_SECTION = """
+## Mixture of Agents
+| Key | Value |
+|-----|-------|
+| points | review |
+| proposers | opus, sonnet, sonnet |
+| layers | 1 |
+| aggregator | opus |
+"""
+
 
 class ParseConfigTest(unittest.TestCase):
     def test_roles_parsed(self):
@@ -103,6 +113,14 @@ class ParseConfigTest(unittest.TestCase):
         self.assertEqual(cfg["overrides"], {})
         # provider defaults exist even when api_key_env/model/base_url rows are absent
         self.assertEqual(cfg["cross_provider"]["api_key_env"], "OPENAI_API_KEY")
+
+    def test_moa_section_is_ignored(self):
+        # The `## Mixture of Agents` section is read by prose, not by this script:
+        # an unknown section must not change what parse_models_config returns.
+        self.assertEqual(
+            cross_review.parse_models_config(FULL_CONFIG + MOA_SECTION),
+            cross_review.parse_models_config(FULL_CONFIG),
+        )
 
 
 class ModelForTest(unittest.TestCase):

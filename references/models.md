@@ -62,6 +62,14 @@ timestamp: <YYYY-MM-DD>
 | Agent | Model |
 |-------|-------|
 | <wi-researcher \| wi-task-runner \| wi-code-checker \| rpa-build> | <tier> |
+
+## Mixture of Agents
+| Key | Value |
+|-----|-------|
+| points | none |
+| proposers | opus, sonnet, sonnet |
+| layers | 1 |
+| aggregator | opus |
 ```
 
 Claude tiers are the Agent-dispatch tokens `fable | opus | sonnet | haiku`, plus `inherit` (= the session
@@ -76,6 +84,7 @@ model). The cross-provider model is the *provider's* model id, independent of th
 | wi-researcher | opus | sonnet |
 | wi-task-runner | opus | sonnet |
 | cross-provider | gpt-5 (openai) | none |
+| MoA | none | none |
 
 Each role's default follows a rule, not an arbitrary pick:
 
@@ -118,9 +127,12 @@ At every wi Agent dispatch, resolve the model as **per-agent override → the ag
 reads `wi-task-runner`; RPA build delegations resolve `rpa-build` override → `wi-task-runner` role →
 `inherit` — `rpa-build` is a **role label** for those delegations, not a registered agent; there is no
 `agents/rpa-build.md`) and pass it as the dispatch's model parameter. No `.wi/models.md` → everything
-inherits, exactly wi's pre-routing behavior. **Fallback:** a configured model that errors as unavailable at
-dispatch time → re-dispatch with `inherit` and note it in `progress.md`; never stall a run on a model
-assignment.
+inherits, exactly wi's pre-routing behavior. **Exception — MoA dispatches:** a dispatch carrying an
+`MoA role:` marker resolves from the `## Mixture of Agents` rows instead of override → role — each
+proposer at its listed `proposers` tier, the aggregator at the `aggregator` tier (each resolved like any
+dispatch: the literal tier, or `inherit`; `${CLAUDE_PLUGIN_ROOT}/references/moa.md`). **Fallback:** a
+configured model that errors as unavailable at dispatch time → re-dispatch with `inherit` and note it in
+`progress.md`; never stall a run on a model assignment.
 
 ## wi-code-checker's two modes
 
@@ -171,3 +183,13 @@ independent of this file.
 `Cross-provider config` `provider: none` (simple preset) → skip the script entirely; RESULT mode still
 dispatches `wi-code-checker` at its Roles-table tier, same as PLAN mode — the cross-provider path is a
 layer on top of checker, never a replacement.
+
+### Mixture of Agents (optional)
+
+An optional proposer/aggregator layer at wi's two judgment points — the research approach decision and the
+checker's result-mode review at ship: N proposer agents answer the same question independently (optionally
+refining in a second round), and one aggregator synthesizes the single answer. **Off by default** — both
+presets write `points: none`, and a config without the `## Mixture of Agents` section is treated as
+`points: none`; enable it by hand-editing `.wi/models.md`. The full contract (dispatch markers,
+who-writes-what, layer semantics, cost) is `${CLAUDE_PLUGIN_ROOT}/references/moa.md` — it composes with
+the tier routing above, but neither requires the other.

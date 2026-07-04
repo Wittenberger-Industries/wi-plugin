@@ -40,7 +40,7 @@ the design gate.
 | plan | research | autonomous | brief, research, repo-map, constitution | spec, tasks, pitfalls | never |
 | design-gate | research | interactive* | adr, spec, tasks | dossier commit on main; gate outcome in progress.md | never — it is the second human gate |
 | build | post-gate loop (/goal or Autopilot keeps it alive) | autonomous | tasks, spec, constitution | source, ticked tasks | tasks already all ticked |
-| ship | post-gate loop | autonomous | the diff, spec, constitution | commits, PR | never |
+| ship | post-gate loop | autonomous | the diff, spec, constitution | commits, PR (remote checks verified) | never |
 
 *Design-gate re-entry guard (research §0): resuming into `design-gate` requires a fresh plan-mode
 `verification.md` — missing, or older than `spec.md`/`tasks.md`, means the pre-gate checker pass runs

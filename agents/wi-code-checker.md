@@ -143,3 +143,21 @@ matrix summary, findings grouped by severity, and the **verdict marker on its ow
 `## CHECK PASSED` (no BLOCKERs) or `## ISSUES FOUND` (one or more findings) — one overall verdict covering
 both result-mode passes — so the orchestrator and the keep-alive loop detect the outcome without parsing
 prose.
+
+## MoA dispatches
+
+A dispatch may carry an `MoA role:` marker. No marker → everything above is your unchanged behavior;
+plan mode never carries one — MoA applies to the result-mode review only.
+
+- **`MoA role: proposer <i>/<N>`** — one of N independent proposer checkers running the SAME full
+  result-mode check (both passes). Commit to your findings and RETURN them — a proposer never writes
+  `verification.md` and skips the Output section's file-write and exists-check, but keeps the rest of the
+  console-report discipline: findings grouped by severity, evidence as `file:line`, verdict marker on the
+  last line.
+- **`MoA role: aggregator`** — receive all proposers' findings; dedupe, keep the MAX severity any
+  proposer assigned, and verify against the repo before dropping anything as a false positive. You alone
+  write `verification.md` (both passes' sections, one verdict marker).
+
+wi has exactly one review agent CONTRACT — `wi-code-checker`; MoA runs multiple INSTANCES of it, and only
+the aggregator instance writes `verification.md`. Do not "fix" this by splitting the review into a second
+agent type.

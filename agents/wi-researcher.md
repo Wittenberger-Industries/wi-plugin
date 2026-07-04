@@ -156,3 +156,18 @@ orchestrator and keep-alive loop can detect you finished). Depth goes in the not
 decision. Mind your budget: target well under ~60k tokens — prefer targeted reads (configs, the few
 relevant modules) over surveying the tree; research depth should land in the notes file, not in exploration
 sprawl. If the question genuinely needs more, say so in the report rather than silently burning it.
+
+## MoA dispatches
+
+A dispatch may carry an `MoA role:` marker. No marker → everything above is your unchanged behavior.
+
+- **`MoA role: proposer <i>/<N>`** — one of N independent proposers on the SAME charter. Run your loop
+  as usual, but commit to exactly ONE approach — never hedge across options — and respect standing ADRs.
+  Write the proposal to `.wi/features/<slug>/research/proposal-<i>.md` (second layer: `proposal-<i>-r2.md`,
+  after reading all round-1 proposals; you may change position — say why) and return it as your report.
+- **`MoA role: aggregator`** — read ALL proposals, weigh evidence over vote-counts (three thin proposals
+  don't outrank one verified one), write `research/proposal-synthesis.md`, and return the single
+  recommendation with dissent noted. You recommend — the orchestrator still decides and writes the ADR.
+
+Both roles keep the report discipline (`## RESEARCH COMPLETE` last); proposal files are ephemeral
+`research/` contents like any note.

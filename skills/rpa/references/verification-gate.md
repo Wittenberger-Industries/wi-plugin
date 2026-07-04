@@ -89,6 +89,23 @@ mode — **one dispatch, two sequential passes**, same interface and logging as 
   `review via wi-code-checker + superpowers:requesting-code-review[inline]` or
   `review via wi-code-checker (wi line review; superpowers absent)`.
 
+**Mixture of Agents (optional, off by default)** — when `.wi/models.md` has a `## Mixture of Agents`
+section whose `points` include `review`, this dispatch mirrors `wi:ship` §2's MoA branch (rpa runs mirror
+the review point only): instead of one checker dispatch, dispatch N proposer checkers (one per listed
+`proposers` tier) in parallel with IDENTICAL prompts (result mode, both passes — `sdd.md`'s acceptance
+criteria as the spec analogue — and the same `Line review template:` line) plus the marker
+`MoA role: proposer <i>/<N>`; proposers return findings and **never** write `verification.md`.
+`layers: 2` → a second parallel round — each proposer
+receives the union of round-1 findings and returns a refinement (may change position; must say why).
+Then one aggregator checker (`MoA role: aggregator`, at the `aggregator` tier) receives all findings,
+dedupes, keeps the MAX severity any proposer assigned, verifies against the repo before dropping anything
+as a false positive, and alone writes `verification.md`. Append
+`+ MoA (<N> proposers, <L> layers, aggregator <tier>)` to the review log line (e.g.
+`review via wi-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`);
+each dispatch appends its own `tokens.md` row. The cross-provider layer and the max-2-rounds loop are
+unchanged (a full MoA pass = one round). Without the section — or `review` not in `points` — the single
+dispatch above is unchanged.
+
 Findings from both passes land in `verification.md` (the feature-level matrix plus its
 `## Line-level findings` section) in the BLOCKER/WARNING/INFO taxonomy, refreshing it. A result-mode
 **BLOCKER** — an unmet SDD criterion, a decision silently reduced to a stub/mock not signed off, or a
@@ -112,3 +129,7 @@ run the checker says isn't met.
 No PASS without a fresh run this session — analyzer/validate output from *this* build, not quoted from
 earlier and not "should pass". A red gate stops the ship: fix the workflow (loop back to build) or, if the
 SDD was wrong, amend it deliberately and note it. Never weaken a rule to go green.
+
+This gate is the **local** half: the PR's remote checks are verified at ship §8 — which rpa step 7 reuses
+— after the PR opens, and the final report names the two separately
+(`local gate: green · PR checks: N/N green · deployment: ready`).

@@ -151,10 +151,12 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    + the **checker · result mode** — one dispatch: the feature-level pass over the SDD's
    acceptance-criteria section plus the inline line-level review (verification-gate.md). Then reuse the **ship**
    skill (`wi:ship`) for the docs-sync, PR (`PR.md` committed, then `gh pr create --body-file`), close-out
-   checklist, **compound/learnings** (confirm + promote the candidate `.wi/learnings/<run-slug>.md` written at
+   checklist (including the remote-checks gate — ship §8 verifies the PR's remote checks before any
+   cleanup), **compound/learnings** (confirm + promote the candidate `.wi/learnings/<run-slug>.md` written at
    the gate; update its `.wi/learnings.md` index line), and the **token report (`tokens.md` — finalized
    before the dossier commit, mandatory)**.
-   **Publish to the tenant (if approved) — after the PR is open.** If `progress.md` `Publish: ≠ none` and
+   **Publish to the tenant (if approved) — after the PR is open and its remote-checks gate has landed**
+   (green or none configured — never while checks are pending or red). If `progress.md` `Publish: ≠ none` and
    `uip` is authenticated to the `orchestrator.md` tenant, delegate to **`uipath-solution`**: `pack` +
    `publish` the package(s) to the feed, and for `deploy` also `deploy` + `activate` as a Process in the
    gate-approved folder. **Not connected** → skip, and record in `progress.md` that publish was approved
