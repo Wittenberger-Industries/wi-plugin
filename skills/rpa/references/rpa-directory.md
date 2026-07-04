@@ -20,7 +20,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
 ├── components.md            # project: reusable components registry — reuse before build
 ├── orchestrator.md          # project: Orchestrator resource manifest (link, agents, queues, assets, buckets, processes, triggers)
 ├── glossary.md              # project: domain terms
-├── moa.md                   # project: MoA model assignments (references/moa.md)
+├── models.md                # project: tiered model routing — model assignments (references/models.md)
 ├── learnings.md             # project: learnings INDEX — one line + hook per run; read this, not the dir
 ├── learnings/               # project: substantial learnings, each its own .md (indexed above)
 └── features/
@@ -33,7 +33,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
         ├── assumptions.md   # gap/assumption register (per-process sections) + PDD->SDD trace
         ├── tasks.md         # the multi-process build DAG (components -> processes -> sub-workflows)
         ├── verification.md  # checker output (plan mode pre-gate, result mode at ship) — EPHEMERAL; verdict folds into PR.md
-        ├── moa-review.md    # cross-provider diff review (ship; only when configured) — EPHEMERAL
+        ├── cross-review.md  # cross-provider diff review (ship; only when configured) — EPHEMERAL
         ├── tokens.md        # token ledger
         ├── PR.md            # PR description
         └── processes/
@@ -49,19 +49,19 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
   `ADR-NNNN`; next = highest existing `.wi/features/` ordinal + 1, else `0001`, never renumbered), so runs
   list in implementation order. Same convention as the dev flow (`wi-directory.md`).
 - **Project-level files persist & compound** across runs: `rpa-constitution.md`, `sdd-template.md` (if
-  present), `inputs.md`, `components.md`, `orchestrator.md`, `glossary.md`, `moa.md`, `adr/` (+ its index),
+  present), `inputs.md`, `components.md`, `orchestrator.md`, `glossary.md`, `models.md`, `adr/` (+ its index),
   `roadmap.md` (if present), `learnings.md`, `learnings/`. Never pruned. Build + compound write
   back (especially new reusable components → `components.md`). This list is ship's stray-sweep whitelist
   when progress.md says `Flow: rpa`. A repo where both flows have run also carries the dev project files
   (`constitution.md`, `repo-map.md`, `overview.md`, `architecture.md`): the sweep whitelist is the
   **union** of both directory references' project-level lists.
 - **Project-level files are committed where they're written** (`wi-directory.md`'s rule — same here):
-  ingest/brainstorm commit `inputs.md` / `components.md` / `orchestrator.md` / `moa.md` as they create
+  ingest/brainstorm commit `inputs.md` / `components.md` / `orchestrator.md` / `models.md` as they create
   them, so the post-gate worktree carries them.
 - **The run dossier** — what ship's tidy leaves under `features/<run-slug>/` at `done` (the manifest ship
   reads when progress.md says `Flow: rpa`): `progress.md`, `pdd.md`, `architecture.md`, `sdd.md`,
   `process-inventory.md`, `assumptions.md`, `tasks.md`, `tokens.md`, `PR.md`, plus `processes/<p>/tobe.md`
-  per process. `verification.md` and `moa-review.md` are ephemeral — ship's prune list for the rpa flow
+  per process. `verification.md` and `cross-review.md` are ephemeral — ship's prune list for the rpa flow
   (no `research/` exists here): their verdicts fold into `PR.md` (ship §5), then ship's dossier tidy
   prunes them (same rule as the dev flow).
 - **The SDD structure is overridable** (clients differ): an existing project `sdd.md`'s ToC wins; else

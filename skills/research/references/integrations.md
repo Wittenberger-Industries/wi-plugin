@@ -25,22 +25,35 @@ absent. Every delegating phase logs its mode to progress.md — `<phase> via <sk
 fallback (<skill> absent)` — so a run's delegation behavior is auditable afterwards. Running a fallback
 while the preferred skill is installed is a defect.
 
-## Phase -> preferred skill -> fallback
+## Delegation matrix
 
-| wi phase | REQUIRED when installed | Fallback (only when absent) |
-|----------|---------------------|----------------------|
-| brainstorm | `superpowers:brainstorming` | the brainstorm skill's own dialogue |
-| research | — (built in; researchers prefer a docs-lookup tool/MCP, e.g. Context7, when the session has one) | the `wi-researcher` agent (`agents/wi-researcher.md`) + light web/repo survey; ADR via plan's template |
-| plan | `superpowers:writing-plans` | plan skill's templates (incl. the ADR template) |
-| build | `superpowers:subagent-driven-development`, `using-git-worktrees`, `test-driven-development`, `dispatching-parallel-agents` | build skill + `agents/wi-task-runner.md` |
-| ship | `superpowers:requesting-code-review` + `verification-before-completion` + `finishing-a-development-branch` | ship skill's verification gate |
-| debug (any phase) | `superpowers:systematic-debugging` | inline hypothesis-and-test |
+| wi phase | superpowers skill (REQUIRED when installed) | initiator | artifact mapping | fallback when absent |
+|----------|---------------------------------------------|-----------|------------------|----------------------|
+| brainstorm | `superpowers:brainstorming` | wi — brainstorm step 0 | `brief.md` | the brainstorm skill's own dialogue |
+| research | — (built in; researchers prefer a docs-lookup tool/MCP, e.g. Context7, when the session has one) | wi — research §1c (researcher dispatch) | `research/` notes + the ADR | the `wi-researcher` agent (`agents/wi-researcher.md`) + light web/repo survey; ADR via plan's template |
+| plan | `superpowers:writing-plans` | wi — plan §4 (decomposition) | `spec.md` + `tasks.md` (wi format) | plan skill's templates (incl. the ADR template) |
+| build | `superpowers:using-git-worktrees`, `test-driven-development`, `subagent-driven-development`, `dispatching-parallel-agents` | wi — build §1 (worktree) and §2 (waves + runners) | worktree/branch + task commits | build skill + `agents/wi-task-runner.md` |
+| ship | `superpowers:verification-before-completion` + `finishing-a-development-branch`; `requesting-code-review` runs **inline in wi-code-checker result mode** (its template passed into the dispatch) — logged `review via wi-code-checker + superpowers:requesting-code-review[inline]` | wi — ship §1 (verification), §2 (checker dispatch carrying the line review), §7 (close-out) | `verification.md` + `PR.md` | ship's verification gate + the checker's built-in line review — logged `review via wi-code-checker (wi line review; superpowers absent)`, ship's variant of the generic fallback line |
+| debug (any phase) | `superpowers:systematic-debugging` | wi — the failing phase (e.g. build §3) | `progress.md` log entry | inline hypothesis-and-test |
 
 When you delegate, wi still owns the artifacts: capture the external skill's result into the matching
 `.wi/` file (e.g. a superpowers plan -> `tasks.md` in WI's format) so the rest of the loop and a resumed
 run can read it. The external skill does the thinking; `.wi/` keeps the memory. The same rule applies to any equivalent
 skill an environment happens to provide (a code-review or architecture suite, etc.): detect, delegate,
 capture into `.wi/` — but wi only *offers to install* things with a known, verifiable slug.
+
+### Who initiates: wi does
+
+During an active wi run (`dev`, `rpa`, or any phase skill in flight), superpowers skills are invoked
+**only** at the delegation points in the matrix — wi initiates, the delegate executes. A superpowers
+skill description matching the current moment ("before touching code", "starting feature work", "before
+merging") is **not** a trigger; self-invocation outside the matrix bypasses wi's phase logging and
+artifact contract. If one fires anyway, capture its output into the matching `.wi/` artifact and log the
+deviation in progress.md. wi's artifact formats always win: a plan lands in `tasks.md`, never
+`docs/plans/`; a review lands in `verification.md`. Phases dispatched as subagents (research
+investigation, build tasks, checker passes) are structurally immune — superpowers disables itself inside
+subagents — so this rule is what protects the inline phases: the brainstorm dialogue, plan writing, the
+design gate, and ship orchestration.
 
 ## Frontend work
 

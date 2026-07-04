@@ -97,7 +97,7 @@ flowchart TD
   planp --> precheck["checker · plan mode — feature-backward coverage matrix"]
   sddplan --> precheck
   precheck --> gate{"DESIGN GATE (YOU) — approve / amend / stop (--auto: auto-approved + recorded)"}
-  gate -->|approve| isolate["isolate — git worktree + feature branch; the dossier is the branch's first commit"]
+  gate -->|approve| isolate["isolate — git worktree + feature branch; the dossier, committed on main at the gate, rides the branch"]
   isolate --> build["build in parallel waves — dev: wi-task-runner subagents (TDD); rpa: uipath-rpa or uipath-maestro-flow"]
   build --> verify["verification gate + checker · result mode (+ cross-provider diff review when configured)"]
   verify -->|"red — back to build (max 2 rounds)"| build
@@ -115,8 +115,8 @@ The **check** steps are wi's read-only **checker** agent. In *plan mode* (before
 coverage matrix — every acceptance criterion, locked decision, glossary term, and pitfall mapped to a
 covering task — and flags silent scope-reduction or over-build as BLOCKER / WARNING / INFO for the gate to
 weigh. In *result mode* (at ship) it confirms each criterion and locked decision was actually delivered and
-**wired**, not just present. It feeds the gate and the ship review; it doesn't replace line-level code
-review.
+**wired**, not just present — and runs the line-level code review inline (superpowers' reviewer template
+when installed, wi's built-in review otherwise). It feeds the gate and the ship review.
 
 At handoff wi arms a keep-alive loop so the run continues across turns until the PR condition holds —
 Claude Code & Codex use their built-in `/goal`; Copilot uses Autopilot. wi works without it too, just less
@@ -135,7 +135,7 @@ robustly through a stalled turn.
 ├── learnings.md         # learnings index: one line + hook per feature — phases read this, not the dir
 ├── learnings/           # substantial per-feature learnings in their own .mds — compounds across features
 ├── roadmap.md           # optional: ordered features for a larger effort
-├── moa.md               # optional: MoA model assignments per dispatched agent (see references/moa.md)
+├── models.md            # optional: tiered model routing — model assignments per dispatched agent
 └── features/<slug>/
     ├── progress.md      # the feature's state machine (source of truth)
     ├── brief.md         # brainstorm output: what you want
@@ -199,11 +199,11 @@ skill auto-triggers from natural language too.
 ## Setup & conventions
 
 - **No required env vars or MCP servers.** `/wi:scan` offers to install the optional skills wi delegates to.
-- **Tiered models (MoA, optional).** `.wi/moa.md` assigns a model per dispatched agent — orchestrator
+- **Tiered model routing (optional).** `.wi/models.md` assigns a model per dispatched agent — orchestrator
   (informational), `wi-code-checker`, `wi-researcher`, `wi-task-runner` — plus an independent
   **cross-provider diff review** (e.g. GPT via `OPENAI_API_KEY`), a layer on top of the checker's
   result-mode pass at ship. Smart/simple presets, set up once on the first wi run, every cell overridable;
-  see `references/moa.md`. Without the file, everything inherits the session model as before.
+  see `references/models.md`. Without the file, everything inherits the session model as before.
 - **Python-first** defaults (uv · pytest · ruff · mypy), stack-agnostic — `scan` records whatever the repo
   uses, and `constitution.md` is where you override.
 - Opening the PR uses `gh` if available; otherwise wi pushes the branch and leaves the PR command for you.
@@ -267,14 +267,21 @@ If none are installed, wi still runs the whole loop on its own.
 
 ## Roadmap
 
+- **Issue sweep** (v1.3.0) shipped — the `/goal` handoff now advances in the same turn the goal registers;
+  the tiered-models layer is renamed to **tiered model routing** (`.wi/models.md`, `cross_review.py`,
+  `cross-review.md`) with the cross-provider review documented as a standalone layer; the feature dossier
+  is committed on main at the design gate; a superpowers precedence rule + delegation matrix land in
+  `skills/research/references/integrations.md`; the line-level review is unified into wi-code-checker's
+  result mode.
 - **One-token entry commands on Copilot/Codex** (v1.2.0) shipped — Copilot auto-prefixes plugin skills
   (`/wi dev`; the prefix isn't configurable), so wi ships flat forwarding aliases
   (`references/skill-aliases/`) that scan's bootstrap offers to copy to `~/.agents/skills/`: the entry
   points read `/wi-scan`, `/wi-dev`, `/wi-rpa` on Copilot and `$wi-*` on Codex — `/wi:*` unchanged on
   Claude. The five phase skills are now `user-invocable: false`: hidden from slash pickers everywhere,
   still natural-language- and orchestrator-invocable.
-- **Tiered models (MoA) + cross-provider review** (v1.1.0) shipped — an optional `.wi/moa.md` assigns a
-  model per dispatched agent (`wi-code-checker`, `wi-researcher`, `wi-task-runner`; the `orchestrator` tier
+- **Tiered models + cross-provider review** (v1.1.0) shipped (renamed to **tiered model routing** in
+  v1.3.0) — an optional per-agent model config (today `.wi/models.md`) assigns a model per dispatched
+  agent (`wi-code-checker`, `wi-researcher`, `wi-task-runner`; the `orchestrator` tier
   is informational, warned-on-mismatch only), chosen once via a **smart / simple / custom** preset and
   overridable per cell. `smart` layers an **independent cross-provider diff review** — another model family
   (e.g. GPT via `OPENAI_API_KEY`) — on top of the checker's result-mode pass at ship; `simple` (the `--auto`

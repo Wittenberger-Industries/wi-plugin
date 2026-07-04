@@ -22,7 +22,8 @@ Inputs: the feature branch/worktree, `spec.md` (acceptance criteria), `pitfalls.
 Run the full gate from `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/verification-gate.md`: the complete
 test suite, lint, format check, typecheck, and any CI-equivalent command from `repo-map.md`. Every
 acceptance criterion in `spec.md` must map to something that actually passed. If `superpowers:verification-before-completion`
-is in your available skills you MUST run it too (log it). A red gate stops the ship — fix the code (loop
+is in your available skills you MUST run it too (log it) — a delegation point; see the precedence rule in
+`skills/research/references/integrations.md`. A red gate stops the ship — fix the code (loop
 back to build), don't lower the bar.
 
 ## 2 · Review against intent
@@ -33,31 +34,38 @@ Self-review the diff with fresh eyes, specifically against:
   matters).
 - **Constitution** — style, boundaries, no secrets, no stray scope.
 
-**Delegation check:** if `superpowers:requesting-code-review` is in your available skills you MUST run
-the review through it (log `review via superpowers:requesting-code-review`); unaided self-review is the
-fallback only when it's absent.
+**Review dispatch (wi-code-checker · result mode) — always runs; one dispatch, two passes.** Before
+dispatching, resolve the line-review source: if `superpowers:requesting-code-review` is in your available
+skills, locate its reviewer template — the `code-reviewer.md` inside that skill's installed directory
+(Glob the plugin roots, e.g. `~/.claude/plugins/**/requesting-code-review/**/code-reviewer.md`) — and
+pass its absolute path in the checker dispatch as `Line review template: <path>`. If it is absent, pass
+`Line review template: none`. Log `review via wi-code-checker + superpowers:requesting-code-review[inline]`
+or `review via wi-code-checker (wi line review; superpowers absent)`.
 
-**Feature-level check (wi-code-checker · result mode) — always runs.** Dispatch **wi-code-checker**
-(`agents/wi-code-checker.md`) in `result` mode against `spec.md`'s acceptance criteria + locked decisions
-(ADRs, constitution); it confirms each is delivered and **wired**, not just present — it reads the actual
-repo — refreshing `verification.md`. This dispatch is unconditional (on the `wi-code-checker` role's model
-when `.wi/moa.md` exists, else inherit); no cross-provider configuration demotes or replaces it.
+Then dispatch **wi-code-checker** (`agents/wi-code-checker.md`) in `result` mode. The dispatch prompt asks
+for both passes: the **feature-level result check** — `spec.md`'s acceptance criteria + locked decisions
+(ADRs, constitution), each confirmed delivered and **wired**, not just present (the checker reads the
+actual repo) — and the **line-level review** of the branch diff, run from the template path above or the
+checker's built-in review when `none`. Findings from both passes land in `verification.md` in the
+BLOCKER/WARNING/INFO taxonomy. This dispatch is unconditional (on the `wi-code-checker` role's model
+when `.wi/models.md` exists, else inherit); no cross-provider configuration demotes or replaces it.
 
-**Cross-provider layer (only when configured).** If `.wi/moa.md`'s `## Cross-provider config` names a
-provider (≠ `none`) and its API key is present, **additionally** run an independent cross-provider
-**line-level diff review** — a second opinion from another model family, sitting conceptually beside this
-section's self-review — per `${CLAUDE_PLUGIN_ROOT}/references/moa.md`: full feature diff + `spec.md` through
-`skills/ship/scripts/moa_review.py` → `.wi/features/<slug>/moa-review.md`. The script only receives the
+**Cross-provider layer (only when configured).** If `.wi/models.md`'s `## Cross-provider config` names a
+provider (≠ `none`) and its API key is present, **additionally** run an independent **cross-provider
+diff review** — a second opinion from another model family, a separate optional layer on top of the
+checker dispatch — per `${CLAUDE_PLUGIN_ROOT}/references/models.md`: full feature diff + `spec.md` through
+`skills/ship/scripts/cross_review.py` → `.wi/features/<slug>/cross-review.md`. The script only receives the
 diff + spec text — no Read/Grep/Bash against the repo — so it cannot verify anything is actually wired, and
 it never writes `verification.md`: the cross-provider path is a layer on top of checker, never a replacement.
 Unconfigured, exit 2 (config/API error), or exit 3 (missing API key) governs only whether this layer runs
 — log `cross-provider layer skipped (<reason>)` and continue; the checker dispatch above ran regardless.
 
-Findings from **both** layers feed the same loop: a BLOCKER — an unmet criterion, a decision silently
-reduced to a stub — sends the feature **back to build**, **max 2 review→fix rounds** shared across both;
-whatever remains goes with its severity into `PR.md`'s Verification. A BLOCKER from either layer blocks
-the PR. `moa-review.md` is ephemeral (pruned in §6, after §5 distills it into `PR.md`). Ship never opens
-the PR on a feature wi-code-checker says isn't delivered.
+Findings from both checker passes and the cross-provider layer feed the same loop: a BLOCKER — an unmet
+criterion, a decision silently reduced to a stub, a correctness bug in the diff — sends the feature
+**back to build**, **max 2 review→fix rounds** shared across all of it; whatever remains goes with its
+severity into `PR.md`'s Verification. A BLOCKER from any layer blocks the PR. `cross-review.md` is
+ephemeral (pruned in §6, after §5 distills it into `PR.md`). Ship never opens the PR on a feature
+wi-code-checker says isn't delivered.
 
 Address findings before proceeding; note anything deliberately deferred.
 
@@ -214,8 +222,9 @@ findings with severity. Distilled from verification.md; the dossier tidy (§6) t
      Verification; research notes live on in the ADR and `spec.md`. If something is still load-bearing,
      fold it in first. Prune tracked ephemera with `git rm -f` (the §2 result-mode checker refreshed
      `verification.md` *after* the commit that last touched it, so a plain `git rm` refuses on the local
-     modifications); a never-committed one (`moa-review.md` is written at §2 and typically never
-     committed) is untracked — plain-delete it, `git rm` has no pathspec to match.
+     modifications); a never-committed one (`cross-review.md` is written at §2 and typically never
+     committed) is untracked — plain-delete it, `git rm` has no pathspec to match (prune a review file
+     left under its pre-1.3 legacy name too).
      (Skip pruning if the constitution says to keep them.)
   3. *Finalize `tokens.md` — NOW, not at close-out.* The file must be complete **inside the dossier
      commit**, or it never rides the PR. The ledger was scaffolded at research/build start and its
@@ -261,7 +270,8 @@ above) —
 force-push.** If `superpowers:finishing-a-development-branch` is installed, consult it for the close-out
 **decision** (merge / PR / keep) in interactive runs — in an autonomous run that decision is already made
 (the PR). The worktree and branch **mechanics stay wi's own (§8)**: wi's sibling-dir worktrees fail that
-skill's `.worktrees/`-only provenance rule, so never delegate the removal itself.
+skill's `.worktrees/`-only provenance rule, so never delegate the removal itself. (A delegation point —
+see the precedence rule in `skills/research/references/integrations.md`.)
 
 **No remote at all** (`git remote` prints nothing — a local-only repo): pushing and `gh pr create` are
 *impossible*, not failed — don't loop on them. Record `Close-out: local (no remote)` in `progress.md`'s

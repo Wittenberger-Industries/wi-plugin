@@ -10,7 +10,8 @@ tags: [research, reference]
 
 The loop is one interactive phase (**brainstorm**, run by `dev`) followed by an autonomous pipeline
 (**research -> plan -> build -> ship**, sequenced by `dev`). The handoff after brainstorm is the single human
-checkpoint; after it, the pipeline makes and records decisions on its own.
+checkpoint — the user's `/goal` paste is the go, and the run continues into research in the same turn;
+after it, the pipeline makes and records decisions on its own.
 
 ## State machine
 
@@ -37,7 +38,7 @@ the design gate.
 | brainstorm | dev | interactive | request, repo-map, constitution | brief.md | brief exists & intent unchanged |
 | research | research | autonomous | brief, repo-map, constitution | research/*, .wi/adr/ADR-* (if hard-to-reverse) | approach already chosen & recorded |
 | plan | research | autonomous | brief, research, repo-map, constitution | spec, tasks, pitfalls | never |
-| design-gate | research | interactive* | adr, spec, tasks | gate outcome in progress.md | never — it is the second human gate |
+| design-gate | research | interactive* | adr, spec, tasks | dossier commit on main; gate outcome in progress.md | never — it is the second human gate |
 | build | post-gate loop (/goal or Autopilot keeps it alive) | autonomous | tasks, spec, constitution | source, ticked tasks | tasks already all ticked |
 | ship | post-gate loop | autonomous | the diff, spec, constitution | commits, PR | never |
 

@@ -26,10 +26,13 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
    don't proceed without a repo map and constitution. If it exists but looks stale — `scanned` stamp older
    than ~2 weeks, or config/lock/CI files changed since it — run the scan skill's **`--refresh`** drift
    pass (cheap; updates facts + consolidates learnings) before building on the map.
-   **MoA first-run setup** (`${CLAUDE_PLUGIN_ROOT}/references/moa.md`): `.wi/moa.md` absent → interactive
-   asks once (preset smart / simple / custom, rows confirmable), `--auto` writes the **simple** preset and
-   logs the assumption; present → apply it silently, warning once if the session model is below the
-   configured orchestrator tier. Never re-ask an existing config.
+   **Model routing first-run setup** (`${CLAUDE_PLUGIN_ROOT}/references/models.md`): `.wi/models.md`
+   absent → interactive asks once (preset smart / simple / custom, rows confirmable), `--auto` writes the
+   **simple** preset and logs the assumption; present → apply it silently, warning once if the session
+   model is below the configured orchestrator tier. A legacy config left by a pre-1.3 run (an old-named
+   `.wi/*.md` carrying the same `## Roles` / `## Cross-provider config` sections): rename it to
+   `.wi/models.md` and set its frontmatter to `type: Model Routing Config` — the section format is
+   unchanged. Never re-ask an existing config.
 2. **Open the feature folder — or resume the one already open.** Parse flags: `--auto` sets **Gate mode:
    auto-approve** in progress.md — tell the user the design gate will be auto-approved and recorded, not
    asked. Then **check before creating** — the slug ordinal, then whether this idea is new, a resume, or a
@@ -94,8 +97,11 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
    - **auto-approve** (`--auto`): do **not** ask for confirmation — the user already chose hands-off by
      passing the flag. Set Phase = `research` and continue straight into the design phase **in the same
      turn**. Brainstorm was the only stop; pausing for "say go" here is the bug `--auto` exists to avoid.
-   - **interactive** (default): ask once — *"Ready to hand off?"* — and advance to `research` only on the
-     user's go (pasting the `/goal` line counts as go).
+   - **interactive** (default): ask once — *"Ready to hand off?"* — and advance on the user's go.
+     **Pasting the `/goal` line is the go.** When the goal registers (the platform echoes "Goal set: …"),
+     do not stop: set Phase = `research` and continue into the design phase **in the same turn**, exactly
+     as the auto path does. Ending the turn after the recap or the "Goal set" acknowledgment — waiting
+     for another prompt — is the stall this rule exists to prevent.
 5. **Design** (skill `wi:research`): research -> plan -> **design gate** (inline summary; approve / amend
    / stop — or auto-approve per the flag).
 6. **Implement** (after the gate): **build** (skill `wi:build`) — worktree + parallel waves — then
@@ -115,4 +121,7 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
   `roadmap.md` line (tell them which feature it became); contradicts the approved design/ADR → pause,
   re-open the design gate with a delta summary (approve / amend / stop), continue on the answer. The run
   never derails on input, and input never vanishes.
+- **Superpowers precedence:** during a run, superpowers skills fire only at wi's delegation points
+  (`${CLAUDE_PLUGIN_ROOT}/skills/research/references/integrations.md`) — never self-triggered mid-phase;
+  wi's artifact formats always win.
 - Keep dev thin: it sequences; the phase skills do the work; the keep-alive loop (`/goal` or Autopilot) keeps it alive.

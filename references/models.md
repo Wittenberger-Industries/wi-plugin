@@ -1,16 +1,16 @@
 ---
 type: Reference
-title: "MoA — tiered model assignments for wi's dispatched agents"
-description: "Configurable Mixture-of-Agents: each wi-dispatched sub-agent (wi-code-checker, wi-researcher, wi-task-runner) gets its own tiered default, with an independent cross-provider diff review layered on top of wi-code-checker's result-mode pass when a second provider is configured. Config in .wi/moa.md, set up on first run."
+title: "Tiered model routing — model assignments for wi's dispatched agents"
+description: "Configurable tiered model routing: each wi-dispatched sub-agent (wi-code-checker, wi-researcher, wi-task-runner) gets its own tiered default, with an independent cross-provider diff review layered on top of wi-code-checker's result-mode pass when a second provider is configured. Config in .wi/models.md, set up on first run."
 timestamp: 2026-07-02
-tags: [moa, models, reference]
+tags: [models, routing, reference]
 ---
 
-# MoA — tiered model assignments for wi's dispatched agents
+# Tiered model routing — model assignments for wi's dispatched agents
 
 wi dispatches three kinds of sub-agents — **wi-researcher**, **wi-task-runner**, **wi-code-checker** — plus
 the **orchestrator**, which is just the session itself (the agent reading this file, planning and routing
-the run). MoA lets a project tune what each of the three sub-agents runs on, and adds an
+the run). Tiered model routing lets a project tune what each of the three sub-agents runs on, and adds an
 **independent cross-provider diff review** — ideally a *different provider/architecture* (different training,
 different blind spots) — as a layer on top of wi-code-checker's result-mode verification. Scope: **wi-dispatched agents only**
 (wi-researcher, wi-task-runner, wi-code-checker, RPA build delegations); wi never re-models other plugins'
@@ -25,21 +25,21 @@ accordingly, so wi never auto-escalates a dispatch above config. A tier above `o
 when the user put it there: choosing **smart** interactively, or writing it into custom rows / per-agent
 overrides.
 
-## The config file — `.wi/moa.md`
+## The config file — `.wi/models.md`
 
 Project-level, persisted, read at every dispatch point. Template (fill from a preset, then let the user
 override any cell):
 
 ```markdown
 ---
-type: MoA Config
-title: MoA model assignments — <project>
+type: Model Routing Config
+title: Model assignments — <project>
 description: Per-role model assignments for wi-dispatched agents (preset: smart | simple | custom).
 preset: <smart | simple | custom>
 timestamp: <YYYY-MM-DD>
 ---
 
-# MoA model assignments
+# Model assignments
 
 ## Roles
 | Role | Model | Notes |
@@ -100,14 +100,16 @@ tier, including `fable`).
 
 ## First-run setup (dev / rpa entry points)
 
-When `.wi/moa.md` is **absent** at a wi entry skill (dev step 1, rpa step 2): **interactive** → ask once
-— *"MoA models: smart, simple, or custom?"* — pre-fill from the chosen preset (`wi-researcher`'s literal
+When `.wi/models.md` is **absent** at a wi entry skill (dev step 1, rpa step 2): **interactive** → ask once
+— *"Model routing: smart, simple, or custom?"* — pre-fill from the chosen preset (`wi-researcher`'s literal
 is computed once as one tier below the chosen orchestrator tier), confirm the per-role rows (and any
-per-agent override), write the file **and commit it** (`chore(wi): moa config` — the project-level rule
+per-agent override), write the file **and commit it** (`chore(wi): models config` — the project-level rule
 in `wi-directory.md`: committed where written, so post-worktree phases read the same tracked copy).
 **`--auto`** → write + commit the **simple** preset and log it as an
-assumption. Either way the file persists and is **never re-asked** (edit `.wi/moa.md` to change it). When
-the file exists, skip setup entirely — just apply it.
+assumption. Either way the file persists and is **never re-asked** (edit `.wi/models.md` to change it). When
+the file exists, skip setup entirely — just apply it. The entry skills also handle the legacy migration: a
+pre-1.3 config under the old filename is renamed to `.wi/models.md` with its frontmatter set to
+`type: Model Routing Config` — the section format is unchanged.
 
 ## Dispatch rule (build, research, ship, rpa)
 
@@ -115,8 +117,8 @@ At every wi Agent dispatch, resolve the model as **per-agent override → the ag
 (`wi-code-checker` reads the `wi-code-checker` role, `wi-researcher` reads `wi-researcher`, `wi-task-runner`
 reads `wi-task-runner`; RPA build delegations resolve `rpa-build` override → `wi-task-runner` role →
 `inherit` — `rpa-build` is a **role label** for those delegations, not a registered agent; there is no
-`agents/rpa-build.md`) and pass it as the dispatch's model parameter. No `.wi/moa.md` → everything
-inherits, exactly wi's pre-MoA behavior. **Fallback:** a configured model that errors as unavailable at
+`agents/rpa-build.md`) and pass it as the dispatch's model parameter. No `.wi/models.md` → everything
+inherits, exactly wi's pre-routing behavior. **Fallback:** a configured model that errors as unavailable at
 dispatch time → re-dispatch with `inherit` and note it in `progress.md`; never stall a run on a model
 assignment.
 
@@ -147,8 +149,8 @@ it cannot verify things are actually wired, and it does not write `verification.
 1. Produce the diff (`git diff <base>...HEAD` for at-finish; the wave's commits for per-wave) to a temp
    file, plus context: `spec.md` (or the SDD's acceptance-criteria section) and the relevant
    constitution rules.
-2. Run `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/moa_review.py --config .wi/moa.md
-   --diff <patch> --context <spec> --out .wi/features/<slug>/moa-review.md` (`python` assumed on PATH; where it
+2. Run `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/cross_review.py --config .wi/models.md
+   --diff <patch> --context <spec> --out .wi/features/<slug>/cross-review.md` (`python` assumed on PATH; where it
    does not resolve, fall back to `py -3` on Windows or `python3` on Linux/macOS).
 3. Exit `0` = `## REVIEW PASSED`; `1` = `## ISSUES FOUND` — treat findings like any checker finding:
    BLOCKER → fix (loop back to build), WARNING/INFO → address or record. Both layers share the **max 2
@@ -158,8 +160,13 @@ it cannot verify things are actually wired, and it does not write `verification.
    continue; wi-code-checker's result-mode dispatch is unconditional and runs regardless. The
    cross-provider script works alone — the orchestrator hands it the diff and takes back findings; it does
    not steer the review.
-4. `moa-review.md` is **ephemeral** like `verification.md`: ship §5 distills the verdict into `PR.md`,
+4. `cross-review.md` is **ephemeral** like `verification.md`: ship §5 distills the verdict into `PR.md`,
    then the dossier tidy (§6) prunes both.
+
+The cross-provider review is a standalone layer: it needs only the `## Cross-provider config` section and
+works even when every role is `inherit` (no tier routing in use). The escalation contract in
+`agents/wi-task-runner.md` — architectural decisions stop and ask the orchestrator — is likewise
+independent of this file.
 
 `Cross-provider config` `provider: none` (simple preset) → skip the script entirely; RESULT mode still
 dispatches `wi-code-checker` at its Roles-table tier, same as PLAN mode — the cross-provider path is a

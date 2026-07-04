@@ -30,13 +30,13 @@ Then work happens in `../<repo>-wi-<slug>` on branch `wi/<slug>`. Record both in
 - **Branch:** wi/<slug>
 ```
 
-The feature folder does **not** arrive with the checkout: through brainstorm/research/plan it lives
-**untracked** in the main checkout, and `git worktree add` checks out HEAD — untracked files don't follow.
-So build's first act after creating the worktree is to **move** `.wi/features/<slug>/` from the main checkout
-into the worktree and commit it as the branch's first commit (`chore(<slug>): feature dossier`). The move
-leaves main's working tree clean (the files were untracked there); from then on the worktree's copy is
-canonical, and main's copy catches up when the branch merges. Resume-safe: if the feature folder already
-exists in the worktree, the move already happened — skip it.
+The feature folder arrives with the checkout: research commits the dossier on main at the design gate
+(`docs(<slug>): feature dossier (design gate)`), and the worktree branches from main — `.wi/features/<slug>/`
+is in place from the first command. During build the worktree's copy is canonical, and main's copy catches
+up when the branch merges. Fallback for pre-1.3 features whose dossier is still untracked on main: **move**
+`.wi/features/<slug>/` from the main checkout into the worktree and commit it as the branch's first commit
+(`chore(<slug>): feature dossier`) — the move leaves main's working tree clean, since the files were
+untracked there. Resume-safe either way: a dossier already present in the worktree needs nothing.
 
 ### Finish / clean up (done by the ship phase)
 
@@ -77,7 +77,7 @@ The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/referenc
 Codex uses `spawn_agent` bounded by `[agents] max_threads`. The prompt **content** is inline on every
 platform — the skeleton below gives each runner its task block + context in full. The dispatch *target*
 differs: on Claude Code, dispatch the **registered `wi-task-runner` agent** (build §2's instruction — the
-plugin registers it, and MoA model routing rides the dispatch); only on platforms without reliable
+plugin registers it, and tiered model routing rides the dispatch); only on platforms without reliable
 named-agent registration (Codex — named-role dispatch is unreliable across builds there) pass the prompt
 to a generic worker carrying the `agents/wi-task-runner.md` contract inline.
 

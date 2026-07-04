@@ -24,10 +24,11 @@ repo (ship closes out locally instead — ship §7); dev's preflight checks this
 - **Claude Code / Codex CLI** (both have a built-in `/goal`):
 
   ```
-  /goal The <slug> PR is open and its branch passes <lint + test commands from repo-map.md>;
-  .wi/features/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change;
-  never force-push; tests are never weakened to pass.
+  /goal The <slug> PR is open and its branch passes <lint + test commands from repo-map.md>; .wi/features/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change; never force-push; tests are never weakened to pass.
   ```
+
+  Print and paste as **one line**. A multi-line `/goal` can register only its first line as the
+  predicate, silently dropping the Phase condition and the constraints.
 
 - **GitHub Copilot CLI** (no `/goal` — use Autopilot, condition in the prompt):
 

@@ -20,12 +20,14 @@ Precondition: the design gate passed (SDD + assumptions confirmed, or `--auto`),
 
 ## 1. Isolate
 
-The worktree + branch (`wi/<run-slug>`) and the dossier's first commit
-(`chore(<run-slug>): feature dossier`) are created at rpa §6 — framework-neutral, exactly as
+The worktree + branch (`wi/<run-slug>`) are created at rpa §6 — framework-neutral, exactly as
 `wi:build` does it (`${CLAUDE_PLUGIN_ROOT}/skills/build/references/worktrees-and-subagents.md`; use
-`superpowers:using-git-worktrees` if installed). Record path + branch in `progress.md`. Before wave
-1, verify `.wi/features/<run-slug>/` is present in-tree and committed; if it isn't (an out-of-order
-resume), do the move now.
+`superpowers:using-git-worktrees` if installed) — and the run dossier arrives with the checkout: it
+was committed on main at the design gate (`docs(<run-slug>): feature dossier (design gate)`), and the
+branch starts from main. Record path + branch in `progress.md`. Before wave 1, verify
+`.wi/features/<run-slug>/` is present in-tree and committed; if it isn't (a pre-1.3 run or an
+out-of-order resume), do the move now and commit it as the branch's first commit
+(`chore(<run-slug>): feature dossier`).
 
 ## 2. Execute the build DAG in waves (from `tasks.md`)
 

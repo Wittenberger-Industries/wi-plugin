@@ -58,8 +58,8 @@ parallel, in the same turn. Each charter names: its single question **and mode**
 the researcher hits the web — see the agent), what is OUT of scope (the sibling charters, by name), and
 any standing ADR it must respect. Ship each researcher `brief.md` + the relevant constitution rules +
 `repo-map.md` + any relevant learning. One small question = one researcher; never fan out for the sake
-of it. When `.wi/moa.md` exists, dispatch each researcher on its MoA model (override → `wi-researcher`
-role → inherit; `${CLAUDE_PLUGIN_ROOT}/references/moa.md`).
+of it. When `.wi/models.md` exists, dispatch each researcher on its routed model (override → `wi-researcher`
+role → inherit; `${CLAUDE_PLUGIN_ROOT}/references/models.md`).
 
 **d · Reconcile -> decide.** Merge the reports into one recommended approach and adopt it. A report that
 returns empty, blows its budget, or wanders off-charter gets **one** narrower re-dispatch; after that,
@@ -88,6 +88,12 @@ Phase still `plan`, so an interrupted run can never resume into the gate without
 run.
 
 ### 3 - Design gate
+**Commit the dossier first.** Commit the feature dossier on main now — `docs(<slug>): feature dossier
+(design gate)` — everything under `.wi/features/<slug>/`. The gate decision is made against committed
+artifacts, and the build worktree (branched from main) starts with them; like the ADR, the dossier rides
+the branch and the PR. On a **mid-build reopen** skip this main commit — the worktree branch already
+carries the amendments and merges them back (the reopen rule below governs which copy you render).
+
 The user decides **from the console**. Render the summary inline in your response — never just point at
 the `.wi/` files; they are the appendix, not the message. Use exactly this shape (~25-40 lines, content
 inlined from the ADR/spec/tasks you just wrote):
@@ -112,7 +118,7 @@ inlined from the ADR/spec/tasks you just wrote):
 **Touches:** <n> files — <key paths>
 **Checker (plan mode):** <PASS — or N findings; list any unresolved BLOCKER/WARNING the user must weigh>
 
-Full detail: .wi/features/<slug>/ (spec.md, tasks.md, pitfalls.md, verification.md) and .wi/adr/ADR-NNNN-*.md
+Full detail: .wi/features/<slug>/ (spec.md, tasks.md, pitfalls.md, verification.md — committed on main as of this gate) and .wi/adr/ADR-NNNN-*.md
 ```
 
 No ADR (nothing hard to reverse)? Render the line as **Approach:** <the decision> *(no ADR — nothing hard
@@ -124,6 +130,10 @@ Then check **Gate mode** in `progress.md`:
 - **auto-approve** (`/wi:dev --auto`): skip the question; write the same rendered summary into
   `progress.md` and log "design gate auto-approved (--auto)" — the user reads it after the fact.
 
+**Re-opened mid-build** (a post-gate amend loops back here while the feature worktree exists): the
+worktree's `.wi/features/<slug>/` is canonical — read and render the summary from that copy, not main's,
+and say in the summary which copy it was rendered from.
+
 Only an explicit approve (or auto-approve) advances to implementation.
 
 ### 4 - Hand off to implementation
@@ -131,7 +141,9 @@ Only an explicit approve (or auto-approve) advances to implementation.
 (the user is present — they just approved) for the current platform: Claude Code & Codex CLI arm their
 built-in `/goal` with the PR-open condition; Copilot CLI relaunches under Autopilot. The exact command
 templates — and the unattended-run warning that must accompany the Copilot one — live in
-`${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`; print them from there verbatim. Under **auto-approve**
+`${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`; print them from there verbatim. Pasting the `/goal`
+line is the go: when it registers, continue into build **in the same turn** — don't end the turn waiting
+for another prompt. Under **auto-approve**
 skip the re-print — nobody is at the console (the gate was recorded, not asked), the handoff already
 recorded the line, and arming is the user's act, never wi's.
 

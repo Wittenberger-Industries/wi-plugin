@@ -27,19 +27,18 @@ Create a dedicated worktree and branch for the feature so the main checkout stay
 can run in parallel. Exact commands and the no-git / opt-out variants are in
 `${CLAUDE_PLUGIN_ROOT}/skills/build/references/worktrees-and-subagents.md`. **Delegation check:** if
 `superpowers:using-git-worktrees` is in your available skills you MUST use it (log `worktree via
-superpowers` to progress.md); this reference is the fallback when absent. Record the worktree path and
-branch in `progress.md`.
+superpowers` to progress.md); this reference is the fallback when absent (delegation point — see
+integrations.md precedence). Record the worktree path and branch in `progress.md`.
 
 Branch name: `wi/<slug>`. Worktree path: a sibling dir, e.g. `../<repo>-wi-<slug>`.
 
-**First step, right after `git worktree add -b wi/<slug>`: bring the feature dossier over.** The feature folder
-is still **untracked** in the main checkout (no phase before build commits the feature folder —
-project-level `.wi/` files, by contrast, are committed by their writing phases per `wi-directory.md`),
-so the new worktree starts without it. Move `.wi/features/<slug>/` from the main checkout into the worktree's `.wi/features/<slug>/` and
-commit it there as the branch's **first commit** — `chore(<slug>): feature dossier`. Moving (not copying)
-leaves main's working tree clean: the files were untracked on main, so nothing is lost and nothing
-unmerged stays behind. Resume-safe: if the feature folder is already present in the worktree (build
-re-entered after an interruption), the move already happened — skip it.
+**The feature dossier rides in with the checkout.** Research committed `.wi/features/<slug>/` on main at
+the design gate (`docs(<slug>): feature dossier (design gate)`), and the worktree branches from main — so
+the worktree starts with the dossier in place; nothing to move. During build the worktree's copy is
+canonical; main's catches up when the branch merges. One fallback for pre-1.3 features: if the dossier is
+still untracked in the main checkout, move `.wi/features/<slug>/` into the worktree and commit it as the
+branch's **first commit** — `chore(<slug>): feature dossier` (moving, not copying, leaves main's working
+tree clean).
 
 ## 2 · Execute in parallel waves (the default)
 
@@ -52,9 +51,9 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
 2. **Dispatch the whole ready set at once** — one fresh `wi-task-runner` (see `agents/wi-task-runner.md`) per
    task, all in the same turn. Each gets exactly what it needs and nothing more: its task block, the
    relevant constitution rules, and the repo commands. Fresh agents keep context from rotting across a
-   long build; parallel dispatch keeps wall-clock short. **Model per dispatch (MoA):** when `.wi/moa.md`
+   long build; parallel dispatch keeps wall-clock short. **Model per dispatch (tiered model routing):** when `.wi/models.md`
    exists, resolve each runner's model as per-agent override → `wi-task-runner` role → `inherit`
-   (`${CLAUDE_PLUGIN_ROOT}/references/moa.md`) and pass it on the dispatch; a model that errors as
+   (`${CLAUDE_PLUGIN_ROOT}/references/models.md`) and pass it on the dispatch; a model that errors as
    unavailable → re-dispatch on `inherit` and note it in `progress.md`. No config → inherit, as always.
 3. **TDD per task** (per the constitution): failing test first, minimal implementation, green, refactor.
    **Frontend routing is operational, not just asserted:** when a task is tagged `[frontend]`, the dispatch
@@ -84,10 +83,10 @@ when the DAG is a chain, never the default: an idle DAG is wasted wall-clock.
 (`superpowers:dispatching-parallel-agents` codifies the dispatch pattern if installed.)
 
 Two scheduling refinements proven in dry runs: (a) **wave-end gate** — at each wave boundary run the full
-lint + test commands once, serially, before dispatching the next wave — and when `.wi/moa.md` sets
+lint + test commands once, serially, before dispatching the next wave — and when `.wi/models.md` sets
 `check_points: per-wave`, also run **the cross-provider diff review** — the layer on top of
 wi-code-checker, when configured — over the wave's diff there
-(`${CLAUDE_PLUGIN_ROOT}/references/moa.md`, same bounded 2-round loop as at ship); (b) **sole-runner exception** —
+(`${CLAUDE_PLUGIN_ROOT}/references/models.md`, same bounded 2-round loop as at ship); (b) **sole-runner exception** —
 when exactly one task in a wave executes tests (the rest are docs/config), that runner keeps full TDD
 (watch-fail / watch-pass); only multi-test waves switch to authored-not-run + orchestrator serial Verify.
 

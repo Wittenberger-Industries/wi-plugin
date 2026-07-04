@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""MoA cross-provider check — an independent diff-review layer beside wi-code-checker's result mode.
+"""Cross-provider diff review — an independent layer beside wi-code-checker's result mode.
 
-Reads the target project's `.wi/moa.md` (the MoA model-assignment config), and — when a second
+Reads the target project's `.wi/models.md` (the tiered model routing config), and — when a second
 provider is configured — sends the diff + spec context to that model, possibly a different
 provider/architecture than the session (e.g. GPT via OPENAI_API_KEY). A layer on top of
 wi-code-checker's result-mode pass, never a replacement for it. Writes the findings to a file.
 Stdlib only; no third-party deps.
 
 Usage:
-    python3 moa_review.py --config .wi/moa.md --diff diff.patch \
+    python3 cross_review.py --config .wi/models.md --diff diff.patch \
         [--context spec.md ...] --out review.md
 
 Exit codes:
@@ -36,7 +36,7 @@ PROVIDER_DEFAULTS = {
 }
 
 REVIEW_SYSTEM_PROMPT = (
-    "You are an independent third-party code reviewer (MoA Checker). You did not "
+    "You are an independent third-party code reviewer (Cross-provider reviewer). You did not "
     "write this code and you do not negotiate with its author. Review the diff "
     "against the provided spec/context with repo-level impact in mind: correctness, "
     "necessity (redundant or wasteful changes), alignment with the stated intent, "
@@ -69,8 +69,8 @@ def _section(body, heading):
     return m.group(1).splitlines() if m else []
 
 
-def parse_moa_config(text):
-    """Parse `.wi/moa.md` into {preset, roles, cross_provider, overrides}."""
+def parse_models_config(text):
+    """Parse `.wi/models.md` into {preset, roles, cross_provider, overrides}."""
     preset = "custom"
     body = text
     if text.startswith("---"):
@@ -169,7 +169,7 @@ def run_review(cfg, diff_text, context_blobs, out_path):
     api_key = os.environ.get(provider["api_key_env"], "")
     if not api_key:
         print(
-            f"moa_review: no API key in ${provider['api_key_env']} — "
+            f"cross_review: no API key in ${provider['api_key_env']} — "
             "cross-provider layer skipped; the wi-code-checker result pass still runs",
             file=sys.stderr,
         )
@@ -184,33 +184,33 @@ def run_review(cfg, diff_text, context_blobs, out_path):
     try:
         reply = call(provider, api_key, REVIEW_SYSTEM_PROMPT, user)
     except (urllib.error.URLError, KeyError, json.JSONDecodeError, TimeoutError) as e:
-        print(f"moa_review: cross-provider review API call failed: {e}", file=sys.stderr)
+        print(f"cross_review: cross-provider review API call failed: {e}", file=sys.stderr)
         return 2
 
     with open(out_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(reply.rstrip() + "\n")
-    print(f"moa_review: findings written to {out_path}")
+    print(f"cross_review: findings written to {out_path}")
     return 0 if "## REVIEW PASSED" in reply else 1
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--config", required=True, help="path to .wi/moa.md")
+    ap.add_argument("--config", required=True, help="path to .wi/models.md")
     ap.add_argument("--diff", required=True, help="path to the diff/patch file")
     ap.add_argument("--context", nargs="*", default=[], help="spec/context files")
     ap.add_argument("--out", required=True, help="findings output file")
     args = ap.parse_args(argv)
 
     try:
-        cfg = parse_moa_config(
+        cfg = parse_models_config(
             open(args.config, encoding="utf-8", errors="replace").read()
         )
     except OSError as e:
-        print(f"moa_review: cannot read config: {e}", file=sys.stderr)
+        print(f"cross_review: cannot read config: {e}", file=sys.stderr)
         return 2
     if not cross_provider_configured(cfg):
         print(
-            "moa_review: cross-provider not configured — nothing to run",
+            "cross_review: cross-provider not configured — nothing to run",
             file=sys.stderr,
         )
         return 2
@@ -222,7 +222,7 @@ def main(argv=None):
             for p in args.context
         ]
     except OSError as e:
-        print(f"moa_review: cannot read input: {e}", file=sys.stderr)
+        print(f"cross_review: cannot read input: {e}", file=sys.stderr)
         return 2
 
     return run_review(cfg, diff_text, blobs, args.out)

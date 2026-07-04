@@ -25,7 +25,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 ├── learnings.md            # INDEX of learnings: one line + hook per feature (ship). Read this, not the dir.
 ├── learnings/              # substantial per-feature learnings, each its own .md (ship; indexed above).
 ├── roadmap.md              # optional. Ordered list of features for a larger effort.
-├── moa.md                  # MoA model assignments (optional; references/moa.md) — written+committed at first dev/rpa run
+├── models.md               # tiered model routing — model assignments (optional; references/models.md) — written+committed at first dev/rpa run
 └── features/
     └── 0001-<slug>/        # one folder per feature; NNNN- global ordinal (creation order) + kebab slug
         ├── progress.md     # the state machine for this feature — single source of truth
@@ -35,7 +35,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
         ├── tasks.md        # plan output: small ordered tasks, each with files + verification
         ├── pitfalls.md     # plan output: known failure modes for this change
         ├── verification.md # checker output (plan mode pre-gate, result mode at ship) — EPHEMERAL; verdict folds into PR.md, pruned at ship's dossier tidy
-        ├── moa-review.md   # cross-provider diff review (ship; only when configured) — EPHEMERAL, pruned with verification.md
+        ├── cross-review.md # cross-provider diff review (ship; only when configured) — EPHEMERAL, pruned with verification.md
         ├── tokens.md       # token ledger: exact subagent usage + orchestrator (finalized by ship pre-PR)
         └── PR.md           # the PR description (ship §5) — committed, consumed by gh pr create
 ```
@@ -48,13 +48,15 @@ reasoned about. Keep every file small and current; these are working artifacts, 
   order; next number = highest existing `.wi/features/` ordinal + 1 (else `0001`). Legacy features — unnumbered or with a non-numeric prefix — are left as-is and
   ignored by the next-number scan (they contribute nothing to the max).
 - **Commit `.wi/`.** It is documentation. Feature-folder lifecycle: untracked in the main checkout through
-  brainstorm/research/plan; build moves it into the feature worktree and commits it as the branch's first
-  commit (`chore(<slug>): feature dossier`); main's copy arrives when the branch merges. **Project-level
-  files are committed where they're written, by the phase that writes them** — scan its docs (+ the
-  greenfield `.gitignore`), brainstorm glossary updates, research the ADR + its index row, dev/rpa
-  `moa.md` / `roadmap.md`, ship the docs-sync — `chore(wi): …` / `docs(wi): …` subjects; **only the
-  feature folder defers** to build's first branch commit. That is what puts ADRs on the branch (committed
-  on main before build branches from HEAD) and lets every post-worktree phase read the same tracked
+  brainstorm/research/plan; research commits it on main at the design gate (`docs(<slug>): feature
+  dossier (design gate)`), so the gate decides against committed artifacts and the build worktree
+  (branched from main) starts with them; during build the **branch copy is canonical**, and main's copy
+  catches up when the branch merges. **Project-level files are committed where they're written, by the
+  phase that writes them** — scan its docs (+ the greenfield `.gitignore`), brainstorm glossary updates,
+  research the ADR + its index row, dev/rpa `models.md` / `roadmap.md`, ship the docs-sync —
+  `chore(wi): …` / `docs(wi): …` subjects; **only the feature folder defers** — to research's design-gate
+  commit. That is what puts ADRs and the dossier on the branch (committed on main before build branches
+  from HEAD) and lets every post-worktree phase read the same tracked
   copies. A team that doesn't want wi committing to main overrides this in the constitution. Gitignore
   `research/` only if it gets large or holds scraped material — leave a one-line summary in the ADR/spec
   instead.
@@ -63,15 +65,15 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 - **One writer per phase.** A phase owns its outputs; later phases read but don't silently rewrite them.
 - **No strays.** Everything feature-specific lives under `features/<slug>/` — never loose in `.wi/`. If a phase
   needs a scratch file, it goes in the slug folder (ship sweeps and deletes strays at the dossier tidy).
-- **`research/`, `verification.md`, and `moa-review.md` are ephemeral.** Working notes exist to produce
+- **`research/`, `verification.md`, and `cross-review.md` are ephemeral.** Working notes exist to produce
   the ADR and spec; the checker's `verification.md` feeds the design gate (plan mode) and the ship review
-  (result mode); `moa-review.md` is the cross-provider diff review's output (ship, only when configured).
+  (result mode); `cross-review.md` is the cross-provider diff review's output (ship, only when configured).
   Their verdicts + any waived findings fold into `PR.md` (ship §5), then the dossier tidy (§6) prunes all
   three before the PR (unless the constitution says keep them). This bullet is ship's prune list for the
   dev flow — the tidy prunes exactly what it names. After `done`, a feature folder holds
   exactly the seven-file dossier: progress, brief, spec, tasks, pitfalls, tokens, PR.
 - **Project-level memory persists & compounds.** `constitution.md`, `repo-map.md`, `overview.md`,
-  `architecture.md`, `glossary.md`, `adr/`, `roadmap.md`, `moa.md`, `learnings.md`, and `learnings/` belong to the
+  `architecture.md`, `glossary.md`, `adr/`, `roadmap.md`, `models.md`, `learnings.md`, and `learnings/` belong to the
   project — never pruned. Each feature reads them at the start and ship writes back into them, so the project
   gets smarter per feature.
 - **Learnings recall is via the index.** Phases read `.wi/learnings.md` (one line + hook per feature) and
@@ -92,7 +94,7 @@ version:
 - **`type` per file:** `constitution.md` → `Constitution`, `repo-map.md` → `Repo Map`, `overview.md` →
   `Overview`, `architecture.md` → `Architecture`, `glossary.md` → `Glossary`, `adr/ADR-*.md` → `ADR`,
   `learnings.md` → `Learnings Index`, `learnings/<slug>.md` → `Learning`, `roadmap.md` → `Roadmap`,
-  `moa.md` → `MoA Config`; per
+  `models.md` → `Model Routing Config`; per
   feature: `progress.md` → `Feature Progress`, `brief.md` → `Brief`, `spec.md` → `Spec`, `tasks.md` →
   `Task List`, `pitfalls.md` → `Pitfalls`, `verification.md` → `Verification`, `tokens.md` →
   `Token Ledger`, `PR.md` → `PR Description`, `research/*.md` → `Research Note`,
@@ -144,8 +146,8 @@ timestamp: <YYYY-MM-DD>
 ```
 
 Update the **Phase** field and append to **Log** at every transition. During build, the **feature
-branch's copy is canonical** — build committed the dossier into the worktree as the branch's first
-commit, so tick tasks and log in the worktree's `.wi/` and the updates ride the PR;
+branch's copy is canonical** — the dossier was committed on main at the design gate and rides into the
+worktree at branch time, so tick tasks and log in the worktree's `.wi/` and the updates ride the PR;
 `main`'s copy catches up on merge. The build phase ticks the task
 checkboxes here, so a resumed (or handed-off) run knows exactly what's left. Record the chosen approach and
 any blocker here too — it's what the user reads after a hands-off run.

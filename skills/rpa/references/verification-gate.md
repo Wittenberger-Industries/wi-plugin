@@ -21,8 +21,8 @@ deploy`) is a separate, **post-gate** ship action that runs only on an already-g
 This gate is **framework-aware**. The steps below are the **REFramework** gate. On the **Maestro** path
 (`Framework: maestro`) the gate is instead: `uip maestro flow validate` (mandatory) **+** `uip maestro flow
 eval` **when eval sets exist** (run-if-present, reported) — there is **no** Workflow Analyzer or
-approved-paradigm check (those are REFramework-specific). The feature-level **checker (result mode)** below runs
-on **both** paths.
+approved-paradigm check (those are REFramework-specific). The **checker (result mode)** below — the
+feature-level pass plus the inline line-level review — runs on **both** paths.
 
 ## Run, in this order (per process/project) — REFramework
 
@@ -72,14 +72,29 @@ available in the run environment, the gate degrades to: **artifacts complete + t
 ruleset/criteria to pass**, and the actual Analyzer run is deferred to the user (say so explicitly — don't
 claim green you didn't verify).
 
-## Feature-level check (checker · result mode)
+## Checker (result mode) — feature-level + line-level, one dispatch
 
 Beyond the tooling above, dispatch the **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `result`
-mode against **the SDD's acceptance-criteria section** (§10 in the base ToC) + the locked decisions (the SDD's §1-§7, the
-`rpa-constitution`, any ADR) — it confirms each is **delivered and wired in the generated project**, not just
-present, refreshing `verification.md`. Feature/coverage-level, distinct from the Analyzer's line-level rules. A
-result-mode **BLOCKER** — an unmet SDD criterion, or a decision silently reduced to a stub/mock not signed
-off — **loops back to build**; ship never opens the PR on a run the checker says isn't met.
+mode — **one dispatch, two sequential passes**, same interface and logging as `wi:ship` §2:
+
+- **Feature-level pass** — against **the SDD's acceptance-criteria section** (§10 in the base ToC) + the
+  locked decisions (the SDD's §1-§7, the `rpa-constitution`, any ADR): it confirms each is **delivered and
+  wired in the generated project**, not just present. Coverage-level, distinct from the Analyzer's rules.
+- **Line-level pass** — the same dispatch carries the code review inline. Before dispatching, resolve the
+  line-review source: if `superpowers:requesting-code-review` is in your available skills, locate its
+  reviewer template — the `code-reviewer.md` inside that skill's installed directory (Glob the plugin
+  roots, e.g. `~/.claude/plugins/**/requesting-code-review/**/code-reviewer.md`) — and pass its absolute
+  path in the dispatch as `Line review template: <path>`; absent → `Line review template: none` (the
+  checker runs wi's built-in line review over the branch diff — here, the generated project). Log
+  `review via wi-code-checker + superpowers:requesting-code-review[inline]` or
+  `review via wi-code-checker (wi line review; superpowers absent)`.
+
+Findings from both passes land in `verification.md` (the feature-level matrix plus its
+`## Line-level findings` section) in the BLOCKER/WARNING/INFO taxonomy, refreshing it. A result-mode
+**BLOCKER** — an unmet SDD criterion, a decision silently reduced to a stub/mock not signed off, or a
+line-level defect of that gravity — **loops back to build** (**max 2 review→fix rounds**, shared with the
+cross-provider findings when that layer is configured — `wi:ship` §2's rule); ship never opens the PR on a
+run the checker says isn't met.
 
 ## What "green" means
 
@@ -89,7 +104,8 @@ off — **loops back to build**; ship never opens the PR on a run the checker sa
   the Subagents sum filled, and a resolved `## Orchestrator` section (real figure or honest `unavailable`).
 - every criterion in the SDD's acceptance-criteria section maps to something that actually passed.
 - every assumption is either confirmed (gate) or recorded for sign-off; no unaddressed `NEEDS DECISION`.
-- the **checker (result mode) verdict is PASS** — every SDD acceptance criterion and locked decision delivered and wired.
+- the **checker (result mode) verdict is PASS** — every SDD acceptance criterion and locked decision
+  delivered and wired, and no line-level BLOCKER outstanding.
 
 ## The iron law (same as wi:dev)
 
