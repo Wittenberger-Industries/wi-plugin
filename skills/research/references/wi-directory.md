@@ -30,7 +30,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
     └── 0001-<slug>/        # one folder per feature; NNNN- global ordinal (creation order) + kebab slug
         ├── progress.md     # the state machine for this feature — single source of truth
         ├── brief.md        # brainstorm output: desired behavior, scope, constraints
-        ├── research/       # questions.md + researcher notes + chosen-approach (+ runtime-state-inventory.md for rename/migration features) — EPHEMERAL
+        ├── research/       # questions.md + researcher notes + chosen-approach (+ runtime-state-inventory.md for rename/migration features; + proposal-*.md + proposal-synthesis.md, MoA runs only) — EPHEMERAL
         ├── spec.md         # plan output: what/why + testable acceptance criteria
         ├── tasks.md        # plan output: small ordered tasks, each with files + verification
         ├── pitfalls.md     # plan output: known failure modes for this change

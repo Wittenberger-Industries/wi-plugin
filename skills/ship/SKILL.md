@@ -50,6 +50,22 @@ checker's built-in review when `none`. Findings from both passes land in `verifi
 BLOCKER/WARNING/INFO taxonomy. This dispatch is unconditional (on the `wi-code-checker` role's model
 when `.wi/models.md` exists, else inherit); no cross-provider configuration demotes or replaces it.
 
+**Mixture of Agents layer (only when configured).** If `.wi/models.md` has a `## Mixture of Agents`
+section with `points` including `review` (see `${CLAUDE_PLUGIN_ROOT}/references/moa.md`), dispatch N
+proposer checkers (one per listed `proposers` tier) in parallel, same turn, instead of the one dispatch
+above — IDENTICAL prompts (result mode, both passes, the same `Line review template:` line) plus the
+marker `MoA role: proposer <i>/<N>`.
+Proposers RETURN findings only; they never write `verification.md`. If `layers: 2`, run a second parallel
+round: each proposer receives the union of round-1 findings and returns a refinement (may change position;
+must say why). Then dispatch one aggregator checker (`MoA role: aggregator`, at the `aggregator` tier): it
+receives all findings, dedupes, keeps the MAX severity any proposer assigned, verifies against the repo
+before dropping anything as a false positive, and alone writes `verification.md` (both passes' sections,
+one verdict marker). Append `+ MoA (<N> proposers, <L> layers, aggregator <tier>)` to the review log line
+above (e.g. `review via wi-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`);
+every proposer and aggregator dispatch appends its own `tokens.md` row on completion. The cross-provider
+layer below and the max-2-rounds loop are unchanged — a full MoA pass counts as one round. Without the
+section, or with `review` not in `points`, the single dispatch above runs unchanged.
+
 **Cross-provider layer (only when configured).** If `.wi/models.md`'s `## Cross-provider config` names a
 provider (≠ `none`) and its API key is present, **additionally** run an independent **cross-provider
 diff review** — a second opinion from another model family, a separate optional layer on top of the

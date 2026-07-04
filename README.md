@@ -204,6 +204,10 @@ skill auto-triggers from natural language too.
   **cross-provider diff review** (e.g. GPT via `OPENAI_API_KEY`), a layer on top of the checker's
   result-mode pass at ship. Smart/simple presets, set up once on the first wi run, every cell overridable;
   see `references/models.md`. Without the file, everything inherits the session model as before.
+- **Mixture of Agents (optional, off by default).** The `## Mixture of Agents` section in `.wi/models.md`
+  puts N proposer agents on the same judgment — the research approach decision and the ship review — with
+  an optional second refinement layer; one aggregator synthesizes the single answer. Neither preset enables
+  it (`points: none`); see `references/moa.md`.
 - **Python-first** defaults (uv · pytest · ruff · mypy), stack-agnostic — `scan` records whatever the repo
   uses, and `constitution.md` is where you override.
 - Opening the PR uses `gh` if available; otherwise wi pushes the branch and leaves the PR command for you.
@@ -267,6 +271,9 @@ If none are installed, wi still runs the whole loop on its own.
 
 ## Roadmap
 
+- **Mixture of Agents** (v1.4.0) shipped — a real MoA layer at wi's two judgment points (research approach
+  selection, ship review): N proposers → optional second layer → aggregator, configured in `.wi/models.md`
+  (`points: none` by default; neither preset enables it).
 - **Issue sweep** (v1.3.0) shipped — the `/goal` handoff now advances in the same turn the goal registers;
   the tiered-models layer is renamed to **tiered model routing** (`.wi/models.md`, `cross_review.py`,
   `cross-review.md`) with the cross-provider review documented as a standalone layer; the feature dossier
