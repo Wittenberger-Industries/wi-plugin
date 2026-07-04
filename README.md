@@ -102,14 +102,15 @@ flowchart TD
   build --> verify["verification gate + checker · result mode (+ cross-provider diff review when configured)"]
   verify -->|"red — back to build (max 2 rounds)"| build
   verify -->|green| ship["ship — docs-sync, learnings, PR.md, dossier tidy"]
-  ship --> pr["open the PR (gh) — close-out checklist -> done"]
+  ship --> pr["open the PR (gh) -> remote checks green (CI + deployment) -> close-out checklist -> done"]
   pr -.->|"rpa, if gate-approved"| publish["publish to the tenant — feed / deploy via uipath-solution"]
 ```
 
 **(YOU)** marks the only two conversations in either flow — everything else runs autonomously, the
-post-gate stretch under the keep-alive loop (`/goal` or Autopilot) until ship's close-out checklist
-passes. At the rpa gate the user also locks the **framework** (REFramework | Maestro), the **build
-paradigm** (XAML-only | coded `.cs`), and the **publish** decision (none | feed | deploy).
+post-gate stretch under the keep-alive loop (`/goal` or Autopilot) until ship's close-out checklist —
+including the PR's remote checks — passes. At the rpa gate the user also locks the **framework**
+(REFramework | Maestro), the **build paradigm** (XAML-only | coded `.cs`), and the **publish** decision
+(none | feed | deploy).
 
 The **check** steps are wi's read-only **checker** agent. In *plan mode* (before the gate) it builds a
 coverage matrix — every acceptance criterion, locked decision, glossary term, and pitfall mapped to a
@@ -271,6 +272,12 @@ If none are installed, wi still runs the whole loop on its own.
 
 ## Roadmap
 
+- **Remote checks gate at ship** (v1.5.0) shipped — ship now waits for the PR's remote checks (CI +
+  deployment) after opening it: green is logged with run URLs; red enters a bounded fix loop with the
+  worktree kept; close-out, worktree cleanup, and the success summary come only after the remote gate;
+  the final report separates local and remote status —
+  `local gate: green · PR checks: N/N green · deployment: ready` — and the `/goal` template includes
+  remote checks.
 - **Mixture of Agents** (v1.4.0) shipped — a real MoA layer at wi's two judgment points (research approach
   selection, ship review): N proposers → optional second layer → aggregator, configured in `.wi/models.md`
   (`points: none` by default; neither preset enables it).

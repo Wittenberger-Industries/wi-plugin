@@ -105,8 +105,9 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
 5. **Design** (skill `wi:research`): research -> plan -> **design gate** (inline summary; approve / amend
    / stop — or auto-approve per the flag).
 6. **Implement** (after the gate): **build** (skill `wi:build`) — worktree + parallel waves — then
-   **ship** (skill `wi:ship`) — verification gate, PR, cleanup, and the final report including the token
-   table. **No questions anywhere in this stretch**; decisions get made, recorded, and moved past.
+   **ship** (skill `wi:ship`) — verification gate, PR opened and its remote checks verified, cleanup,
+   and the final report including the token table. **No questions anywhere in this stretch**; decisions
+   get made, recorded, and moved past.
 
 ## Boundaries
 

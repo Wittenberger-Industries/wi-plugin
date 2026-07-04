@@ -41,7 +41,7 @@ untracked there. Resume-safe either way: a dossier already present in the worktr
 ### Finish / clean up (done by the ship phase)
 
 ```bash
-git worktree remove ../<repo>-wi-<slug>     # after the branch is merged/PR'd
+git worktree remove ../<repo>-wi-<slug>     # only after ship §8's remote-checks gate lands (green / none / user-accepted red)
 git branch -d wi/<slug>                      # if fully merged
 ```
 
