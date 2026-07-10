@@ -17,6 +17,10 @@ feature isn't done.
 Inputs: the feature branch/worktree, `spec.md` (acceptance criteria), `pitfalls.md`, `constitution.md`,
 `repo-map.md`.
 
+Hold exactly that (workflow.md's **context budget** — `spec.md` + `pitfalls.md` are this phase's
+artifacts, read by section where possible): the diff enters as `--stat` + hunks (§2), command output
+as exit code + tail (§1/§8), and the checker — not you — re-reads the repo.
+
 First act once engaged: append `- <ts> **Update** phase = ship (ship engine engaged (wi <version>))` to
 progress.md's Log — full ISO-8601 stamp from the OS clock (`date -Iseconds` /
 `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/now.py`), <version> read from
@@ -26,15 +30,20 @@ build→ship transition is timed like every other phase flip.
 ## 1 · Verification gate (must be green)
 
 Run the full gate from `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/verification-gate.md`: the complete
-test suite, lint, format check, typecheck, and any CI-equivalent command from `repo-map.md`. Every
-acceptance criterion in `spec.md` must map to something that actually passed. If `superpowers:verification-before-completion`
-is in your available skills you MUST run it too (log it) — a delegation point; see the precedence rule in
-`skills/research/references/integrations.md`. A red gate stops the ship — fix the code (loop
-back to build), don't lower the bar.
+test suite, lint, format check, typecheck, and any CI-equivalent command from `repo-map.md`. Run every
+gate command per workflow.md's **output house rule** — redirected to
+`.wi/features/<slug>/.logs/gate-<step>.txt`, verdict from the exit code + `tail -n 30`, failures pulled
+by grep. The log file is the evidence and stays on disk; the transcript keeps only the verdict. Every
+acceptance criterion in `spec.md` must map to something that actually passed. If
+`superpowers:verification-before-completion` is in your available skills you MUST run it too (log it) —
+a delegation point; see the precedence rule in `skills/research/references/integrations.md`. A red gate
+stops the ship — fix the code (loop back to build), don't lower the bar.
 
 ## 2 · Review against intent
 
-Self-review the diff with fresh eyes, specifically against:
+Self-review the diff with fresh eyes — overview via `git diff --stat`, then open only the hunks a
+criterion or finding needs (workflow.md's output house rule: never a whole-diff read) — specifically
+against:
 - **Acceptance criteria** in `spec.md` — each one met and demonstrably so.
 - **Pitfalls** in `pitfalls.md` — each applicable one actually handled (and covered by a test where it
   matters).
@@ -247,7 +256,8 @@ findings with severity. Distilled from verification.md; the dossier tidy (§6) t
      `verification.md` *after* the commit that last touched it, so a plain `git rm` refuses on the local
      modifications); a never-committed one (`cross-review.md` is written at §2 and typically never
      committed) is untracked — plain-delete it, `git rm` has no pathspec to match (prune a review file
-     left under its pre-1.3 legacy name too).
+     left under its pre-1.3 legacy name too; `.logs/` is likewise never tracked (self-gitignored) —
+     plain-delete the directory).
      (Skip pruning if the constitution says to keep them.)
   3. *Finalize `tokens.md` — NOW, not at close-out.* The file must be complete **inside the dossier
      commit**, or it never rides the PR. The ledger was scaffolded at research/build start and its
@@ -318,8 +328,10 @@ is merge-ready the moment a remote appears.
 **The remote-checks gate — before any cleanup.** The §1 gate was local; the PR's checks — CI runs and
 deployment checks (e.g. Vercel) — are the authoritative signal, and they run remotely *after* the push.
 The PR must be green, not just the worktree. Give the checks a moment to register, then watch them to
-completion: `gh pr checks <pr-url-or-number> --watch --fail-fast`, bounded by a sane timeout (default
-~15 minutes; the constitution may override). If no checks register after ~2 minutes AND the repo has no
+completion: `gh pr checks <pr-url-or-number> --watch --fail-fast`, bounded by a sane timeout —
+redirected to `.wi/features/<slug>/.logs/pr-checks.txt`; the final table (its tail) is the evidence
+you log to `progress.md` (default ~15 minutes; the constitution may override). If no checks register
+after ~2 minutes AND the repo has no
 CI config (no `.github/workflows/`, nothing in `repo-map.md`), log `remote checks: none configured` in
 `progress.md` and proceed to cleanup — the remote-checks box below passes on that recorded substitute.
 
@@ -329,8 +341,10 @@ CI config (no `.github/workflows/`, nothing in `repo-map.md`), log `remote check
   `PR.md` was committed before the push, so neither can carry evidence that only exists after the PR
   opens — `progress.md` carries it, and the final report repeats it.
 - **Red** — **the run is not done and the keep-alive condition is not satisfied.** Pull the failing logs
-  (`gh run view <run-id> --log-failed`; an external check via its details URL) and diagnose. The worktree
-  still exists — cleanup hasn't run — so fix there, commit, push, re-watch. **Max 2 remote-fix rounds**;
+  to a file, not into context (`gh run view <run-id> --log-failed >
+  .wi/features/<slug>/.logs/ci-<run-id>.txt 2>&1`; an external check via its details URL), read the
+  failing lines by grep/tail, and diagnose. The worktree still exists — cleanup hasn't run — so fix
+  there, commit, push, re-watch. **Max 2 remote-fix rounds**;
   a genuine flake (runner died, transient network, timeout with no log) may be re-run without consuming
   a round. Budget exhausted: interactive → present the concrete failures and let the user decide (keep
   fixing, or accept red → record `remote checks: red — accepted by user (<reason>)` in `progress.md`'s
