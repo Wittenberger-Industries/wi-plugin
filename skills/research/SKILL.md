@@ -65,7 +65,7 @@ the researcher hits the web — see the agent), what is OUT of scope (the siblin
 any standing ADR it must respect. Ship each researcher `brief.md` + the relevant constitution rules +
 `repo-map.md` + any relevant learning. One small question = one researcher; never fan out for the sake
 of it. Dispatch each researcher on the `researcher` tier from `progress.md`'s resolved-routing block
-(absent, or `.wi/models.md` changed after its stamp → resolve once and rewrite the block;
+(absent, or `.wi/models.md` changed after its stamp → resolve once now and rewrite the block;
 `${CLAUDE_PLUGIN_ROOT}/references/models.md`'s resolve-once rule).
 
 **d · Reconcile -> decide.** Merge the reports into one recommended approach and adopt it. A report that

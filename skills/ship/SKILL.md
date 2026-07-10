@@ -81,8 +81,8 @@ one verdict marker). Append `+ MoA (<N> proposers, <L> layers, aggregator <tier>
 above (e.g. `review via wi-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`);
 every proposer and aggregator dispatch appends its own `tokens.md` row (with its `Duration` cell) on
 completion. The cross-provider
-layer below and the max-2-rounds loop are unchanged — a full MoA pass counts as one round. Without the
-section, or with `review` not in `points`, the single dispatch above runs unchanged.
+layer below and the max-2-rounds loop are unchanged — a full MoA pass counts as one round. MoA row
+`none`, or `review` not in its `points` → the single dispatch above runs unchanged.
 
 **Cross-provider layer (only when configured).** If the resolved-routing block's cross-provider row
 names a provider (≠ `none`) and its API key is present, **additionally** run an independent **cross-provider
