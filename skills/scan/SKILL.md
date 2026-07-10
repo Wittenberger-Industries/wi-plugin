@@ -55,7 +55,7 @@ Plus a plugin check that may install the skills wi delegates to.
    confirmed answers into `repo-map.md` (`Kind: greenfield`) and seed `constitution.md` from them; skip
    `overview.md` (nothing to document yet). Anything the user genuinely can't answer → `UNKNOWN — ask`;
    don't invent it. A later scaffolding feature can fill the gaps — but the intent is now on record. Also drop a
-   stack-appropriate `.gitignore` (caches, build artifacts) so the first build doesn't leak them.
+   stack-appropriate `.gitignore` (caches, build artifacts, `.wi/features/*/.logs/` — wi's redirected command output) so the first build doesn't leak them.
 
 3. **Classify frontend / backend / both.** A UI framework in `package.json` or a `components/` tree ⇒
    frontend present. Record it — build routes `[frontend]` tasks to a design skill.
@@ -76,7 +76,7 @@ Plus a plugin check that may install the skills wi delegates to.
    This is what makes the committed-`.wi/` promise true and puts the docs in every future worktree.
 
 7. **Report** (4-8 lines): stack, frontend/backend, what docs were written, which plugins are present vs
-   newly installed, and anything left `UNKNOWN`.
+   newly installed, anything left `UNKNOWN`, and a **lean-file warning** when `constitution.md` or `repo-map.md` exceeds the ~150-line ceiling (wi-directory.md) — both are held in the orchestrator's context for entire runs, so overweight there is paid every turn.
 
 ## `--refresh` — drift check + memory hygiene (already-scanned projects)
 
@@ -104,6 +104,8 @@ Anchor on the repo-map's `scanned <YYYY-MM-DD>` stamp and diff reality against t
 4. **`overview.md`:** update only sections made wrong (organization, run steps, external services).
 5. **`constitution.md` is user-owned — never rewrite it.** If reality now contradicts a rule (e.g. the
    lint tool changed), surface the contradiction in the report and let the user amend.
+6. **Lean check:** `constitution.md` / `repo-map.md` grown past ~150 lines → flag it in the report
+   with a suggested split or trim (the constitution is user-owned — suggest, never rewrite).
 
 Re-stamp `repo-map.md` (`scanned <today>, refreshed`). If the **Kind or core stack fundamentally changed**
 (greenfield grew real code, repo swapped language), say so and run the full scan instead.
