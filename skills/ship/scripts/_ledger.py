@@ -3,7 +3,8 @@ _ledger.py — shared helpers for the tokens.md token ledger.
 
 NOT an entrypoint. Imported by the two scripts the skills invoke:
   - check_tokens.py  (--init scaffold, default = verify gate)
-  - token_report.py  (--write finalize: Orchestrator section + Subagents sum)
+  - token_report.py  (--write finalize: Orchestrator section + Subagents sum
+                      + Duration totals + per-agent split/cost where recoverable)
 
 tokens.md is a per-feature RUNTIME artifact in a user's .wi/, never in this plugin repo.
 This module owns the file format; the scripts are thin CLIs over it. Stdlib only.
@@ -19,7 +20,10 @@ UNAVAILABLE = "Orchestrator: unavailable for this run"
 
 # [^.*] excludes the literal dot and asterisk, so the lazy capture stops before the closing '.**'
 _SUM_RE = re.compile(r"\*\*Subagents \(exact\):\s*([^.*]*?)\.\*\*")
+_COMPUTE_RE = re.compile(r"\*\*Σ compute: ([^*]*?) across ([^*]*?) dispatches\.\*\*")
+_WALL_RE = re.compile(r"\*\*Autonomous wall-clock \(excl\. manual steps\): ([^*]*?)\.\*\*")
 _ORCH_RE = re.compile(r"^## Orchestrator\b.*$", re.MULTILINE)
+_DUR_RE = re.compile(r"^(?:(\d+)h)?(?:(\d{1,2})m)?(\d{1,2})s$")
 
 TEMPLATE = """\
 ---
@@ -33,17 +37,21 @@ timestamp: __TIMESTAMP__
 # __TITLE__
 
 Append a row the moment each subagent's completion notification arrives — the figure
-exists only there and is NOT retrievable later. ship finalizes the Orchestrator section.
+exists only there and is NOT retrievable later. Duration comes from the notification's
+elapsed time or the orchestrator's own dispatch/arrival stamps (OS clock) — write
+`unavailable` when unknown, never an estimate. ship finalizes the Orchestrator section.
 
-| Phase | Source | Tokens | Basis |
-|-------|--------|--------|-------|
-| orchestrator | main thread, all phases | (see Orchestrator section) | parsed by token_report.py; unavailable if the parse fails — never substitute or estimate |
+| Phase | Source | Tokens | Duration | Basis |
+|-------|--------|--------|----------|-------|
+| orchestrator | main thread, all phases | (see Orchestrator section) | n/a (see below) | parsed by token_report.py; unavailable if the parse fails — never substitute or estimate |
 
 **Subagents (exact): <sum>.**
+**Σ compute: <dur> across <n> dispatches.**
+**Autonomous wall-clock (excl. manual steps): <dur>.**
 
 ## Orchestrator
 
-_PENDING — ship replaces this section during the dossier tidy (BEFORE the dossier commit and the PR) by running `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>`, which parses the session transcript. That parsed figure is the only reliable orchestrator measure; if the parse fails it writes `Orchestrator: unavailable for this run` — never a substitute, estimate, or invented figure. A tokens.md still reading PENDING after ship is a defect._
+_PENDING — ship replaces this section during the dossier tidy (BEFORE the dossier commit and the PR) by running `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>`, which parses the session transcript, fills the duration totals from the ledger rows + progress.md phase spans, and appends the exact per-subagent split (Claude Code). That parsed figure is the only reliable orchestrator measure; if the parse fails it writes `Orchestrator: unavailable for this run` — never a substitute, estimate, or invented figure. A tokens.md still reading PENDING after ship is a defect._
 """
 
 
@@ -54,29 +62,97 @@ def make_template(slug, timestamp=None):
                     .replace("__TIMESTAMP__", ts))
 
 
-def _data_row_tokens(text):
-    """Integer token counts from ledger rows whose Tokens (3rd) cell is an integer.
-    Header, separator, the orchestrator row, and <n> placeholders are naturally excluded."""
-    vals = []
+def format_duration(seconds):
+    """Seconds -> '42s' / '3m12s' / '1h03m05s'; None or negative -> 'unavailable'."""
+    if seconds is None or seconds < 0:
+        return "unavailable"
+    s = int(round(seconds))
+    h, rem = divmod(s, 3600)
+    m, sec = divmod(rem, 60)
+    if h:
+        return "{}h{:02d}m{:02d}s".format(h, m, sec)
+    if m:
+        return "{}m{:02d}s".format(m, sec)
+    return "{}s".format(sec)
+
+
+def parse_duration(text):
+    """Inverse of format_duration. Returns seconds (int) or None ('unavailable'/unparseable)."""
+    m = _DUR_RE.match((text or "").strip())
+    if not m:
+        return None
+    h, mi, s = (int(g) if g else 0 for g in m.groups())
+    return h * 3600 + mi * 60 + s
+
+
+def _data_rows(text):
+    """[(tokens, duration_cell_or_None), ...] for ledger rows whose Tokens (3rd) cell is an
+    integer. Header, separator, the orchestrator row, and <n> placeholders are excluded.
+    duration_cell is None for legacy 4-column rows. Scanning stops at the first '## '
+    heading: the ledger table lives above '## Orchestrator' by template design, and the
+    finalized tail carries other numeric tables (the per-subagent split) that must never
+    be re-counted as ledger rows."""
+    rows = []
     for line in text.splitlines():
         s = line.strip()
+        if s.startswith("## "):
+            break
         if not s.startswith("|"):
             continue
         cells = [c.strip() for c in s.split("|")[1:-1]]
         if len(cells) < 3:
             continue
         tok = cells[2].replace(",", "").replace("_", "")
-        if tok.isdigit():
-            vals.append(int(tok))
-    return vals
+        if not tok.isdigit():
+            continue
+        rows.append((int(tok), cells[3] if len(cells) >= 4 else None))
+    return rows
+
+
+def _data_row_tokens(text):
+    return [tok for tok, _dur in _data_rows(text)]
 
 
 def has_data_row(text):
     return len(_data_row_tokens(text)) > 0
 
 
+def count_data_rows(text):
+    return len(_data_row_tokens(text))
+
+
 def sum_data_rows(text):
     return sum(_data_row_tokens(text))
+
+
+def sum_row_durations(text):
+    """(seconds_or_None, n_rows): sum of parseable Duration cells across data rows.
+    None when no row carries a parseable duration."""
+    total, parsed = 0, 0
+    rows = _data_rows(text)
+    for _tok, dur in rows:
+        d = parse_duration(dur) if dur else None
+        if d is not None:
+            total += d
+            parsed += 1
+    return (total if parsed else None), len(rows)
+
+
+def has_duration_column(text):
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("|") and "| Duration |" in s and "| Tokens |" in s:
+            return True
+    return False
+
+
+def _duration_cells_ok(text):
+    """Every data row must carry a non-empty, non-placeholder Duration cell
+    (a real figure or the honest 'unavailable')."""
+    for _tok, dur in _data_rows(text):
+        if dur is None or not dur or dur.startswith("<"):
+            return False
+    return True
 
 
 def subagents_sum_filled(text):
@@ -93,6 +169,26 @@ def set_subagents_sum(text, total):
     return text
 
 
+def set_compute_totals(text, compute_seconds, n_dispatches, wall_seconds):
+    """Fill (or re-fill) the Σ-compute and autonomous-wall-clock lines. None -> 'unavailable'."""
+    comp = format_duration(compute_seconds)
+    n = str(n_dispatches if n_dispatches is not None else 0)
+    wall = format_duration(wall_seconds)
+    text = _COMPUTE_RE.sub(
+        lambda _m: "**Σ compute: {} across {} dispatches.**".format(comp, n), text, count=1)
+    text = _WALL_RE.sub(
+        lambda _m: "**Autonomous wall-clock (excl. manual steps): {}.**".format(wall), text, count=1)
+    return text
+
+
+def compute_totals_filled(text):
+    cm, wm = _COMPUTE_RE.search(text), _WALL_RE.search(text)
+    if not cm or not wm:
+        return False
+    vals = (cm.group(1).strip(), cm.group(2).strip(), wm.group(1).strip())
+    return all(v and not (v.startswith("<") and v.endswith(">")) for v in vals)
+
+
 def orchestrator_resolved(text):
     m = _ORCH_RE.search(text)
     if not m:
@@ -103,13 +199,22 @@ def orchestrator_resolved(text):
     return "_PENDING" not in body and body.strip() != ""
 
 
-def replace_orchestrator_section(text, body):
-    section = "## Orchestrator\n\n" + body.rstrip() + "\n"
+def replace_tail(text, orchestrator_body, extra_sections=""):
+    """Replace from '## Orchestrator' to EOF with the orchestrator body plus any extra
+    sections (e.g. the per-subagent split). Re-running regenerates the whole tail, so
+    the finalize step stays idempotent."""
+    section = "## Orchestrator\n\n" + orchestrator_body.rstrip() + "\n"
+    if extra_sections and extra_sections.strip():
+        section += "\n" + extra_sections.strip() + "\n"
     m = _ORCH_RE.search(text)
     if not m:
         return text.rstrip() + "\n\n" + section
-    # '## Orchestrator' is the last section by template design, so replacing to EOF is intentional.
+    # '## Orchestrator' opens the tail by template design, so replacing to EOF is intentional.
     return text[:m.start()] + section
+
+
+def replace_orchestrator_section(text, body):
+    return replace_tail(text, body)
 
 
 def parse_frontmatter(text):
@@ -141,6 +246,12 @@ def verify(path):
         return "no subagent row with an integer token count"
     if not subagents_sum_filled(text):
         return "Subagents (exact) sum not filled (still '<sum>')"
+    # Duration checks apply only to v2 ledgers; a legacy 4-column tokens.md still passes.
+    if has_duration_column(text):
+        if not _duration_cells_ok(text):
+            return "a subagent row's Duration cell is empty (write the figure or 'unavailable')"
+        if not compute_totals_filled(text):
+            return "duration totals not filled (Σ compute / wall-clock — token_report.py --write fills them)"
     if not orchestrator_resolved(text):
         return "Orchestrator section still PENDING / unresolved"
     return None

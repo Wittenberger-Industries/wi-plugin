@@ -86,7 +86,9 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
 5. **Design gate.** **Pre-gate check (checker · plan mode):** first scaffold the token ledger (idempotent):
    `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md`
    — the checker is a subagent and its exact token count exists **only in its completion notification**;
-   append that row the moment it arrives (mirrors the dev flow's research-start scaffold; step 6's
+   append that row the moment it arrives, with its `Duration` cell (the notification's elapsed time or
+   your dispatch→arrival delta; `unavailable` if neither exists — mirrors the dev flow's research-start
+   scaffold; step 6's
    scaffold-if-absent remains the fallback). Each checker round appends its own row; a re-check round that
    returns without a completion notification (e.g. a resumed agent) records `unavailable` — never an
    estimate. Then, before rendering the gate, dispatch the

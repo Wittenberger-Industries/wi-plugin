@@ -72,7 +72,10 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
    the feature's `tokens.md` (it's in the task-completion notification and is NOT retrievable later; if the file
    is somehow absent, `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<slug>/tokens.md`
    first — `python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3`
-   on Linux/macOS), then recompute the ready set and dispatch the next wave without waiting for stragglers it doesn't depend on.
+   on Linux/macOS). The row's `Duration` cell is the notification's elapsed time, or the delta between
+   your dispatch stamp and the notification's arrival (OS clock — `date -Iseconds` / ship's `now.py`);
+   write `unavailable` when neither exists, never an estimate. Then recompute the ready set and dispatch
+   the next wave without waiting for stragglers it doesn't depend on.
    A runner whose last line is **`## TASK AUTH-GATE`** (status `auth-gate` — a `401` / `run <x> login` /
    missing `ENV` wall) is **not** a failure to retry: don't commit it, record the exact unblock steps in
    `progress.md`, and let the keep-alive loop pause cleanly — it resumes once the human clears the gate.
