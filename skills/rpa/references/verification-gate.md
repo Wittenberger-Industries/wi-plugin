@@ -89,10 +89,11 @@ mode — **one dispatch, two sequential passes**, same interface and logging as 
   `review via wi-code-checker + superpowers:requesting-code-review[inline]` or
   `review via wi-code-checker (wi line review; superpowers absent)`.
 
-**Mixture of Agents (optional, off by default)** — when `.wi/models.md` has a `## Mixture of Agents`
-section whose `points` include `review`, this dispatch mirrors `wi:ship` §2's MoA branch (rpa runs mirror
-the review point only): instead of one checker dispatch, dispatch N proposer checkers (one per listed
-`proposers` tier) in parallel with IDENTICAL prompts (result mode, both passes — `sdd.md`'s acceptance
+**Mixture of Agents (optional, off by default)** — when `progress.md`'s resolved-routing block's MoA row
+includes `review` in its `points` (mirroring `.wi/models.md`'s `## Mixture of Agents` section), this
+dispatch mirrors `wi:ship` §2's MoA branch (rpa runs mirror the review point only): instead of one
+checker dispatch, dispatch N proposer checkers (one per listed `proposers` tier) in parallel with
+IDENTICAL prompts (result mode, both passes — `sdd.md`'s acceptance
 criteria as the spec analogue — and the same `Line review template:` line) plus the marker
 `MoA role: proposer <i>/<N>`; proposers return findings and **never** write `verification.md`.
 `layers: 2` → a second parallel round — each proposer

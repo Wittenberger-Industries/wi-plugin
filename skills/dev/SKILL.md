@@ -32,7 +32,10 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
    model is below the configured orchestrator tier. A legacy config left by a pre-1.3 run (an old-named
    `.wi/*.md` carrying the same `## Roles` / `## Cross-provider config` sections): rename it to
    `.wi/models.md` and set its frontmatter to `type: Model Routing Config` — the section format is
-   unchanged. Never re-ask an existing config.
+   unchanged. Never re-ask an existing config. Finish by resolving the routing once (override → role →
+   `inherit` per dispatch kind — models.md's **resolve-once rule**); step 2 records it as the
+   `## Model routing (resolved)` block when `progress.md` is seeded, and a resumed feature missing the
+   block gets it written on re-entry. Every later dispatch reads the block, not `.wi/models.md`.
 2. **Open the feature folder — or resume the one already open.** Parse flags: `--auto` sets **Gate mode:
    auto-approve** in progress.md — tell the user the design gate will be auto-approved and recorded, not
    asked. Then **check before creating** — the slug ordinal, then whether this idea is new, a resume, or a

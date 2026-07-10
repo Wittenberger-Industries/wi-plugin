@@ -57,10 +57,12 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
    task, all in the same turn. Each gets exactly what it needs and nothing more: its task block, the
    relevant constitution rules, and the repo commands. Pointers and rules, not pasted file bodies: the
    runner reads its own files (workflow.md's context budget). Fresh agents keep context from rotting across a
-   long build; parallel dispatch keeps wall-clock short. **Model per dispatch (tiered model routing):** when `.wi/models.md`
-   exists, resolve each runner's model as per-agent override → `wi-task-runner` role → `inherit`
-   (`${CLAUDE_PLUGIN_ROOT}/references/models.md`) and pass it on the dispatch; a model that errors as
-   unavailable → re-dispatch on `inherit` and note it in `progress.md`. No config → inherit, as always.
+   long build; parallel dispatch keeps wall-clock short. **Model per dispatch (tiered model routing):** pass
+   each runner the `task-runner` tier from `progress.md`'s `## Model routing (resolved)` block; block
+   absent, or `.wi/models.md` changed after its stamp → resolve once now and rewrite the block
+   (`${CLAUDE_PLUGIN_ROOT}/references/models.md`'s resolve-once rule). A model that errors as unavailable
+   → re-dispatch on `inherit` and note it in `progress.md` (the block stands — the config didn't change).
+   No config → inherit, as always.
 3. **TDD per task** (per the constitution): failing test first, minimal implementation, green, refactor.
    **Frontend routing is operational, not just asserted:** when a task is tagged `[frontend]`, the dispatch
    MUST name the available design skill in that runner's charter — detect `frontend-design` (per

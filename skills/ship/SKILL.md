@@ -62,11 +62,13 @@ for both passes: the **feature-level result check** — `spec.md`'s acceptance c
 (ADRs, constitution), each confirmed delivered and **wired**, not just present (the checker reads the
 actual repo) — and the **line-level review** of the branch diff, run from the template path above or the
 checker's built-in review when `none`. Findings from both passes land in `verification.md` in the
-BLOCKER/WARNING/INFO taxonomy. This dispatch is unconditional (on the `wi-code-checker` role's model
-when `.wi/models.md` exists, else inherit); no cross-provider configuration demotes or replaces it.
+BLOCKER/WARNING/INFO taxonomy. This dispatch is unconditional (on the `checker` tier from
+`progress.md`'s resolved-routing block — models.md's resolve-once rule — else inherit); no
+cross-provider configuration demotes or replaces it.
 
-**Mixture of Agents layer (only when configured).** If `.wi/models.md` has a `## Mixture of Agents`
-section with `points` including `review` (see `${CLAUDE_PLUGIN_ROOT}/references/moa.md`), dispatch N
+**Mixture of Agents layer (only when configured).** If the resolved-routing block's MoA row includes
+`review` in its `points` (see `${CLAUDE_PLUGIN_ROOT}/references/moa.md`; the block mirrors
+`.wi/models.md`'s `## Mixture of Agents` section), dispatch N
 proposer checkers (one per listed `proposers` tier) in parallel, same turn, instead of the one dispatch
 above — IDENTICAL prompts (result mode, both passes, the same `Line review template:` line) plus the
 marker `MoA role: proposer <i>/<N>`.
@@ -82,8 +84,8 @@ completion. The cross-provider
 layer below and the max-2-rounds loop are unchanged — a full MoA pass counts as one round. Without the
 section, or with `review` not in `points`, the single dispatch above runs unchanged.
 
-**Cross-provider layer (only when configured).** If `.wi/models.md`'s `## Cross-provider config` names a
-provider (≠ `none`) and its API key is present, **additionally** run an independent **cross-provider
+**Cross-provider layer (only when configured).** If the resolved-routing block's cross-provider row
+names a provider (≠ `none`) and its API key is present, **additionally** run an independent **cross-provider
 diff review** — a second opinion from another model family, a separate optional layer on top of the
 checker dispatch — per `${CLAUDE_PLUGIN_ROOT}/references/models.md`: full feature diff + `spec.md` through
 `skills/ship/scripts/cross_review.py` → `.wi/features/<slug>/cross-review.md`. The script only receives the
