@@ -13,8 +13,8 @@ The gate is the objective bar a feature must clear before it can ship. It uses t
 
 ## The iron law
 
-**No PASS claim without fresh verification evidence** — a command actually run in this session, its full
-output read, its exit code checked. Before writing any "green" / "passed":
+**No PASS claim without fresh verification evidence** — a command actually run in this session, its
+output captured to the log, its exit code + tail read. Before writing any "green" / "passed":
 1. name the command that proves it; 2. run it now, output redirected per workflow.md's output
 house rule; 3. read the exit code + the log's tail (the full output stays on disk — grep it on
 red); 4. confirm it matches the claim. Only then report pass.
