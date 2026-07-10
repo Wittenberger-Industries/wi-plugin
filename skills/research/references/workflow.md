@@ -79,9 +79,29 @@ being the only committer.
 
 ## Token budget
 
-`research` and the post-gate loop should hold at most: `constitution.md`, `repo-map.md`, the feature's `progress.md`, and the one
-artifact for the active phase. Research and build tasks run in subagents that return summaries; their
-transcripts never enter the orchestrator's context. That is what makes a hands-off, multi-file feature affordable.
+Every token the orchestrator retains is re-read on every later turn (~75× measured on a real run), so
+standing weight compounds for the whole run. Two hard rules keep a hands-off run affordable — phase
+skills cite them as **the context budget** and **the output house rule**:
+
+1. **The context budget — hold at most:** `constitution.md`, `repo-map.md`, the feature's
+   `progress.md`, and the one artifact for the active phase. `progress.md` is the state of record:
+   phase re-entry reads it (plus the active artifact) and **never re-Reads prior-phase artifacts**
+   already summarized there. To confirm one criterion or rule, read that section, not the whole
+   file. Reading beyond the budget is delegated: researchers (research) and task-runners (build)
+   read sources and return summaries — an ad-hoc "let me check file X" on a large file is a
+   subagent dispatch, not an orchestrator Read.
+2. **The output house rule — never pipe unbounded command output into context.** Redirect to the
+   feature's log dir and read the verdict, not the stream. Once per feature:
+   `mkdir -p .wi/features/<slug>/.logs && printf '*\n' > .wi/features/<slug>/.logs/.gitignore`
+   (self-gitignored — the dir never enters `git status` or a dossier commit). Then per command:
+   `<cmd> > .wi/features/<slug>/.logs/<name>.txt 2>&1; echo $?; tail -n 30 .wi/features/<slug>/.logs/<name>.txt`.
+   On red, pull the failing lines (`grep -n -B1 -A3 -iE 'fail|error' <log>`), never the whole log —
+   the file stays on disk for deeper dives and is pruned at ship's dossier tidy (wi-directory.md's
+   ephemera list). Diffs enter by summary, then hunk: `git diff --stat` first, open only the hunks a
+   finding needs; never read a whole diff into context.
+
+Research and build tasks run in subagents that return summaries; their transcripts never enter the
+orchestrator's context. That is what makes a hands-off, multi-file feature affordable.
 The cost is also *measured* where it can be: `tokens.md` records each subagent's **exact** usage (from its
 completion notification). The main thread can't read its own usage *mid-turn*, but the harness
 records it: ship runs `token_report.py` to sum the session transcript's per-turn `usage` for a real
