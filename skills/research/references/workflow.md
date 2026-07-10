@@ -86,4 +86,8 @@ The cost is also *measured* where it can be: `tokens.md` records each subagent's
 completion notification). The main thread can't read its own usage *mid-turn*, but the harness
 records it: ship runs `token_report.py` to sum the session transcript's per-turn `usage` for a real
 orchestrator total. If that parse fails it's reported **unavailable** — never a fabricated number or a
-fraction of subagent work.
+fraction of subagent work. **Time is measured the same way** (issue #35): every `progress.md` Log stamp
+is a full ISO-8601 timestamp from the OS clock, each `tokens.md` row carries its dispatch `Duration`,
+and ship's finalize computes Σ compute plus the autonomous wall-clock (sum of the research→gate-open
+and gate-approved→PR spans — manual waits and resume idle excluded); a figure that can't be observed
+is written `unavailable`, never estimated.

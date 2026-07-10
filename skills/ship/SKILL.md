@@ -17,6 +17,12 @@ feature isn't done.
 Inputs: the feature branch/worktree, `spec.md` (acceptance criteria), `pitfalls.md`, `constitution.md`,
 `repo-map.md`.
 
+First act once engaged: append `- <ts> **Update** phase = ship (ship engine engaged (wi <version>))` to
+progress.md's Log — full ISO-8601 stamp from the OS clock (`date -Iseconds` /
+`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/now.py`), <version> read from
+`${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` — so the invocation is auditable and the
+build→ship transition is timed like every other phase flip.
+
 ## 1 · Verification gate (must be green)
 
 Run the full gate from `${CLAUDE_PLUGIN_ROOT}/skills/ship/references/verification-gate.md`: the complete
@@ -62,7 +68,8 @@ receives all findings, dedupes, keeps the MAX severity any proposer assigned, ve
 before dropping anything as a false positive, and alone writes `verification.md` (both passes' sections,
 one verdict marker). Append `+ MoA (<N> proposers, <L> layers, aggregator <tier>)` to the review log line
 above (e.g. `review via wi-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`);
-every proposer and aggregator dispatch appends its own `tokens.md` row on completion. The cross-provider
+every proposer and aggregator dispatch appends its own `tokens.md` row (with its `Duration` cell) on
+completion. The cross-provider
 layer below and the max-2-rounds loop are unchanged — a full MoA pass counts as one round. Without the
 section, or with `review` not in `points`, the single dispatch above runs unchanged.
 
@@ -244,13 +251,19 @@ findings with severity. Distilled from verification.md; the dossier tidy (§6) t
      (Skip pruning if the constitution says to keep them.)
   3. *Finalize `tokens.md` — NOW, not at close-out.* The file must be complete **inside the dossier
      commit**, or it never rides the PR. The ledger was scaffolded at research/build start and its
-     subagent rows appended live; finalize the orchestrator total with one command:
+     subagent rows appended live; finalize with one command:
      `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write .wi/features/<slug>/tokens.md`
      (auto-detects the active session transcript under `~/.claude/projects/`; add
-     `--transcript <path>` if you know it). It replaces the `## Orchestrator` section in place and
-     recomputes the **Subagents (exact)** sum from the ledger rows — no manual stdout-copy. On a parse
+     `--transcript <path>` if you know it). It replaces the `## Orchestrator` section in place,
+     recomputes the **Subagents (exact)** sum from the ledger rows, fills the **duration totals**
+     (Σ compute from the rows' Duration cells; the autonomous wall-clock from the sibling
+     `progress.md`'s stamped phase spans — `--progress <path>` to override), and on Claude Code appends
+     the **`## Subagent detail`** section: each dispatch's exact input/output/cache split, model,
+     transcript-stamped duration, and estimated cost, read from the session's
+     `subagents/agent-*.jsonl` sidecar transcripts — no manual stdout-copy anywhere. On a parse
      failure it writes `Orchestrator: unavailable for this run` (never a substitute, estimate, or
-     fabricated figure). The **file** is the deliverable, not the console output.
+     fabricated figure); a missing stamp likewise yields `unavailable` timing, not a guess. The
+     **file** is the deliverable, not the console output.
   4. *What remains is the fixed dossier for this flow* — take the manifest from the flow's directory
      reference, not from memory: `dev` → wi-directory.md's seven-file dossier (progress, brief, spec,
      tasks, pitfalls, tokens, PR); `rpa` → rpa-directory.md's run dossier (the SDD pack plus per-process
@@ -276,7 +289,9 @@ is not guaranteed under Copilot CLI. The leading `{sub(/\r$/,"")}` keeps the fro
 a `core.autocrlf=true` checkout, where the `---` delimiters arrive as `---\r` and a bare line compare would
 miss them.)
 
-Log the PR URL in `progress.md`. §8 verifies the PR's remote checks before any cleanup.
+Log the PR URL in `progress.md` as `- <ts> **Update** PR opened: <url>` — full OS-clock stamp; this
+exact wording is the stamp `token_report.py` reads as the end of the second autonomous span. §8
+verifies the PR's remote checks before any cleanup.
 
 **A pushed branch is not a shipped feature.** If `gh` is unavailable or `pr create` fails, the run is **not
 done**: record in `progress.md`'s Decisions/blockers the exact recovery command (frontmatter-stripped, as
@@ -346,9 +361,10 @@ console already said:
 - [ ] `.wi/features/<slug>/PR.md` exists and is committed on the branch
 - [ ] `tokens.md` passes the structural gate — run
       `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py .wi/features/<slug>/tokens.md`; a
-      **non-zero exit blocks `Phase = done`** (file missing / no subagent row / unfilled sum / `## Orchestrator`
-      still PENDING). An honest `Orchestrator: unavailable for this run` passes. This *replaces* reading the
-      file by eye — the exit code is the close-out condition the keep-alive loop waits on.
+      **non-zero exit blocks `Phase = done`** (file missing / no subagent row / unfilled sum / a row's
+      Duration cell empty / duration totals unfilled / `## Orchestrator` still PENDING). An honest
+      `unavailable` — for the orchestrator, a duration, or a total — always passes. This *replaces*
+      reading the file by eye — the exit code is the close-out condition the keep-alive loop waits on.
 - [ ] `.wi/learnings.md` index has this feature's line (and the detail file exists if one was warranted)
 - [ ] dossier = exactly the flow's manifest (per progress.md `Flow:`, missing = dev — dev: the seven-file
       dossier in wi-directory.md; rpa: the run dossier in rpa-directory.md; **RPA runs: see rpa/SKILL §7
@@ -357,8 +373,8 @@ console already said:
 - [ ] worktree removed; local branch deleted only if fully merged (`git branch -d` refuses otherwise) —
       the remote branch / open PR never deleted
 
-All green: set Phase = `done`, add a final Log line with the PR link, and if `roadmap.md` exists mark this
-feature done and surface the next one.
+All green: set Phase = `done`, add a final stamped Log line (`- <ts> **Update** phase = done` + the PR
+link), and if `roadmap.md` exists mark this feature done and surface the next one.
 
 Then deliver the **final run report** in the console: the approach (cite ADR-NNNN), what was built, the
 gate results with local and remote status reported **separately** —
@@ -366,8 +382,18 @@ gate results with local and remote status reported **separately** —
 the PR URL, and the **token table read from the finalized `tokens.md`** — the file was completed back in
 the dossier tidy; do not recompute it here. **Subagent rows are exact** (from completion
 notifications) — that sum is the real, measurable cost of the delegated work; report it as the headline,
-with the orchestrator figure (or `unavailable`) alongside. The two numbers wi trusts: **subagent-exact**
-(completion notifications) and **orchestrator-from-transcript** (`token_report.py`). If a keep-alive loop
+with the orchestrator figure (or `unavailable`) alongside, and the cost estimate + per-agent split when
+the finalize produced them. The two numbers wi trusts: **subagent-exact**
+(completion notifications) and **orchestrator-from-transcript** (`token_report.py`). Beside the token
+table, print the **timing table**, read from the same finalized files (`unavailable` rows print as-is):
+
+```
+Timing (autonomous, manual waits excluded)
+  research + plan (gate 1 → gate 2):  <span from progress.md stamps>
+  build + ship (gate 2 → PR):         <span from progress.md stamps>
+  autonomous total:                   <tokens.md wall-clock line>
+  Σ subagent compute:                 <tokens.md Σ-compute line>
+``` If a keep-alive loop
 is armed (Claude/Codex `/goal` or Copilot Autopilot), its condition holds only when the checklist
 **including the remote-checks box** passes — that is the state in which the loop clears. Exception:
 user-accepted red — the condition names green checks and stays unsatisfiable; the loop ends only when

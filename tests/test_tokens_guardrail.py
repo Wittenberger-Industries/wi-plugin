@@ -16,12 +16,20 @@ def _scaffold_text():
     return _ledger.make_template("my-feature", timestamp="2026-06-15")
 
 
+def _fill_totals(text, compute="1m00s", n="1", wall="unavailable"):
+    return (text
+            .replace("**Σ compute: <dur> across <n> dispatches.**",
+                     "**Σ compute: {} across {} dispatches.**".format(compute, n))
+            .replace("**Autonomous wall-clock (excl. manual steps): <dur>.**",
+                     "**Autonomous wall-clock (excl. manual steps): {}.**".format(wall)))
+
+
 def _with_row_and_sum(text, tokens=100):
     text = text.replace(
         "| orchestrator |",
-        "| build W1 | task-runner: t1 | {} | exact |\n| orchestrator |".format(tokens),
+        "| build W1 | task-runner: t1 | {} | 1m00s | exact |\n| orchestrator |".format(tokens),
     )
-    return text.replace("<sum>", str(tokens))
+    return _fill_totals(text.replace("<sum>", str(tokens)))
 
 
 def _resolve_orchestrator(text, body="Orchestrator: unavailable for this run"):
@@ -35,8 +43,42 @@ class LedgerHelperTests(unittest.TestCase):
         self.assertIn("feature: my-feature", t)
         self.assertIn("timestamp: 2026-06-15", t)
         self.assertIn("**Subagents (exact): <sum>.**", t)
+        self.assertIn("| Duration |", t)
+        self.assertIn("**Σ compute: <dur> across <n> dispatches.**", t)
+        self.assertIn("**Autonomous wall-clock (excl. manual steps): <dur>.**", t)
         self.assertIn("## Orchestrator", t)
         self.assertIn("PENDING", t)
+
+    def test_format_duration(self):
+        self.assertEqual(_ledger.format_duration(42), "42s")
+        self.assertEqual(_ledger.format_duration(192), "3m12s")
+        self.assertEqual(_ledger.format_duration(3785), "1h03m05s")
+        self.assertEqual(_ledger.format_duration(0), "0s")
+        self.assertEqual(_ledger.format_duration(None), "unavailable")
+        self.assertEqual(_ledger.format_duration(-5), "unavailable")
+
+    def test_parse_duration_round_trip(self):
+        for secs in (0, 9, 42, 60, 192, 3599, 3600, 3785, 7322):
+            self.assertEqual(_ledger.parse_duration(_ledger.format_duration(secs)), secs)
+        self.assertIsNone(_ledger.parse_duration("unavailable"))
+        self.assertIsNone(_ledger.parse_duration("<dur>"))
+        self.assertIsNone(_ledger.parse_duration(""))
+        self.assertIsNone(_ledger.parse_duration(None))
+
+    def test_set_and_check_compute_totals(self):
+        t = _scaffold_text()
+        self.assertFalse(_ledger.compute_totals_filled(t))       # placeholders
+        t2 = _ledger.set_compute_totals(t, 1040, 4, 2466)
+        self.assertIn("**Σ compute: 17m20s across 4 dispatches.**", t2)
+        self.assertIn("**Autonomous wall-clock (excl. manual steps): 41m06s.**", t2)
+        self.assertTrue(_ledger.compute_totals_filled(t2))
+        t3 = _ledger.set_compute_totals(t, None, 0, None)        # honest unavailable
+        self.assertIn("**Σ compute: unavailable across 0 dispatches.**", t3)
+        self.assertIn("wall-clock (excl. manual steps): unavailable.**", t3)
+        self.assertTrue(_ledger.compute_totals_filled(t3))
+        # idempotent re-set over already-filled lines
+        t4 = _ledger.set_compute_totals(t2, 60, 1, 120)
+        self.assertIn("**Σ compute: 1m00s across 1 dispatches.**", t4)
 
     def test_data_rows_ignore_header_separator_and_orchestrator(self):
         t = _scaffold_text()
@@ -48,7 +90,7 @@ class LedgerHelperTests(unittest.TestCase):
     def test_sum_excludes_orchestrator_and_handles_commas(self):
         t = _scaffold_text().replace(
             "| orchestrator |",
-            "| build | task-runner: a | 1,200 | exact |\n| build | task-runner: b | 800 | exact |\n| orchestrator |",
+            "| build | task-runner: a | 1,200 | 2m00s | exact |\n| build | task-runner: b | 800 | 30s | exact |\n| orchestrator |",
         )
         self.assertEqual(_ledger.sum_data_rows(t), 2000)
 
@@ -96,10 +138,56 @@ class LedgerHelperTests(unittest.TestCase):
             # subagents sum not filled (data row present, <sum> still unfilled, checked before orchestrator)
             t = _scaffold_text().replace(
                 "| orchestrator |",
-                "| build W1 | task-runner: t1 | 5 | exact |\n| orchestrator |",
+                "| build W1 | task-runner: t1 | 5 | 10s | exact |\n| orchestrator |",
             )
             p.write_text(t, encoding="utf-8")
             self.assertEqual(_ledger.verify(p), "Subagents (exact) sum not filled (still '<sum>')")
+
+    def test_verify_duration_and_totals_gate_v2(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "tokens.md"
+            # v2 row with an EMPTY Duration cell fails
+            t = _scaffold_text().replace(
+                "| orchestrator |",
+                "| build W1 | task-runner: t1 | 100 |  | exact |\n| orchestrator |",
+            )
+            t = _fill_totals(t.replace("<sum>", "100"))
+            p.write_text(_resolve_orchestrator(t), encoding="utf-8")
+            reason = _ledger.verify(p)
+            self.assertIsNotNone(reason)
+            self.assertIn("duration", reason.lower())
+            # 'unavailable' Duration is an honest value and passes
+            t = _scaffold_text().replace(
+                "| orchestrator |",
+                "| build W1 | task-runner: t1 | 100 | unavailable | exact |\n| orchestrator |",
+            )
+            t = _fill_totals(t.replace("<sum>", "100"), compute="unavailable", n="1")
+            p.write_text(_resolve_orchestrator(t), encoding="utf-8")
+            self.assertIsNone(_ledger.verify(p))
+            # totals still placeholders fails
+            t = _scaffold_text().replace(
+                "| orchestrator |",
+                "| build W1 | task-runner: t1 | 100 | 1m00s | exact |\n| orchestrator |",
+            ).replace("<sum>", "100")
+            p.write_text(_resolve_orchestrator(t), encoding="utf-8")
+            reason = _ledger.verify(p)
+            self.assertIsNotNone(reason)
+            self.assertIn("totals", reason.lower())
+
+    def test_verify_legacy_four_column_ledger_still_passes(self):
+        legacy = (
+            "---\ntype: Token Ledger\ntitle: legacy\nfeature: old-feature\ntimestamp: 2026-05-01\n---\n\n"
+            "# Token ledger: old-feature\n\n"
+            "| Phase | Source | Tokens | Basis |\n"
+            "|-------|--------|--------|-------|\n"
+            "| build W1 | task-runner: t1 | 100 | exact |\n\n"
+            "**Subagents (exact): 100.**\n\n"
+            "## Orchestrator\n\nOrchestrator: unavailable for this run\n"
+        )
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "tokens.md"
+            p.write_text(legacy, encoding="utf-8")
+            self.assertIsNone(_ledger.verify(p))
 
 
 CHECK = SCRIPTS / "check_tokens.py"
@@ -170,7 +258,7 @@ def fixture_transcript(d):
     f = Path(d) / "t.jsonl"
     f.write_text(
         '{"message":{"usage":{"input_tokens":10,"output_tokens":20,'
-        '"cache_creation_input_tokens":0,"cache_read_input_tokens":5}}}\n'
+        '"cache_creation_input_tokens":0,"cache_read_input_tokens":5},"model":"claude-opus-4-8"}}\n'
         '{"usage":{"input_tokens":1,"output_tokens":2,'
         '"cache_creation_input_tokens":0,"cache_read_input_tokens":0}}\n',
         encoding="utf-8",
@@ -183,8 +271,8 @@ class TokenReportWriteTests(unittest.TestCase):
         p = init_ledger(d)
         text = p.read_text(encoding="utf-8").replace(
             "| orchestrator |",
-            "| build W1 | task-runner: t1 | 100 | exact |\n"
-            "| build W1 | task-runner: t2 | 50 | exact |\n| orchestrator |",
+            "| build W1 | task-runner: t1 | 100 | 1m00s | exact |\n"
+            "| build W1 | task-runner: t2 | 50 | 1m30s | exact |\n| orchestrator |",
         )
         p.write_text(text, encoding="utf-8")
         return p
@@ -198,6 +286,10 @@ class TokenReportWriteTests(unittest.TestCase):
             self.assertNotIn("PENDING", out)
             self.assertIn("output tokens (generated): 22", out)   # 20 + 2
             self.assertIn("**Subagents (exact): 150.**", out)     # 100 + 50
+            self.assertIn("**Σ compute: 2m30s across 2 dispatches.**", out)
+            # no sibling progress.md in this fixture -> honest unavailable
+            self.assertIn("wall-clock (excl. manual steps): unavailable.**", out)
+            self.assertIn("- model: claude-opus-4-8", out)
             self.assertEqual(run(CHECK, p).returncode, 0)
 
     def test_write_unavailable_on_unparseable_transcript(self):

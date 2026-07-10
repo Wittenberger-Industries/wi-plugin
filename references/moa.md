@@ -76,8 +76,8 @@ existing review log label (e.g. `review via wi-code-checker + superpowers:reques
 
 ## Token ledger
 
-Every proposer and aggregator dispatch appends its own `tokens.md` row on completion, same convention as
-researchers/checkers today.
+Every proposer and aggregator dispatch appends its own `tokens.md` row on completion — including the
+row's `Duration` cell — same convention as researchers/checkers today.
 
 ## Cost
 

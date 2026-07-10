@@ -65,7 +65,10 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
      stop, like the preflight): wait for the merge, **stack** this branch on the dependency's branch (record
      it in progress.md; retarget the PR after the dep merges), or proceed off `main` deliberately.
    Only then create `.wi/features/<slug>/` and seed `progress.md` (template in the research skill's
-   `wi-directory.md`).
+   `wi-directory.md`). Every Log line — the `**Created**` seed included — opens with a full ISO-8601
+   timestamp from the OS clock (`date -Iseconds`, or `python
+   ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/now.py`); ship computes the run's timing from these
+   stamps, so never write a date-only or guessed one.
 3. **Brainstorm** (skill `wi:brainstorm`) — the dialogue about desired behavior, scope, constraints.
    Writes `brief.md`.
 4. **Hand off — and arm persistence (platform-aware).** First the **preflight** — an armed loop with a
@@ -95,12 +98,13 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
    `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` / `copilot-tools.md`. **Then branch on Gate mode
    (from `progress.md`):**
    - **auto-approve** (`--auto`): do **not** ask for confirmation — the user already chose hands-off by
-     passing the flag. Set Phase = `research` and continue straight into the design phase **in the same
+     passing the flag. Set Phase = `research` — stamp the Log line (`- <ts> **Update** phase = research`);
+     it starts the run's autonomous clock — and continue straight into the design phase **in the same
      turn**. Brainstorm was the only stop; pausing for "say go" here is the bug `--auto` exists to avoid.
    - **interactive** (default): ask once — *"Ready to hand off?"* — and advance on the user's go.
      **Pasting the `/goal` line is the go.** When the goal registers (the platform echoes "Goal set: …"),
-     do not stop: set Phase = `research` and continue into the design phase **in the same turn**, exactly
-     as the auto path does. Ending the turn after the recap or the "Goal set" acknowledgment — waiting
+     do not stop: set Phase = `research` (same stamped Log line — it starts the autonomous clock) and
+     continue into the design phase **in the same turn**, exactly as the auto path does. Ending the turn after the recap or the "Goal set" acknowledgment — waiting
      for another prompt — is the stall this rule exists to prevent.
 5. **Design** (skill `wi:research`): research -> plan -> **design gate** (inline summary; approve / amend
    / stop — or auto-approve per the flag).

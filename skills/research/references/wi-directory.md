@@ -104,8 +104,14 @@ version:
   optional root `.wi/index.md`, which may declare `okf_version: "0.1"`. `learnings.md` is *not* a reserved
   index (it's a named file) and **is** typed (`Learnings Index`). Entries in both reuse each concept's
   `description`.
-- **Log.** `progress.md`'s `## Log` uses ISO dates and a leading bold keyword (`**Created**`,
-  `**Update**`, `**Decision**`); it stays append-order as a resumable run timeline.
+- **Log.** `progress.md`'s `## Log` lines open with a **full ISO-8601 timestamp** — date + time +
+  offset, e.g. `2026-07-05T14:19:47+02:00` — and a leading bold keyword (`**Created**`,
+  `**Update**`, `**Decision**`); it stays append-order as a resumable run timeline. Stamps come
+  from the **OS clock** (`date -Iseconds`, or
+  `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/now.py` where that shell syntax is
+  unavailable), never a model estimate — ship's `token_report.py` derives the run's autonomous
+  wall-clock (research→gate-open + gate-approved→PR, i.e. manual waits and idle time excluded)
+  from exactly these stamps, so a date-only or invented stamp makes timing `unavailable`.
 - **Citations.** External sources go under a numbered `## Citations` heading at the foot of the doc.
 - **Links.** Prefer bundle-relative `/features/<slug>/spec.md`; a broken link (not-yet-written knowledge) is
   normal, never an error.
@@ -135,7 +141,7 @@ timestamp: <YYYY-MM-DD>
 - **Branch:** <branch or "-">
 
 ## Log
-- <YYYY-MM-DD> created feature, phase = brainstorm
+- <YYYY-MM-DDTHH:MM:SS±hh:mm> **Created** feature, phase = brainstorm
 
 ## Tasks (mirrored from tasks.md once planned)
 - [ ] 1. <task>
@@ -155,9 +161,11 @@ any blocker here too — it's what the user reads after a hands-off run.
 ## `tokens.md` template
 
 Append a row the **moment** each subagent's completion notification arrives — the token figure exists
-only in that notification. ship compiles the totals at the dossier tidy and `dev` includes the table in the final
-report. The scaffold is written by `check_tokens.py --init` from `_ledger.TEMPLATE` (the source of truth
-for the exact bytes); the block below is illustrative.
+only in that notification. Each row also carries its **Duration**: the notification's elapsed time, or
+the delta between your dispatch stamp and the notification's arrival (OS clock) — `unavailable` when
+neither exists, never an estimate. ship compiles the totals at the dossier tidy and `dev` includes the
+table in the final report. The scaffold is written by `check_tokens.py --init` from `_ledger.TEMPLATE`
+(the source of truth for the exact bytes); the block below is illustrative.
 
 ```markdown
 ---
@@ -169,14 +177,16 @@ timestamp: <YYYY-MM-DD>
 
 # Token ledger: <feature title>
 
-| Phase | Source | Tokens | Basis |
-|-------|--------|--------|-------|
-| research | researcher: <topic> | <n> | exact (completion notification) |
-| build W1 | task-runner: task 1 | <n> | exact |
-| build W1 | task-runner: task 2 | <n> | exact |
-| orchestrator | main thread, all phases | `ship/scripts/token_report.py` (parses the session transcript) | the only reliable measure; **unavailable** if the parse fails — never substitute or estimate |
+| Phase | Source | Tokens | Duration | Basis |
+|-------|--------|--------|----------|-------|
+| research | researcher: <topic> | <n> | 3m12s | exact (completion notification) |
+| build W1 | task-runner: task 1 | <n> | 5m48s | exact |
+| build W1 | task-runner: task 2 | <n> | unavailable | exact |
+| orchestrator | main thread, all phases | (see Orchestrator section) | n/a (see below) | parsed by token_report.py; unavailable if the parse fails — never substitute or estimate |
 
 **Subagents (exact): <sum>.**
+**Σ compute: <dur> across <n> dispatches.**
+**Autonomous wall-clock (excl. manual steps): <dur>.**
 
 ## Orchestrator
 
@@ -186,9 +196,23 @@ ship replaces this section during the dossier tidy (BEFORE the dossier commit an
 session transcript (per-turn `usage`: output, fresh input, cache write/read) and recomputes the Subagents
 sum. That parsed figure is the **only** reliable orchestrator measure; if the parse fails it writes
 `Orchestrator: unavailable for this run` — never a substitute, estimate, or invented figure. At close-out
-`check_tokens.py <this file>` gates `Phase = done`: a tokens.md still reading PENDING (or missing rows) is
-a defect that blocks the PR._
+`check_tokens.py <this file>` gates `Phase = done`: a tokens.md still reading PENDING (or missing rows,
+or — on this Duration-column format — missing Duration cells / unfilled duration totals; an honest
+`unavailable` always passes) is a defect that blocks the PR._
 ```
+
+The same `--write` also fills the two duration totals — **Σ compute** is summed from the rows' Duration
+cells (total delegated effort; parallel waves overlap, so it can exceed real time) and the **autonomous
+wall-clock** is the sum of the two autonomous phase spans from `progress.md`'s Log stamps (research →
+gate-open plus gate-approved → PR), which drops the brainstorm dialogue, the handoff, the design-gate
+wait, and idle time between resumed sessions — and, on **Claude Code**, appends a
+`## Subagent detail` section read from the harness's per-agent sidecar transcripts
+(`<session>/subagents/agent-*.jsonl`): each dispatch's exact input/output/cache-write/cache-read split,
+model, transcript-stamped duration, and an **estimated** cost (exact tokens × published list prices,
+"as of" date shown — the tokens are exact; only the dollar figure is an estimate). Platform note: Codex
+and Copilot expose no per-subagent usage or sidecar transcripts — rows there record `unavailable`, and
+on Copilot the accountable unit is the session's **AI credits** (see
+`${CLAUDE_PLUGIN_ROOT}/references/copilot-tools.md`).
 
 ## `roadmap.md` template (optional, multi-feature efforts)
 

@@ -56,3 +56,25 @@ copy the flat aliases from `references/skill-aliases/` into `~/.agents/skills/`,
 flat too. The phase skills (brainstorm, research, plan, build, ship) are `user-invocable: false`: hidden
 from the `/` picker, invoked by the orchestrating skill or by natural language — every skill still
 auto-triggers from its `description`.
+
+## Usage & AI credits (the `tokens.md` ledger on Copilot)
+Copilot bills in **GitHub AI Credits** (since 2026-06-01; 1 credit = $0.01, computed from token
+consumption at per-model rates — the successor to premium requests). What wi can and cannot record:
+
+- **Per-subagent rows: `unavailable`.** `task`-tool dispatches produce no per-task usage figure and no
+  per-agent transcript — the finest native unit is the session (total credits + a per-model token
+  breakdown). Ledger rows on Copilot record
+  `unavailable (Copilot exposes no per-task usage)` as their Basis; Duration cells still work (they
+  come from the orchestrator's own OS-clock stamps).
+- **Run level: record only what is actually on screen.** Interactive: the user's `/usage` output
+  (AI credits used, per-model tokens, session duration) may be copied verbatim into the ledger's
+  `## Orchestrator` section as `AI credits (from /usage): <figure>`. Programmatic/Autopilot runs print
+  usage statistics with the response unless `-s/--silent` — same rule. No figure in the conversation →
+  `Orchestrator: unavailable for this run`; never estimate credits.
+- **`token_report.py`'s transcript parse and per-subagent split are Claude Code-only** (they read
+  `~/.claude/projects/**` and its `subagents/` sidecars). The duration totals and `progress.md`
+  wall-clock still finalize normally on Copilot — timing comes from wi's own stamps, not the platform.
+- **Post-hoc reconciliation** (outside the run): `GET /users/{username}/settings/billing/ai_credit/usage`
+  (or the `/organizations/{org}/…` variant) reports credits per day/model/user with ~30-minute lag, and
+  the billing CSV itemizes per interaction — useful to attribute a run's real cost after the fact, but
+  wi never writes these delayed figures into a shipping dossier as if they were measured in-run.

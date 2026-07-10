@@ -23,8 +23,9 @@ keep-alive loop (`/goal` or Autopilot) if the user armed it.
   re-derive what a file records.
 - **Delegate, summarize, discard.** Researchers run in parallel subagents and return short reports; append
   each one's token count as a row to `tokens.md` the moment its completion notification arrives (the figure
-  exists only there — NOT retrievable later). ship finalizes the orchestrator total and a `check_tokens.py`
-  gate blocks the PR if the ledger was skipped.
+  exists only there — NOT retrievable later), with its `Duration` cell (the notification's elapsed time, or
+  your dispatch→arrival delta from the OS clock; `unavailable` if neither exists). ship finalizes the
+  orchestrator total + duration totals and a `check_tokens.py` gate blocks the PR if the ledger was skipped.
 - **Borrow.** Detect installed skills and hand off:
   `${CLAUDE_PLUGIN_ROOT}/skills/research/references/integrations.md`.
 
@@ -85,7 +86,7 @@ If the decision is **hard to reverse**, record it as the next
 **ADR-NNNN** in the project-wide `.wi/adr/` log (global numbering + an index.md row, per the plan skill's
 ADR template). Commit the ADR + its index row now (`docs(wi): ADR-NNNN <title>`) — research runs on main
 before build branches, so the committed ADR rides the branch and the PR (the project-level rule in
-`wi-directory.md`). Set Phase = `plan`.
+`wi-directory.md`). Set Phase = `plan` (stamped Log line: `- <ts> **Update** phase = plan`).
 
 ### 2 - Plan
 Run **plan** (`wi:plan`): brief + research -> `spec.md` (testable acceptance criteria), `tasks.md` (small
@@ -99,9 +100,11 @@ acceptance criterion, a silently down-scoped decision — loops to plan to fix, 
 (**max 2 rounds**; each round appends its own `tokens.md` row — a re-check round that returns without a
 completion notification records `unavailable`, never an estimate). Whatever remains is **carried into the
 gate summary** with its severity, so the user
-decides with eyes open. Then Phase = `design-gate` — this flip is **research's alone**: plan ends with
-Phase still `plan`, so an interrupted run can never resume into the gate without this checker pass having
-run.
+decides with eyes open. Then Phase = `design-gate`, stamped as `- <ts> **Update** design gate opened` —
+the exact wording matters: `token_report.py` reads this stamp as the end of the first autonomous span
+(the gate wait that follows is manual time and never counts). This flip is **research's alone**: plan
+ends with Phase still `plan`, so an interrupted run can never resume into the gate without this checker
+pass having run.
 
 ### 3 - Design gate
 **Commit the dossier first.** Commit the feature dossier on main now — `docs(<slug>): feature dossier
@@ -142,9 +145,12 @@ to reverse)* and drop the ADR path from the footer line.
 
 Then check **Gate mode** in `progress.md`:
 - **interactive** (default): ask with AskUserQuestion: **approve** / **amend the approach** (loop to
-  research with the feedback) / **amend scope or spec** (loop to plan) / **stop**. Record the outcome.
+  research with the feedback) / **amend scope or spec** (loop to plan) / **stop**. Record the outcome —
+  an approve is stamped `- <ts> **Update** design gate approved, phase = build` (this wording restarts
+  the autonomous clock after the manual gate wait).
 - **auto-approve** (`/wi:dev --auto`): skip the question; write the same rendered summary into
-  `progress.md` and log "design gate auto-approved (--auto)" — the user reads it after the fact.
+  `progress.md` and log `- <ts> **Update** design gate auto-approved (--auto), phase = build` — the user
+  reads it after the fact.
 
 **Re-opened mid-build** (a post-gate amend loops back here while the feature worktree exists): the
 worktree's `.wi/features/<slug>/` is canonical — read and render the summary from that copy, not main's,
