@@ -118,7 +118,8 @@ in `wi-directory.md`: committed where written, so post-worktree phases read the 
 **`--auto`** → write + commit the **simple** preset and log it as an
 assumption. Either way the file persists and is **never re-asked** (edit `.wi/models.md` to change it). When
 the file exists, skip setup entirely, just apply it. The entry skills also handle the legacy migration: a
-pre-1.3 config under the old filename is renamed to `.wi/models.md` with its frontmatter set to
+pre-1.3 config under the old filename (the tell: an old-named `.wi/*.md` carrying the same `## Roles` /
+`## Cross-provider config` sections) is renamed to `.wi/models.md` with its frontmatter set to
 `type: Model Routing Config` — the section format is unchanged. Setup ends by resolving the routing once
 and recording it as the `## Model routing (resolved)` block when the feature's `progress.md` is seeded
 (dev step 2 / rpa's run seed) — the resolve-once rule below.
@@ -176,8 +177,8 @@ it cannot verify things are actually wired, and it does not write `verification.
    file, plus context: `spec.md` (or the SDD's acceptance-criteria section) and the relevant
    constitution rules.
 2. Run `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/cross_review.py --config .wi/models.md
-   --diff <patch> --context <spec> --out .wi/features/<slug>/cross-review.md` (`python` assumed on PATH; where it
-   does not resolve, fall back to `py -3` on Windows or `python3` on Linux/macOS).
+   --diff <patch> --context <spec> --out .wi/features/<slug>/cross-review.md` (python fallback:
+   `skills/research/references/workflow.md` §Script invocation).
 3. Exit `0` = `## REVIEW PASSED`; `1` = `## ISSUES FOUND` — treat findings like any checker finding:
    BLOCKER → fix (loop back to build), WARNING/INFO → address or record. Both layers share the **max 2
    review→fix rounds** budget; whatever remains after round 2 is surfaced, with

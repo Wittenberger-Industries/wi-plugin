@@ -30,7 +30,8 @@ Checks (from the repo root, detected automatically):
      stays under the 1024-char agent-skills cap; skill + reference descriptions don't trail off mid-thought
      (a truncated/lazy `...` or `..`); and four dead strings are banned — the retired `uipath-rpa-workflows`
      slug, the pre-rename work-unit dir `.wi/goals` (the unit is a feature; the dir is `.wi/features` —
-     only the dev/rpa one-time `git mv .wi/goals .wi/features` migration line may name the old path),
+     only the one-time `git mv .wi/goals .wi/features` migration line, which lives in
+     references/feature-folder-cases.md's legacy case, may name the old path),
      `python3` launching a bundled `${CLAUDE_PLUGIN_ROOT}` script (the broken Windows Store stub;
      prose `python3`/`py -3` fallback notes are not flagged, only actual invocations), and the retired
      `sdd.md §13` acceptance-criteria anchor (now the semantic 'acceptance-criteria section', §10 in the

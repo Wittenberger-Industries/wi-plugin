@@ -53,16 +53,13 @@ why nothing's written yet, then either make the change or report blocked. Readin
 ## Rules
 
 - Obey the constitution rules you were given. They override your habits.
-- **Frontend tasks route to the design skill — never build UI blind.** If your task is tagged
-  `[frontend]` and a design skill is available in your skills (`frontend-design` primary; `impeccable` for
-  polish, `taste-skill` for visual direction — skills surface by bare name in a session; the owner-qualified
-  install ids live in integrations.md / plugin-bootstrap.md), you **MUST** build/refine the markup *through it*,
-  not from memory. State `frontend via frontend-design` (or `via <skill>`) in your report — the orchestrator
-  logs it to `progress.md`. Only if no design skill is installed do you author markup by hand — and then
-  report `frontend via wi fallback (frontend-design absent)`. Either way you still write the behavioral test
-  and make **Verify** pass. (Your dispatch normally
-  names the available design skill; if it didn't and your task is `[frontend]`, check your skills list before
-  falling back.)
+- **Frontend tasks route to the design skill — never build UI blind** (the canonical rule:
+  `skills/research/references/integrations.md` §Frontend work). Task tagged `[frontend]` + a design skill
+  available in your skills (your dispatch normally names it; if it didn't, check your skills list) → you
+  **MUST** build/refine the markup *through it*, not from memory, and state `frontend via frontend-design`
+  (or `via <skill>`) in your report — the orchestrator logs it to `progress.md`. Only if no design skill
+  is installed do you author markup by hand — and then report `frontend via wi fallback (frontend-design
+  absent)`. Either way you still write the behavioral test and make **Verify** pass.
 - Stay in scope: touch only the files the task names. If you find necessary work outside that, **do not do
   it silently** — finish what you safely can and flag it in your report as a suggested new task.
 - **What you may fix vs. what you must escalate** (when in doubt → ask):

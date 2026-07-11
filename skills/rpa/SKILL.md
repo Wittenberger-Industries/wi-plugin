@@ -30,17 +30,17 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    it) are installed (offer to install if absent), and on an existing UiPath repo delegate structure discovery
    to UiPath's `uipath-project-discovery-agent`.
 2. **Register inputs & components, ingest the PDD.** Follow
-   `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/ingest.md`: a repo whose work units still live under the
-   pre-rename folder gets a one-time `git mv .wi/goals .wi/features` before anything else; then derive the **numbered run-slug**
+   `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/ingest.md`: a legacy repo (work units under the
+   pre-rename `goals` folder) gets the one-time migration in
+   `${CLAUDE_PLUGIN_ROOT}/references/feature-folder-cases.md` before anything else; then derive the **numbered run-slug**
    (`NNNN-<name>` — the next global 4-digit ordinal, mirroring `ADR-NNNN`; see ingest.md §1); catalog the
    supporting files in the repo (API refs, CSV/mapping tables, sample data, screenshots) into
    `.wi/inputs.md`; detect reusable components into `.wi/components.md`; convert the PDD to `pdd.md` with
    markitdown (skip if it's already Markdown). Run the **model routing first-run setup** here too
-   (`${CLAUDE_PLUGIN_ROOT}/references/models.md`): `.wi/models.md` absent → one preset question (`--auto` →
-   simple preset, logged); present → apply, warn once on an orchestrator-tier mismatch. A legacy config
-   left by a pre-1.3 run (an old-named `.wi/*.md` carrying the same `## Roles` / `## Cross-provider config`
-   sections): rename it to `.wi/models.md` and set its frontmatter to `type: Model Routing Config` — the
-   section format is unchanged. Resolve the routing once now (models.md's **resolve-once rule**) and
+   (`${CLAUDE_PLUGIN_ROOT}/references/models.md` §First-run setup): absent → one preset question
+   (`--auto` → simple, logged); present → apply, warn once on an orchestrator-tier mismatch; a pre-1.3
+   legacy config → rename per that section. Never re-ask. Resolve the routing once now (models.md's
+   **resolve-once rule**) and
    record it as the `## Model routing (resolved)` block when the run's `progress.md` is seeded
    (rpa-directory.md's template); every build delegation then reads the block's `rpa-build` cell
    (`rpa-build` resolves override → `wi-task-runner` role → `inherit` — a routing role label, not a
@@ -87,13 +87,11 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
      reverse → no ADR (plan §2's rule: don't manufacture decisions).
 5. **Design gate.** **Pre-gate check (checker · plan mode):** first scaffold the token ledger (idempotent):
    `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md`
-   — the checker is a subagent and its exact token count exists **only in its completion notification**;
-   append that row the moment it arrives, with its `Duration` cell (the notification's elapsed time or
-   your dispatch→arrival delta; `unavailable` if neither exists — mirrors the dev flow's research-start
-   scaffold; step 6's
-   scaffold-if-absent remains the fallback). Each checker round appends its own row; a re-check round that
-   returns without a completion notification (e.g. a resumed agent) records `unavailable` — never an
-   estimate. Then, before rendering the gate, dispatch the
+   (python fallback: workflow.md §Script invocation) — the checker is a subagent: append its `tokens.md` row the moment its
+   completion notification arrives, per wi-directory.md's **ledger rule** (exact tokens + `Duration`,
+   `unavailable` when unobservable — a round returning without a notification records `unavailable`,
+   never an estimate). This mirrors the dev flow's research-start scaffold; step 6's scaffold-if-absent
+   remains the fallback. Each checker round appends its own row. Then, before rendering the gate, dispatch the
    **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `plan` mode over `sdd.md` (its
    acceptance-criteria section — §10 in the base ToC — plus locked decisions), `tasks.md`, `assumptions.md`,
    `orchestrator.md`, `rpa-constitution.md`, and any
@@ -147,8 +145,8 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    coded-allowed → `.cs` workflows ok; scaffold each unit as REFramework per the SDD, never Blank),
    append each unit's tokens to `tokens.md` (scaffold it first if absent:
    `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md` —
-   `python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3` on
-   Linux/macOS), and register any new reusable component back into `.wi/components.md`.
+   python fallback: workflow.md §Script invocation), and register any new reusable component back into
+   `.wi/components.md`.
 7. **Verify & ship.** Gate = `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/verification-gate.md`, **branched on
    `Framework`**: REFramework → approved paradigm + Workflow Analyzer + `uip` validate; Maestro →
    `uip maestro flow validate` (+ `eval` if eval sets exist). Both → `tokens.md` passes `check_tokens.py`
@@ -183,6 +181,6 @@ The design gate, isolated worktrees, **parallel build waves**, the ship PR + **d
 diagrams kept current), **compound/learnings**, the **token report**, `check_mermaid.py`, and
 plugin-bootstrap all work unchanged — `wi:rpa` swaps the *domain* (UiPath/SDD/PDD) into the same machine.
 
-**Superpowers precedence:** during a run, superpowers skills fire only at wi's delegation points
-(`${CLAUDE_PLUGIN_ROOT}/skills/research/references/integrations.md`) — never self-triggered mid-phase;
-wi's artifact formats always win.
+**Superpowers precedence** (integrations.md §Who initiates —
+`${CLAUDE_PLUGIN_ROOT}/skills/research/references/integrations.md`): delegation points only, never
+self-triggered mid-phase; wi's artifact formats always win.

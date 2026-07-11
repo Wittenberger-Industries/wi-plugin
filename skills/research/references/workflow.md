@@ -59,7 +59,8 @@ first, then the gate renders.*
 2. **Two gates, both deliberate.** The brainstorm handoff sets scope; the design gate confirms the
    architecture + design before any code (auto-approvable via `/wi:dev --auto`, always recorded).
    There is no third checkpoint.
-3. **No questions outside the gates.** Between handoff and design gate, and after design-ok, decisions
+3. **No questions outside the gates** (the **no-questions rule** the phase skills cite). Between
+   handoff and design gate, and after design-ok, decisions
    are made on best evidence and recorded (ADR / spec / progress.md), never deferred to the user.
 4. **Write decisions immediately.** The chosen approach lives in `research/` + (if notable) an ADR; scope
    lives in `spec.md`. Later phases and a resumed session read these instead of re-deciding.
@@ -109,12 +110,15 @@ skills cite them as **the context budget** and **the output house rule**:
 
 Research and build tasks run in subagents that return summaries; their transcripts never enter the
 orchestrator's context. That is what makes a hands-off, multi-file feature affordable.
-The cost is also *measured* where it can be: `tokens.md` records each subagent's **exact** usage (from its
-completion notification). The main thread can't read its own usage *mid-turn*, but the harness
-records it: ship runs `token_report.py` to sum the session transcript's per-turn `usage` for a real
-orchestrator total. If that parse fails it's reported **unavailable** — never a fabricated number or a
-fraction of subagent work. **Time is measured the same way** (issue #35): every `progress.md` Log stamp
-is a full ISO-8601 timestamp from the OS clock, each `tokens.md` row carries its dispatch `Duration`,
-and ship's finalize computes Σ compute plus the autonomous wall-clock (sum of the research→gate-open
-and gate-approved→PR spans — manual waits and resume idle excluded); a figure that can't be observed
-is written `unavailable`, never estimated.
+The cost and the time are also *measured* where they can be — never estimated: `tokens.md` records each
+subagent's **exact** usage and `Duration`, ship's `token_report.py` parses the session transcript for
+the real orchestrator total and derives the autonomous wall-clock from `progress.md`'s OS-clock Log
+stamps, and anything unobservable is written `unavailable`, never a fabricated number. The full
+discipline — row timing, stamp format, what ship's finalize fills — is wi-directory.md's `tokens.md`
+template section; phase skills cite it as **the ledger rule**.
+
+## Script invocation
+
+Bundled scripts run as `python` plus the script's `${CLAUDE_PLUGIN_ROOT}` path; where `python` does not
+resolve, fall back to `py -3` (Windows) or `python3` (Linux/macOS). Every skill's script call inherits
+this — skills cite it as **the python fallback** instead of restating it.

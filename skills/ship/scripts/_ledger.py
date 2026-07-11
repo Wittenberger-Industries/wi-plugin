@@ -8,6 +8,8 @@ NOT an entrypoint. Imported by the two scripts the skills invoke:
 
 tokens.md is a per-feature RUNTIME artifact in a user's .wi/, never in this plugin repo.
 This module owns the file format; the scripts are thin CLIs over it. Stdlib only.
+Canonical prose for the ledger discipline ("the ledger rule"):
+skills/research/references/wi-directory.md, tokens.md template section.
 """
 import re
 from datetime import date

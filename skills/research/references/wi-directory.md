@@ -47,7 +47,10 @@ reasoned about. Keep every file small and current; these are working artifacts, 
   assigned at creation**: "Add Stripe webhooks" -> `0001-stripe-webhooks`. The prefix mirrors `ADR-NNNN`
   (global across `.wi/features/`, monotonic, **never renumbered**) so `.wi/features/` lists in implementation
   order; next number = highest existing `.wi/features/` ordinal + 1 (else `0001`). Legacy features — unnumbered or with a non-numeric prefix — are left as-is and
-  ignored by the next-number scan (they contribute nothing to the max).
+  ignored by the next-number scan (they contribute nothing to the max). A resumed feature keeps its
+  number; a roadmap row's name is numbered when its folder is first created. Creation-time edge cases (resume,
+  in-flight overlap, done-collision, roadmap rows, legacy migration):
+  `${CLAUDE_PLUGIN_ROOT}/references/feature-folder-cases.md`.
 - **Commit `.wi/`.** It is documentation. Feature-folder lifecycle: untracked in the main checkout through
   brainstorm/research/plan; research commits it on main at the design gate (`docs(<slug>): feature
   dossier (design gate)`), so the gate decides against committed artifacts and the build worktree
@@ -113,8 +116,8 @@ version:
   from the **OS clock** (`date -Iseconds`, or
   `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/now.py` where that shell syntax is
   unavailable), never a model estimate — ship's `token_report.py` derives the run's autonomous
-  wall-clock (research→gate-open + gate-approved→PR, i.e. manual waits and idle time excluded)
-  from exactly these stamps, so a date-only or invented stamp makes timing `unavailable`.
+  wall-clock from exactly these stamps (spans + exclusions: the `tokens.md` section below), so a
+  date-only or invented stamp makes timing `unavailable`.
 - **Citations.** External sources go under a numbered `## Citations` heading at the foot of the doc.
 - **Links.** Prefer bundle-relative `/features/<slug>/spec.md`; a broken link (not-yet-written knowledge) is
   normal, never an error.
@@ -174,11 +177,12 @@ artifacts already summarized here (workflow.md's context budget).
 
 ## `tokens.md` template
 
-Append a row the **moment** each subagent's completion notification arrives — the token figure exists
-only in that notification. Each row also carries its **Duration**: the notification's elapsed time, or
-the delta between your dispatch stamp and the notification's arrival (OS clock) — `unavailable` when
-neither exists, never an estimate. ship compiles the totals at the dossier tidy and `dev` includes the
-table in the final report. The scaffold is written by `check_tokens.py --init` from `_ledger.TEMPLATE`
+Append a row the **moment** each subagent's completion notification arrives (**the ledger rule** —
+phase skills cite it by this name): the token figure exists only in that notification, and a dispatch
+that returns without one (e.g. a resumed agent) records `unavailable`, never an estimate. Each row also
+carries its **Duration**: the notification's elapsed time, or the delta between your dispatch stamp and
+the notification's arrival (OS clock) — `unavailable` when neither exists, never an estimate. ship
+compiles the totals at the dossier tidy and `dev` includes the table in the final report. The scaffold is written by `check_tokens.py --init` from `_ledger.TEMPLATE`
 (the source of truth for the exact bytes); the block below is illustrative.
 
 ```markdown

@@ -17,8 +17,9 @@ keep-alive loop (`/goal` or Autopilot) if the user armed it.
 
 ## Operating principles
 
-- **Autonomous until the gate.** No questions during research or planning. When a decision arises, pick
-  the best option given `brief.md` + `constitution.md`, record it, continue.
+- **Autonomous until the gate** (workflow.md's no-questions rule). No questions during research or
+  planning. When a decision arises, pick the best option given `brief.md` + `constitution.md`, record
+  it, continue.
 - **State on disk.** Layout: `${CLAUDE_PLUGIN_ROOT}/skills/research/references/wi-directory.md`. Never
   re-derive what a file records.
 - **Hold the budget.** workflow.md's **context budget** is a hard rule: `constitution.md`,
@@ -27,10 +28,10 @@ keep-alive loop (`/goal` or Autopilot) if the user armed it.
   pull their material into this context. Re-entry (§0) reads `progress.md` + the active artifact,
   not prior-phase files.
 - **Delegate, summarize, discard.** Researchers run in parallel subagents and return short reports; append
-  each one's token count as a row to `tokens.md` the moment its completion notification arrives (the figure
-  exists only there — NOT retrievable later), with its `Duration` cell (the notification's elapsed time, or
-  your dispatch→arrival delta from the OS clock; `unavailable` if neither exists). ship finalizes the
-  orchestrator total + duration totals and a `check_tokens.py` gate blocks the PR if the ledger was skipped.
+  each one's `tokens.md` row the moment its completion notification arrives — the figure exists only
+  there — per wi-directory.md's **ledger rule** (exact tokens + `Duration`, `unavailable` when
+  unobservable, never an estimate). ship finalizes the totals and a `check_tokens.py` gate blocks the PR
+  if the ledger was skipped.
 - **Borrow.** Detect installed skills and hand off:
   `${CLAUDE_PLUGIN_ROOT}/skills/research/references/integrations.md`.
 
@@ -38,7 +39,7 @@ keep-alive loop (`/goal` or Autopilot) if the user armed it.
 
 ### 0 - Engage & resume
 First act, always: append a Log line to `progress.md` — `research engine engaged (wi <version>)`, reading
-<version> from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (don't guess; if that file isn't reachable — e.g. a per-skill Copilot install — omit the version rather than inventing one) — so it's auditable on disk. Then scaffold the token ledger (idempotent — no-op if it exists): `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<slug>/tokens.md` (`python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3` on Linux/macOS). Then re-enter the phase it names (research | plan | design-gate). **Design-gate re-entry
+<version> from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (don't guess; if that file isn't reachable — e.g. a per-skill Copilot install — omit the version rather than inventing one) — so it's auditable on disk. Then scaffold the token ledger (idempotent — no-op if it exists): `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<slug>/tokens.md` (python fallback: workflow.md §Script invocation). Then re-enter the phase it names (research | plan | design-gate). **Design-gate re-entry
 guard:** resuming at `design-gate` requires a fresh plan-mode `verification.md` (`type: Verification`) in
 the feature folder; if it is missing or predates the current `spec.md`/`tasks.md`, run the §2 pre-gate checker
 pass first, then present the gate.
@@ -104,8 +105,8 @@ in `plan` mode over `spec.md` + `tasks.md` + `pitfalls.md` + `constitution.md` +
 **Runtime State Inventory** rows). It builds a feature-backward coverage matrix and returns
 BLOCKER/WARNING/INFO findings, writing `verification.md`. Feed them back: a BLOCKER — an unmapped
 acceptance criterion, a silently down-scoped decision — loops to plan to fix, then the checker re-checks
-(**max 2 rounds**; each round appends its own `tokens.md` row — a re-check round that returns without a
-completion notification records `unavailable`, never an estimate). Whatever remains is **carried into the
+(**max 2 rounds**; each round appends its own `tokens.md` row per wi-directory.md's
+**ledger rule**). Whatever remains is **carried into the
 gate summary** with its severity, so the user
 decides with eyes open. Then Phase = `design-gate`, stamped as `- <ts> **Update** design gate opened` —
 the exact wording matters: `token_report.py` reads this stamp as the end of the first autonomous span
@@ -167,10 +168,9 @@ Only an explicit approve (or auto-approve) advances to implementation.
 
 ### 4 - Hand off to implementation
 **Interactive gate only:** if persistence wasn't armed at handoff, print the ready-made keep-alive again
-(the user is present — they just approved) for the current platform: Claude Code & Codex CLI arm their
-built-in `/goal` with the PR-open condition; Copilot CLI relaunches under Autopilot. The exact command
-templates — and the unattended-run warning that must accompany the Copilot one — live in
-`${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`; print them from there verbatim. Pasting the `/goal`
+(the user is present — they just approved), **verbatim from
+`${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`** — the single source of the platform templates
+(`/goal` on Claude Code & Codex, the Autopilot relaunch + unattended-run warning on Copilot). Pasting the `/goal`
 line is the go: when it registers, continue into build **in the same turn** — don't end the turn waiting
 for another prompt. Under **auto-approve**
 skip the re-print — nobody is at the console (the gate was recorded, not asked), the handoff already

@@ -64,25 +64,21 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
    → re-dispatch on `inherit` and note it in `progress.md` (the block stands — the config didn't change).
    No config → inherit, as always.
 3. **TDD per task** (per the constitution): failing test first, minimal implementation, green, refactor.
-   **Frontend routing is operational, not just asserted:** when a task is tagged `[frontend]`, the dispatch
-   MUST name the available design skill in that runner's charter — detect `frontend-design` (per
-   `integrations.md`) and tell the runner to build/refine the UI *through it*, not blind. The runner enforces
-   this (`agents/wi-task-runner.md`) and states `frontend via frontend-design` (or `frontend via wi fallback
-   (frontend-design absent)`) in its report — log that line to `progress.md` when the report returns (runners
-   never write `progress.md`); markup is authored by hand only when no design skill is
-   installed. Still verify behavior. (A `[frontend]` task built blind while `frontend-design` was installed
-   is a defect ship's checker flags.)
+   **Frontend routing is operational, not just asserted** (integrations.md §Frontend work — delegation
+   is mandatory when the skill is installed): a task tagged `[frontend]` MUST have its dispatch name the
+   available design skill, the runner builds the UI *through it* and reports `frontend via
+   frontend-design` (or `frontend via wi fallback (frontend-design absent)`), and you log that line to
+   `progress.md` when the report returns (runners never write `progress.md`). Still verify behavior.
+   (Ship's checker flags `[frontend]` UI built blind while the skill was installed.)
 4. **As each report returns:** check its Verify result and **honor its `Self-Check` line** — tick
    `progress.md` and commit the task (`<type>: <task title>`) only when the runner reports `Self-Check:
    PASS`; a stub or an unmet Verify means the task is *not* done, no matter what the console printed. You
    are the only committer and `progress.md`'s only writer during build, so commits and ticks stay
-   serialized and clean. Append the runner's token count as a row to
-   the feature's `tokens.md` (it's in the task-completion notification and is NOT retrievable later; if the file
-   is somehow absent, `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<slug>/tokens.md`
-   first — `python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3`
-   on Linux/macOS). The row's `Duration` cell is the notification's elapsed time, or the delta between
-   your dispatch stamp and the notification's arrival (OS clock — `date -Iseconds` / ship's `now.py`);
-   write `unavailable` when neither exists, never an estimate. Then recompute the ready set and dispatch
+   serialized and clean. Append the runner's `tokens.md` row the moment its completion notification
+   arrives — the figure exists only there; if the file is somehow absent,
+   `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<slug>/tokens.md`
+   first (python fallback: workflow.md §Script invocation) — per wi-directory.md's **ledger rule** (exact tokens +
+   `Duration`, `unavailable` when unobservable, never an estimate). Then recompute the ready set and dispatch
    the next wave without waiting for stragglers it doesn't depend on.
    A runner whose last line is **`## TASK AUTH-GATE`** (status `auth-gate` — a `401` / `run <x> login` /
    missing `ENV` wall) is **not** a failure to retry: don't commit it, record the exact unblock steps in

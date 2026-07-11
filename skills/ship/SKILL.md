@@ -115,9 +115,8 @@ The feature is built and verified — make the docs match reality before the PR.
   Then validate it for real before committing:
   `python ${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py .wi/architecture.md` — the bundled
   checker catches reserved-word node IDs, unquoted labels, and unbalanced `subgraph`/`end` (and renders
-  via `mmdc` when available). Fix every error it reports. (`python` assumed on PATH; where it does not
-  resolve, fall back to `py -3` on Windows or `python3` on Linux/macOS — this holds for every script in
-  this SKILL.)
+  via `mmdc` when available). Fix every error it reports. (python fallback: workflow.md §Script
+  invocation — holds for every script in this SKILL.)
 - **Project overview & commands:** if organization, stack, or run steps changed, update `.wi/overview.md`;
   if the command list changed, update `.wi/repo-map.md`.
 - **Repo docs the change touched or staled:** READMEs, `docs/`, public-surface docstrings/examples that
@@ -273,8 +272,8 @@ findings with severity. Distilled from verification.md; the dossier tidy (§6) t
      the **`## Subagent detail`** section: each dispatch's exact input/output/cache split, model,
      transcript-stamped duration, and estimated cost, read from the session's
      `subagents/agent-*.jsonl` sidecar transcripts — no manual stdout-copy anywhere. On a parse
-     failure it writes `Orchestrator: unavailable for this run` (never a substitute, estimate, or
-     fabricated figure); a missing stamp likewise yields `unavailable` timing, not a guess. The
+     failure or a missing stamp it writes the honest `unavailable` (wi-directory.md's **ledger rule** —
+     never a substitute, estimate, or fabricated figure). The
      **file** is the deliverable, not the console output.
   4. *What remains is the fixed dossier for this flow* — take the manifest from the flow's directory
      reference, not from memory: `dev` → wi-directory.md's seven-file dossier (progress, brief, spec,

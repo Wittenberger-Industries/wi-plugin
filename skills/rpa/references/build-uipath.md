@@ -78,8 +78,8 @@ DAG allows (independent processes and independent sub-workflows in parallel):
    reports completion (the only point the count exists) — `tokens.md` is **mandatory**, not optional;
    initialize it on the first delegation if absent
    (`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md` —
-   `python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3` on
-   Linux/macOS), and ship finalizes it (`token_report.py --write`) under a `check_tokens.py` close-out gate.
+   python fallback: `skills/research/references/workflow.md` §Script invocation), and ship finalizes it
+   (`token_report.py --write`) under a `check_tokens.py` close-out gate.
 5. **Register new components.** If the build created something reusable (a generic login, a notifier),
    add it to `.wi/components.md` so the next process inherits it.
 
