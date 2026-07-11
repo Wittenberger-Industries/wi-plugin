@@ -341,7 +341,9 @@ Recorded after the pre-PR review (5 finder angles; the removed-behavior audit re
 5. **Noted, not changed:** the python-fallback house rule lives in `skills/research/references/workflow.md`,
    which scan/rpa/models now cite across skill boundaries — consistent with the context budget + output
    house rule already living there (build/ship/dev cite it on main), but a per-skill install would lack
-   it; promoting workflow.md to top-level `references/` is a candidate follow-up issue, out of scope here.
+   it; promoting workflow.md to top-level `references/` is out of scope here — filed as issue #47
+   (2026-07-11), alongside #48 (drop legacy support) and #49 (drop `§` citations) from the same
+   post-review discussion.
 
 ## Out of scope (recorded for #41/#42)
 
