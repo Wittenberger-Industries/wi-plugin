@@ -117,7 +117,7 @@ per-agent override), write the file **and commit it** (`chore(wi): models config
 in `wi-directory.md`: committed where written, so post-worktree phases read the same tracked copy).
 **`--auto`** → write + commit the **simple** preset and log it as an
 assumption. Either way the file persists and is **never re-asked** (edit `.wi/models.md` to change it). When
-the file exists, skip setup entirely — just apply it. The entry skills also handle the legacy migration: a
+the file exists, skip setup entirely, just apply it. The entry skills also handle the legacy migration: a
 pre-1.3 config under the old filename is renamed to `.wi/models.md` with its frontmatter set to
 `type: Model Routing Config` — the section format is unchanged. Setup ends by resolving the routing once
 and recording it as the `## Model routing (resolved)` block when the feature's `progress.md` is seeded
