@@ -8,18 +8,18 @@ tags: [sdd, template, okf, rpa]
 
 # SDD template
 
-The Solution Design Document is the high-fidelity spec handed to `uipath-rpa` — the "robust
+The Solution Design Document is the high-fidelity spec handed to `uipath-rpa`: the "robust
 prompt" meant to one-shot the build. **One SDD per solution**, with sdd:7 repeated per process. Pull from
 `tobe.md`, `.wi/inputs.md`, `.wi/components.md`, the rpa-constitution, and the assumptions. Reference,
 don't duplicate. Fill sdd:1.3, sdd:3.1 and sdd:7.2–7.6 from `.wi/orchestrator.md` (the resource manifest elicited in
-the brainstorm) — concrete names, not placeholders.
+the brainstorm): concrete names, not placeholders.
 
-## Choosing the structure (ToC) — precedence
+## Choosing the structure (ToC): precedence
 
 Clients have different SDD standards, so the structure is **overridable**. Pick the ToC in this order:
 
 1. **An existing SDD in the project wins.** If the repo already has an `sdd.md` (or a delivered SDD doc)
-   with a Table of Contents, **mirror that ToC** — match the client's house standard, don't impose ours.
+   with a Table of Contents, **mirror that ToC**: match the client's house standard, don't impose ours.
 2. **A project override.** Else, if `.wi/sdd-template.md` exists (a per-project ToC) or the
    `rpa-constitution.md` names an SDD structure, use it.
 3. **The base ToC below** otherwise.
@@ -28,16 +28,16 @@ Whichever you use, fill every section from the design; if a section can't be fil
 gap to resolve, not a TODO to leave.
 
 **The acceptance-criteria section is never omitted, whatever ToC wins.** Client and house ToCs rarely
-carry one — when the chosen ToC has no acceptance-criteria section, **append it as the final section**,
+carry one; when the chosen ToC has no acceptance-criteria section, **append it as the final section**,
 whatever number it lands on, rather than dropping it: the checker (plan + result mode) and the
 verification gate verify the run against the SDD's acceptance-criteria section, wherever it sits.
 
 **The ToC is framework-aware** (`progress.md` → `Framework:`). The base ToC below is the **REFramework**
 shape. On the **Maestro** path, reshape these sections: **sdd:2** becomes the **flow diagram** (from
 `maestro-architecture.md`); **sdd:3.1** the Maestro project/flow layout (the `.flow` files, not REFramework);
-**sdd:7.1.x** the flow's **nodes** (each node's type — connector / approval / script / subflow / agent / ixp —
+**sdd:7.1.x** the flow's **nodes** (each node's type (connector / approval / script / subflow / agent / ixp),
 its inputs/outputs, and the connection/agent it uses), **not** a transaction + queue-item schema; **sdd:7.2–7.6**
-become Maestro **connections, triggers, and agent registrations** — Orchestrator **queues** and `Config.xlsx`
+become Maestro **connections, triggers, and agent registrations**; Orchestrator **queues** and `Config.xlsx`
 do not apply. sdd:7.1.3 stays the per-process flow diagram for both, and the acceptance-criteria section
 (sdd:10) applies unchanged on either path.
 
@@ -48,13 +48,13 @@ Copy to `.wi/features/<run-slug>/sdd.md` (or the client's structure):
 ```markdown
 ---
 type: SDD
-title: Solution Design Document — <solution / project name>
+title: Solution Design Document (<solution / project name>)
 description: <the solution this SDD specifies, one line>
 feature: <run-slug>
 timestamp: <YYYY-MM-DD>
 ---
 
-# Solution Design Document — <solution / project name>
+# Solution Design Document (<solution / project name>)
 
 ## 1. Introduction
 ### 1.1 Purpose of the document
@@ -90,30 +90,30 @@ timestamp: <YYYY-MM-DD>
 #### 7.1.2 Production details
 <schedule/trigger, SLA, volumes, robot allocation, environment specifics>
 #### 7.1.3 Process Diagram
-<this process's TO-BE flow diagram (mermaid) — the per-process zoom-in>
+<this process's TO-BE flow diagram (mermaid), the per-process zoom-in>
 ### 7.2 Orchestrator Storage Buckets
 <buckets + purpose, or "none">
 ### 7.3 Orchestrator Queues
 <queue name(s), item schema, SLA/retry, references>
 ### 7.4 Orchestrator Assets
-<asset names, type, scope (global/per-folder), what they hold — never the secret value>
+<asset names, type, scope (global/per-folder), what they hold, never the secret value>
 ### 7.5 Orchestrator Triggers
 <time/queue triggers, schedule>
 #### 7.5.1 Other settings for triggers
 <concurrency, execution target, runtime arguments>
 ### 7.6 Agents
 <any UiPath Agent a process calls (e.g. a document-extraction agent): name, where it runs, its input and
- output schema (ref the sample in .wi/inputs.md), and how the Performer invokes/awaits it — or "none">
+ output schema (ref the sample in .wi/inputs.md), and how the Performer invokes/awaits it, or "none">
 
 ## 8. Other remarks
-<assumptions, open questions, risks, manual fallbacks, anything for sign-off — link assumptions.md
+<assumptions, open questions, risks, manual fallbacks, anything for sign-off; link assumptions.md
  + the PDD->SDD traceability>
 
 ## 9. UiPath Apps Details
 <any UiPath Apps front-ends, or "none">
 
 ## 10. Acceptance criteria
-<one testable criterion per line, each naming its verifying check — the SDD's mirror of spec.md's
+<one testable criterion per line, each naming its verifying check; the SDD's mirror of spec.md's
  acceptance criteria. The pre-gate checker (plan mode), the verification gate, and the checker's
  result mode all verify against THIS section; the run is done when every line demonstrably holds.>
 ```

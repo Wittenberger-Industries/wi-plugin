@@ -1,5 +1,5 @@
 """
-_ledger.py — shared helpers for the tokens.md token ledger.
+_ledger.py: shared helpers for the tokens.md token ledger.
 
 NOT an entrypoint. Imported by the two scripts the skills invoke:
   - check_tokens.py  (--init scaffold, default = verify gate)
@@ -16,7 +16,7 @@ from datetime import date
 from pathlib import Path
 
 # Exact sentinel ship writes when the orchestrator transcript can't be parsed. The verify
-# gate treats this as RESOLVED — an honest "can't measure" passes; only the untouched
+# gate treats this as RESOLVED: an honest "can't measure" passes; only the untouched
 # PENDING placeholder fails. Must match the wording in ship/SKILL.md and wi-directory.md.
 UNAVAILABLE = "Orchestrator: unavailable for this run"
 
@@ -38,14 +38,14 @@ timestamp: __TIMESTAMP__
 
 # __TITLE__
 
-Append a row the moment each subagent's completion notification arrives — the figure
+Append a row the moment each subagent's completion notification arrives; the figure
 exists only there and is NOT retrievable later. Duration comes from the notification's
-elapsed time or the orchestrator's own dispatch/arrival stamps (OS clock) — write
+elapsed time or the orchestrator's own dispatch/arrival stamps (OS clock); write
 `unavailable` when unknown, never an estimate. ship finalizes the Orchestrator section.
 
 | Phase | Source | Tokens | Duration | Basis |
 |-------|--------|--------|----------|-------|
-| orchestrator | main thread, all phases | (see Orchestrator section) | n/a (see below) | parsed by token_report.py; unavailable if the parse fails — never substitute or estimate |
+| orchestrator | main thread, all phases | (see Orchestrator section) | n/a (see below) | parsed by token_report.py; unavailable if the parse fails: never substitute or estimate |
 
 **Subagents (exact): <sum>.**
 **Σ compute: <dur> across <n> dispatches.**
@@ -53,7 +53,7 @@ elapsed time or the orchestrator's own dispatch/arrival stamps (OS clock) — wr
 
 ## Orchestrator
 
-_PENDING — ship replaces this section during the dossier tidy (BEFORE the dossier commit and the PR) by running `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>`, which parses the session transcript, fills the duration totals from the ledger rows + progress.md phase spans, and appends the exact per-subagent split (Claude Code). That parsed figure is the only reliable orchestrator measure; if the parse fails it writes `Orchestrator: unavailable for this run` — never a substitute, estimate, or invented figure. A tokens.md still reading PENDING after ship is a defect._
+_PENDING: ship replaces this section during the dossier tidy (BEFORE the dossier commit and the PR) by running `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>`, which parses the session transcript, fills the duration totals from the ledger rows + progress.md phase spans, and appends the exact per-subagent split (Claude Code). That parsed figure is the only reliable orchestrator measure; if the parse fails it writes `Orchestrator: unavailable for this run`; never a substitute, estimate, or invented figure. A tokens.md still reading PENDING after ship is a defect._
 """
 
 
@@ -253,7 +253,7 @@ def verify(path):
     if not _duration_cells_ok(text):
         return "a subagent row's Duration cell is empty (write the figure or 'unavailable')"
     if not compute_totals_filled(text):
-        return "duration totals not filled (Σ compute / wall-clock — token_report.py --write fills them)"
+        return "duration totals not filled (Σ compute / wall-clock: token_report.py --write fills them)"
     if not orchestrator_resolved(text):
         return "Orchestrator section still PENDING / unresolved"
     return None

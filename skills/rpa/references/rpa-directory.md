@@ -8,20 +8,20 @@ tags: [rpa, wi-directory, okf, conventions]
 
 # The `.wi/` layout for RPA
 
-`wi:rpa` reuses the `.wi/` model — same [OKF](/docs/specs/2026-06-14-okf-knowledge-format.md) frontmatter
-profile — with an extra tier: **project → run (a PDD/solution) → process**. One `/wi:rpa` run is one feature
+`wi:rpa` reuses the `.wi/` model (same [OKF](/docs/specs/2026-06-14-okf-knowledge-format.md) frontmatter
+profile) with an extra tier: **project → run (a PDD/solution) → process**. One `/wi:rpa` run is one feature
 folder for the whole solution, with **one SDD** covering its 1..N processes.
 
 ```
 .wi/
 ├── rpa-constitution.md      # project: RPA house standards (REFramework, connectors-over-UI, naming, gate)
-├── sdd-template.md          # project (OPTIONAL): a client/house SDD ToC override — used if present
-├── inputs.md                # project: input/asset registry (API refs, CSVs, samples) — see ingest.md
-├── components.md            # project: reusable components registry — reuse before build
+├── sdd-template.md          # project (OPTIONAL): a client/house SDD ToC override; used if present
+├── inputs.md                # project: input/asset registry (API refs, CSVs, samples); see ingest.md
+├── components.md            # project: reusable components registry; reuse before build
 ├── orchestrator.md          # project: Orchestrator resource manifest (link, agents, queues, assets, buckets, processes, triggers)
 ├── glossary.md              # project: domain terms
-├── models.md                # project: tiered model routing — model assignments (references/models.md)
-├── learnings.md             # project: learnings INDEX — one line + hook per run; read this, not the dir
+├── models.md                # project: tiered model routing; model assignments (references/models.md)
+├── learnings.md             # project: learnings INDEX: one line + hook per run; read this, not the dir
 ├── learnings/               # project: substantial learnings, each its own .md (indexed above)
 └── features/
     └── 0001-<run-slug>/     # one /wi:rpa run = one PDD -> solution; NNNN- global ordinal (creation order)
@@ -32,8 +32,8 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
         ├── process-inventory.md   # the N processes + dependencies
         ├── assumptions.md   # gap/assumption register (per-process sections) + PDD->SDD trace
         ├── tasks.md         # the multi-process build DAG (components -> processes -> sub-workflows)
-        ├── verification.md  # checker output (plan mode pre-gate, result mode at ship) — EPHEMERAL; verdict folds into PR.md
-        ├── cross-review.md  # cross-provider diff review (ship; only when configured) — EPHEMERAL
+        ├── verification.md  # checker output (plan mode pre-gate, result mode at ship); EPHEMERAL; verdict folds into PR.md
+        ├── cross-review.md  # cross-provider diff review (ship; only when configured); EPHEMERAL
         ├── tokens.md        # token ledger
         ├── PR.md            # PR description
         └── processes/
@@ -45,7 +45,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
 
 - **Framework references:** REFramework uses `refr-architecture.md` + `build-uipath.md`; Maestro uses
   `maestro-architecture.md` + `build-maestro.md`; the gate (`verification-gate.md`) branches on `Framework:`.
-- **Run-slugs are numbered** — `NNNN-<name>` (a global 4-digit ordinal assigned at creation — the dev
+- **Run-slugs are numbered**: `NNNN-<name>` (a global 4-digit ordinal assigned at creation; the dev
   flow's convention, wi-directory.md's **Slugs bullet**), so runs list in implementation order.
 - **Project-level files persist & compound** across runs: `rpa-constitution.md`, `sdd-template.md` (if
   present), `inputs.md`, `components.md`, `orchestrator.md`, `glossary.md`, `models.md`, `adr/` (+ its index),
@@ -54,23 +54,23 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
   when progress.md says `Flow: rpa`. A repo where both flows have run also carries the dev project files
   (`constitution.md`, `repo-map.md`, `overview.md`, `architecture.md`): the sweep whitelist is the
   **union** of both directory references' project-level lists.
-- **Project-level files are committed where they're written** (`wi-directory.md`'s rule — same here):
+- **Project-level files are committed where they're written** (`wi-directory.md`'s rule; same here):
   ingest/brainstorm commit `inputs.md` / `components.md` / `orchestrator.md` / `models.md` as they create
   them, so the post-gate worktree carries them.
-- **The run dossier** — what ship's tidy leaves under `features/<run-slug>/` at `done` (the manifest ship
+- **The run dossier**: what ship's tidy leaves under `features/<run-slug>/` at `done` (the manifest ship
   reads when progress.md says `Flow: rpa`): `progress.md`, `pdd.md`, `architecture.md`, `sdd.md`,
   `process-inventory.md`, `assumptions.md`, `tasks.md`, `tokens.md`, `PR.md`, plus `processes/<p>/tobe.md`
-  per process. `verification.md` and `cross-review.md` are ephemeral — ship's prune list for the rpa flow
+  per process. `verification.md` and `cross-review.md` are ephemeral, ship's prune list for the rpa flow
   (no `research/` exists here): their verdicts fold into `PR.md` (ship:5), then ship's dossier tidy
   prunes them (same rule as the dev flow).
 - **The SDD structure is overridable** (clients differ): an existing project `sdd.md`'s ToC wins; else
   `.wi/sdd-template.md`; else the bundled base ToC (see `references/sdd-template.md`).
-- **`architecture.md` is the whole-solution Runtime diagram** — dispatcher + every performer (2nd/3rd) +
+- **`architecture.md` is the whole-solution Runtime diagram**: dispatcher + every performer (2nd/3rd) +
   queues + systems + Orchestrator. Per-process flow diagrams live in each `tobe.md` (and feed sdd:7.1.3).
-- **`orchestrator.md` is the resource manifest** — the concrete Orchestrator names (folder, processes,
+- **`orchestrator.md` is the resource manifest**: the concrete Orchestrator names (folder, processes,
   queues, assets, buckets, agents, triggers) elicited in brainstorm; sdd:1.3/sdd:3.1/sdd:7.2–7.6 are filled from
   it, and the back-half build provisions from it. Secret/credential **names** only, never values.
-- **Faithful `pdd.md`.** Don't edit it to "fix" the process — refinement lives in `tobe.md`.
+- **Faithful `pdd.md`.** Don't edit it to "fix" the process; refinement lives in `tobe.md`.
 - ADRs for hard-to-reverse choices (REFramework vs coded, dispatcher split, queue model) go in the
   project-wide `.wi/adr/` log, same as `wi:dev`.
 
@@ -82,7 +82,7 @@ Same profile as `wi:dev` (see [wi-directory](/skills/research/references/wi-dire
 `Component Registry`, `orchestrator.md` → `Orchestrator Manifest`; per run: `progress.md` →
 `RPA Run Progress`, `pdd.md` → `PDD`, `architecture.md` → `Architecture`, `sdd.md` → `SDD`,
 `process-inventory.md` → `Process Inventory`, `assumptions.md` → `Assumption Register`, `tasks.md` →
-`Task List`, `verification.md` → `Verification` *(ephemeral — checker output, pruned at ship's dossier tidy)*,
+`Task List`, `verification.md` → `Verification` *(ephemeral: checker output, pruned at ship's dossier tidy)*,
 `tokens.md` → `Token Ledger`, `PR.md` → `PR Description`; per process:
 `processes/<p>/tobe.md` → `TO-BE`. `orchestrator.md` SHOULD carry a `resource:` pointing at the
 Orchestrator folder URL (names only, never secret values).
@@ -97,12 +97,12 @@ artifact. Each load-bearing row still becomes its own migration task in `tasks.m
 
 `progress.md` has its full template below; `sdd.md`, `orchestrator.md`, `inputs.md`, `components.md`, and
 `rpa-constitution.md` carry templates in their reference docs. The remaining run files are written from
-prose — open each with its OKF frontmatter, then the body:
+prose: open each with its OKF frontmatter, then the body:
 
 ```markdown
 ---
 type: PDD
-title: <solution / process name> — PDD
+title: <solution / process name> (PDD)
 description: The ingested Process Definition Document, faithful to the source.
 feature: <run-slug>
 timestamp: <YYYY-MM-DD>
@@ -112,8 +112,8 @@ timestamp: <YYYY-MM-DD>
 ```markdown
 ---
 type: Architecture
-title: Runtime diagram — <solution name>
-description: Whole-solution runtime diagram — dispatcher, every performer, queues, systems, Orchestrator.
+title: Runtime diagram (<solution name>)
+description: Whole-solution runtime diagram (dispatcher, every performer, queues, systems, Orchestrator).
 feature: <run-slug>
 timestamp: <YYYY-MM-DD>
 ---
@@ -122,7 +122,7 @@ timestamp: <YYYY-MM-DD>
 ```markdown
 ---
 type: Process Inventory
-title: Process inventory — <solution name>
+title: Process inventory (<solution name>)
 description: The N processes in this solution and their dependencies.
 feature: <run-slug>
 timestamp: <YYYY-MM-DD>
@@ -132,7 +132,7 @@ timestamp: <YYYY-MM-DD>
 ```markdown
 ---
 type: Assumption Register
-title: Assumptions — <solution name>
+title: Assumptions (<solution name>)
 description: Gap/assumption register (per-process) plus the PDD->SDD traceability.
 feature: <run-slug>
 timestamp: <YYYY-MM-DD>
@@ -142,7 +142,7 @@ timestamp: <YYYY-MM-DD>
 ```markdown
 ---
 type: TO-BE
-title: <process name> — TO-BE
+title: <process name> (TO-BE)
 description: The refined TO-BE flow for this process (feeds sdd:7.1.3).
 feature: <run-slug>
 timestamp: <YYYY-MM-DD>
@@ -170,19 +170,19 @@ timestamp: <YYYY-MM-DD>
 - **Created:** <YYYY-MM-DD>
 - **Phase:** ingest   <!-- bootstrap | ingest | brainstorm | plan | design-gate | build | ship | done -->
 - **Gate mode:** interactive   <!-- interactive | auto-approve (/wi:rpa --auto) -->
-- **Flow:** rpa   <!-- dev | rpa — ship keys its dossier manifest + sweep whitelist on it; a missing line means dev -->
-- **Framework:** reframework   <!-- reframework | maestro — proposed at brainstorm, confirmed at the design gate -->
-- **Build paradigm:** xaml-only   <!-- REFramework only: xaml-only (pure activities, NO Invoke Code) | coded-allowed (.cs) — user-approved at the design gate -->
-- **Publish:** none   <!-- none | feed (publish package to tenant feed) | deploy (feed + deploy/activate to a folder) — approved at the design gate; prod folder needs explicit approval -->
+- **Flow:** rpa   <!-- dev | rpa; ship keys its dossier manifest + sweep whitelist on it; a missing line means dev -->
+- **Framework:** reframework   <!-- reframework | maestro; proposed at brainstorm, confirmed at the design gate -->
+- **Build paradigm:** xaml-only   <!-- REFramework only: xaml-only (pure activities, NO Invoke Code) | coded-allowed (.cs); user-approved at the design gate -->
+- **Publish:** none   <!-- none | feed (publish package to tenant feed) | deploy (feed + deploy/activate to a folder); approved at the design gate; prod folder needs explicit approval -->
 - **SDD ToC source:** base | project sdd.md | .wi/sdd-template.md
 - **Worktree:** <path or ->   **Branch:** <branch or ->
 
 ## Model routing (resolved)
 <!-- written when progress.md is seeded (dev:1-2 / rpa:2) from .wi/models.md; dispatches
      read THIS block, not models.md. Rewrite only when absent or .wi/models.md changed after the
-     stamp (models.md's resolve-once rule). Keep the stamp mid-line — Log-span parsing keys on
+     stamp (models.md's resolve-once rule). Keep the stamp mid-line: Log-span parsing keys on
      stamps that OPEN a line. -->
-- resolved <ISO-8601 stamp> from .wi/models.md (preset: <smart | simple | custom | none — all inherit>)
+- resolved <ISO-8601 stamp> from .wi/models.md (preset: <smart | simple | custom | none - all inherit>)
 - orchestrator=<tier> (informational) · checker=<tier> · researcher=<tier> · task-runner=<tier> · rpa-build=<tier>
 - cross-provider=<none | provider model (at-finish | per-wave)> · MoA=<none | points=<…>; proposers=<…>; layers=<n>; aggregator=<tier>>
 

@@ -9,7 +9,7 @@ tags: [plan, reference]
 # Pitfalls catalog
 
 A foresight checklist. During planning, skim these categories and pull the few that genuinely apply to the
-current feature into `.wi/features/<slug>/pitfalls.md` — each with the *specific* way it could bite here and the
+current feature into `.wi/features/<slug>/pitfalls.md`, each with the *specific* way it could bite here and the
 task that prevents it. The aim is cheap foresight, not a generic risk essay. Skip whole categories that
 don't apply.
 

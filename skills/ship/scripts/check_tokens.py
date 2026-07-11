@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-check_tokens.py — scaffold and verify a feature's tokens.md ledger.
+check_tokens.py: scaffold and verify a feature's tokens.md ledger.
 
   check_tokens.py --init PATH   # write the template iff absent (idempotent no-op otherwise)
   check_tokens.py PATH          # verify (the close-out gate)
@@ -8,7 +8,7 @@ check_tokens.py — scaffold and verify a feature's tokens.md ledger.
 Verify exits 0 iff the ledger is present and structurally finalized (frontmatter
 type: Token Ledger, >=1 integer-token row, Subagents sum filled, the Duration column
 present with every row's Duration cell and the Σ-compute/wall-clock totals filled,
-Orchestrator resolved — a real figure OR the honest "unavailable" sentinel, NOT the
+Orchestrator resolved: a real figure OR the honest "unavailable" sentinel, NOT the
 PENDING placeholder). That five-column format is the only one recognized.
 Otherwise exit 1 and print the first failing check. A non-zero exit is the hard guardrail:
 ship must not mark Phase=done, so the keep-alive loop keeps working the feature. Stdlib only.
@@ -36,9 +36,9 @@ def run_init(path):
 def run_verify(path):
     reason = _ledger.verify(path)
     if reason is None:
-        print("check_tokens: OK — {}".format(path))
+        print("check_tokens: OK - {}".format(path))
         return 0
-    print("check_tokens: FAIL — {} ({})".format(reason, path), file=sys.stderr)
+    print("check_tokens: FAIL - {} ({})".format(reason, path), file=sys.stderr)
     return 1
 
 

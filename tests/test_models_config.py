@@ -11,7 +11,7 @@ import cross_review  # noqa: E402
 
 FULL_CONFIG = """---
 type: Model Routing Config
-title: Model assignments — demo
+title: "Model assignments: demo"
 description: Per-role model assignments for wi-dispatched agents.
 preset: smart
 timestamp: 2026-07-02
@@ -22,7 +22,7 @@ timestamp: 2026-07-02
 ## Roles
 | Role | Model | Notes |
 |------|-------|-------|
-| orchestrator | fable | informational — session model |
+| orchestrator | fable | informational: session model |
 | wi-code-checker | fable | same-family fallback tier |
 | wi-researcher | opus | one tier below orchestrator |
 | wi-task-runner | sonnet | default for wi-task-runner dispatches |
@@ -44,7 +44,7 @@ timestamp: 2026-07-02
 
 SIMPLE_CONFIG = """---
 type: Model Routing Config
-title: Model assignments — demo
+title: "Model assignments: demo"
 description: Per-role model assignments for wi-dispatched agents.
 preset: simple
 timestamp: 2026-07-02

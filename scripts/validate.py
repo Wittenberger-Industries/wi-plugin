@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-validate.py — pre-release check for the wi plugin. Run from anywhere:
+validate.py: pre-release check for the wi plugin. Run from anywhere:
 
     python3 scripts/validate.py
 
@@ -10,7 +10,7 @@ Checks (from the repo root, detected automatically):
      the three manifest versions agree.
   2. Every `skills/**/SKILL.md` / `agents/*.md` / `references/skill-aliases/**/SKILL.md` has valid YAML
      frontmatter with `name` + `description`
-     — this catches the col-0 `<example>` / block-scalar bug that stopped the agents loading.
+     (this catches the col-0 `<example>` / block-scalar bug that stopped the agents loading).
      Needs PyYAML for the full parse (`pip install pyyaml`); without it, the YAML parse is skipped
      and only delimiters + key presence are checked.
   3. Every `${CLAUDE_PLUGIN_ROOT}/<path>` reference in `.md` files resolves to a real file under the repo root.
@@ -19,7 +19,7 @@ Checks (from the repo root, detected automatically):
   5. OKF conformance (see docs/specs/2026-06-14-okf-knowledge-format.md): every concept doc under
      skills/ · agents/ · references/ · docs/ plus README.md/AGENTS.md opens with parseable YAML
      frontmatter carrying a non-empty `type`. Each must also end with a trailing newline and have
-     balanced code fences — the two signatures of a truncated/interrupted write (the bug class that
+     balanced code fences, the two signatures of a truncated/interrupted write (the bug class that
      shipped half-written docs before this guard existed). `index.md` / `log.md` are reserved and exempt.
   6. Generated-`.wi/`-file templates (the ```markdown blocks inside skills/agents that emit the runtime
      `.wi/` files) each open with frontmatter carrying a non-empty `type`, so a generated file can't ship
@@ -28,10 +28,10 @@ Checks (from the repo root, detected automatically):
   7. Mechanical lints, scoped to skills/ · agents/ · references/ · .claude-plugin/ (never docs/ or tests/,
      which legitimately archive the very strings banned in shipped text): every SKILL.md `description`
      stays under the 1024-char agent-skills cap; skill + reference descriptions don't trail off mid-thought
-     (a truncated/lazy `...` or `..`); the section-sign symbol (U+00A7) is banned outright — citations
+     (a truncated/lazy `...` or `..`); the section-sign symbol (U+00A7) is banned outright: citations
      use the name:N locator (ship:8, sdd:7.1.3, protocol:5) or a quoted heading (workflow.md
-     "Script invocation"); and four dead strings are banned — the retired `uipath-rpa-workflows`
-     slug, the dead work-unit dir `.wi/goals` (the unit is a feature; the dir is `.wi/features` —
+     "Script invocation"); and four dead strings are banned: the retired `uipath-rpa-workflows`
+     slug, the dead work-unit dir `.wi/goals` (the unit is a feature; the dir is `.wi/features`;
      banned unconditionally: #48 dropped the migration, an old-format repo is simply unrecognized),
      `python3` launching a bundled `${CLAUDE_PLUGIN_ROOT}` script (the broken Windows Store stub;
      prose `python3`/`py -3` fallback notes are not flagged, only actual invocations), and the retired
@@ -92,7 +92,7 @@ try:
     if len({v_plugin, v_codex, v_market}) != 1:
         errors.append(
             f"manifest version mismatch: .claude-plugin/plugin.json={v_plugin} "
-            f"marketplace.json(wi)={v_market} .codex-plugin/plugin.json={v_codex} — bump all three together"
+            f"marketplace.json(wi)={v_market} .codex-plugin/plugin.json={v_codex} - bump all three together"
         )
 except Exception:
     pass  # invalid JSON already reported above
@@ -155,7 +155,7 @@ for s in ("skills/dev/SKILL.md", "skills/research/SKILL.md"):
         errors.append(f"{s}: missing Copilot Autopilot handoff branch")
 
 # 5. OKF conformance: every concept doc has parseable frontmatter + non-empty `type` --
-RESERVED = {"index.md", "log.md"}  # OKF reserved filenames — exempt from the `type` rule
+RESERVED = {"index.md", "log.md"}  # OKF reserved filenames: exempt from the `type` rule
 concept_md = (
     list(ROOT.glob("skills/**/*.md"))
     + list(ROOT.glob("agents/*.md"))
@@ -172,36 +172,36 @@ for f in sorted(set(concept_md)):
     rel = f.relative_to(ROOT)
     txt = f.read_text(encoding="utf-8")
     # Truncation guards: a concept doc cut off by an interrupted write ends mid-content. Two cheap
-    # signatures catch it — no trailing newline, and an odd number of ``` fences (a block left open or a
+    # signatures catch it: no trailing newline, and an odd number of ``` fences (a block left open or a
     # stray close). validate.py is the only gate, so these prevent shipping a half-written doc.
     if txt and not txt.endswith("\n"):
         errors.append(f"{rel}: no trailing newline (truncated-write signature)")
     if sum(1 for ln in txt.splitlines() if ln.startswith("```")) % 2:
-        errors.append(f"{rel}: unbalanced code fences (odd ``` count — truncated or stray fence)")
+        errors.append(f"{rel}: unbalanced code fences (odd ``` count - truncated or stray fence)")
     if not txt.startswith("---"):
-        errors.append(f"{rel}: OKF — no frontmatter (needs a non-empty 'type')")
+        errors.append(f"{rel}: OKF - no frontmatter (needs a non-empty 'type')")
         continue
     parts = txt.split("---", 2)
     if len(parts) < 3:
-        errors.append(f"{rel}: OKF — unterminated frontmatter")
+        errors.append(f"{rel}: OKF - unterminated frontmatter")
         continue
     if HAVE_YAML:
         try:
             d = yaml.safe_load(parts[1])
         except Exception as e:
-            errors.append(f"{rel}: OKF — frontmatter YAML error: {e}")
+            errors.append(f"{rel}: OKF - frontmatter YAML error: {e}")
             continue
         if not isinstance(d, dict) or not d.get("type"):
-            errors.append(f"{rel}: OKF — missing non-empty 'type'")
+            errors.append(f"{rel}: OKF - missing non-empty 'type'")
     elif "type:" not in parts[1]:
-        errors.append(f"{rel}: OKF — missing 'type'")
+        errors.append(f"{rel}: OKF - missing 'type'")
 
 # 6. Embedded generated-.wi/-file templates carry OKF `type` ---------------
-# The generated .wi/ files live in user repos and never reach this script — but the *templates* that emit
+# The generated .wi/ files live in user repos and never reach this script, but the *templates* that emit
 # them are ```markdown blocks inside the skills/agents that write them. Guard those: every non-reserved
 # generated-file template must open with frontmatter carrying a non-empty `type`, so a generated file can't
 # ship type-less (the bug class: a bare `# Heading` template with no frontmatter, or frontmatter that
-# forgot `type`). Reserved listings (index.md/log.md) are exempt — detected by the block's heading or the
+# forgot `type`). Reserved listings (index.md/log.md) are exempt, detected by the block's heading or the
 # two prose lines just above it naming `index.md`/`log.md`. Console/shell examples use a non-`markdown`
 # fence and are skipped.
 fence_rx = re.compile(r"^([ \t]*)```([A-Za-z]*)[ \t]*$")
@@ -235,33 +235,33 @@ for f in tmpl_files:
             i = nxt  # not a whole-file template (a prose/table snippet)
             continue
         if reserved_rx.search("".join(lines[max(0, i - 2):i]) + first):
-            i = nxt  # reserved index.md / log.md listing — no frontmatter expected
+            i = nxt  # reserved index.md / log.md listing: no frontmatter expected
             continue
         tmpl_checked += 1
         if not body.lstrip().startswith("---"):
-            errors.append(f"{rel}: OKF template (line {open_ln}) — generated-file block has no frontmatter (needs a non-empty 'type')")
+            errors.append(f"{rel}: OKF template (line {open_ln}) - generated-file block has no frontmatter (needs a non-empty 'type')")
             i = nxt
             continue
         tparts = body.lstrip().split("---", 2)
         if len(tparts) < 3:
-            errors.append(f"{rel}: OKF template (line {open_ln}) — unterminated frontmatter")
+            errors.append(f"{rel}: OKF template (line {open_ln}) - unterminated frontmatter")
             i = nxt
             continue
         if HAVE_YAML:
             try:
                 td = yaml.safe_load(tparts[1])
             except Exception as e:
-                errors.append(f"{rel}: OKF template (line {open_ln}) — frontmatter YAML error: {e}")
+                errors.append(f"{rel}: OKF template (line {open_ln}) - frontmatter YAML error: {e}")
                 i = nxt
                 continue
             if not isinstance(td, dict) or not td.get("type"):
-                errors.append(f"{rel}: OKF template (line {open_ln}) — missing non-empty 'type'")
+                errors.append(f"{rel}: OKF template (line {open_ln}) - missing non-empty 'type'")
         elif "type:" not in tparts[1]:
-            errors.append(f"{rel}: OKF template (line {open_ln}) — missing 'type'")
+            errors.append(f"{rel}: OKF template (line {open_ln}) - missing 'type'")
         i = nxt
 
 # 7. Mechanical lints: description hygiene + dead strings ------------------
-# Scope is deliberately skills/ · agents/ · references/ · .claude-plugin/ — never docs/ or tests/ (generated
+# Scope is deliberately skills/ · agents/ · references/ · .claude-plugin/; never docs/ or tests/ (generated
 # plan/spec archives and test fixtures legitimately hold strings we ban in shipped text).
 def _fm_desc(txt):
     """Return the frontmatter `description` string, or None if absent/unparseable (or PyYAML missing)."""
@@ -294,13 +294,13 @@ desc_files = (
 for f in desc_files:
     desc = _fm_desc(f.read_text(encoding="utf-8"))
     if desc is not None and desc.rstrip().endswith(("..", "…")):
-        errors.append(f"{f.relative_to(ROOT)}: description ends mid-thought (trailing '..'/'…') — write a real one-line summary")
+        errors.append(f"{f.relative_to(ROOT)}: description ends mid-thought (trailing '..'/'…') - write a real one-line summary")
 
 # 7c. Dead strings: a retired external slug, the dead `.wi/goals` dir, and python3-launched
 #     bundled scripts (broken on Windows).
 DEAD_SLUG = re.compile(r"uipath-rpa-workflows")
 DEAD_GOALS_DIR = re.compile(r"\.wi/goals")  # goal->feature rename (M1): the work-unit dir is .wi/features
-PY3_INVOKE = re.compile(r"python3[ \t]+\$\{CLAUDE_PLUGIN_ROOT\}")  # an invocation — bare prose `python3` won't match
+PY3_INVOKE = re.compile(r"python3[ \t]+\$\{CLAUDE_PLUGIN_ROOT\}")  # an invocation: bare prose `python3` won't match
 SECTION_SIGN = re.compile("§")  # the section-sign symbol is banned in shipped text (#49): cite name:N locators or quoted headings
 DEAD_SDD_S13 = re.compile(r"(?i)\b(?:sdd:13|section 13)\b")  # the SDD acceptance-criteria anchor is semantic (sdd:10 in the base ToC)
 lint_scope = (
@@ -318,17 +318,17 @@ for f in lint_scope:
     if DEAD_SLUG.search(txt):
         errors.append(f"{rel}: dead skill slug 'uipath-rpa-workflows' (the UiPath authoring skill is 'uipath-rpa')")
     if DEAD_GOALS_DIR.search(txt):
-        errors.append(f"{rel}: dead path '.wi/goals' — the work unit is a feature; use '.wi/features' (goal->feature rename)")
+        errors.append(f"{rel}: dead path '.wi/goals' - the work unit is a feature; use '.wi/features' (goal->feature rename)")
     if PY3_INVOKE.search(txt):
-        errors.append(f"{rel}: 'python3 ${{CLAUDE_PLUGIN_ROOT}}' invocation — use 'python' (python3 is the broken Store stub on Windows)")
+        errors.append(f"{rel}: 'python3 ${{CLAUDE_PLUGIN_ROOT}}' invocation - use 'python' (python3 is the broken Store stub on Windows)")
     if SECTION_SIGN.search(txt):
-        errors.append(f"{rel}: section-sign (U+00A7) — cite a name:N locator (ship:8, sdd:7.1.3) or a quoted heading instead")
+        errors.append(f"{rel}: section-sign (U+00A7) - cite a name:N locator (ship:8, sdd:7.1.3) or a quoted heading instead")
     if DEAD_SDD_S13.search(txt):
-        errors.append(f"{rel}: dead anchor 'sdd:13' — the SDD's acceptance-criteria section is sdd:10 in the base ToC")
+        errors.append(f"{rel}: dead anchor 'sdd:13' - the SDD's acceptance-criteria section is sdd:10 in the base ToC")
 
 # Report -------------------------------------------------------------------
 note = "" if HAVE_YAML else "  [PyYAML absent → YAML parse skipped; `pip install pyyaml` for the full check]"
-print(f"validate.py — {len(manifests)} manifest(s), {len(fm_files)} frontmatter file(s), "
+print(f"validate.py - {len(manifests)} manifest(s), {len(fm_files)} frontmatter file(s), "
       f"{okf_checked} OKF concept doc(s), {tmpl_checked} OKF template(s), "
       f"{len(lint_scope)} mechanical-lint file(s){note}")
 if errors:

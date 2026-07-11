@@ -8,7 +8,7 @@ Catches the real parse-failure classes WITHOUT needing a browser:
   - node IDs that collide with a mermaid reserved word (graph, end, ...)  <- the common one
   - node labels with special chars (: / -> + ( )) that aren't quoted
 
-If `mmdc` (mermaid-cli) is on PATH, it ALSO does a true render — that is authoritative.
+If `mmdc` (mermaid-cli) is on PATH, it ALSO does a true render; that is authoritative.
 Otherwise the static checks above are the gate.
 
 Usage:  python3 check_mermaid.py <file.md> [more.md ...]
@@ -82,7 +82,7 @@ def _check_block(src):
     if bad:
         errs.append(
             "node ID(s) are mermaid reserved words and WILL NOT PARSE: "
-            f"{bad} — rename the id (e.g. graph -> gbuild) and keep the real "
+            f"{bad} - rename the id (e.g. graph -> gbuild) and keep the real "
             "name in the quoted label"
         )
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-token_report.py — sum the main-thread (orchestrator) token usage from a Claude Code
+token_report.py: sum the main-thread (orchestrator) token usage from a Claude Code
 session transcript (JSONL), and optionally write it into a feature's tokens.md.
 
   token_report.py [TRANSCRIPT.jsonl]      # print the orchestrator report (auto-detects transcript)
@@ -13,7 +13,7 @@ session transcript (JSONL), and optionally write it into a feature's tokens.md.
 The model can't read its own running total mid-turn, but the harness records a `usage`
 object on every assistant message in the session transcript. --write turns the parsed
 result into the ledger directly, so there is no manual stdout-copy step to skip. On a
-parse failure it writes `Orchestrator: unavailable for this run` — never a substitute,
+parse failure it writes `Orchestrator: unavailable for this run`; never a substitute,
 estimate, or fabricated figure. It does NOT create the file (run check_tokens.py --init
 first); --write exits non-zero only if the file is absent or unwritable.
 
@@ -25,7 +25,7 @@ between resumed sessions. Anything unrecoverable is written `unavailable`.
 
 Subagent split (Claude Code): each dispatch's transcript lives at
 <transcript-dir>/<session-id>/subagents/agent-<id>.jsonl with exact per-turn `usage`,
-`message.model`, and OS timestamps — parsed here into a per-agent split, duration, and
+`message.model`, and OS timestamps, parsed here into a per-agent split, duration, and
 cost estimate (exact tokens × published list prices; clearly labeled an estimate).
 
 Stdlib only. Canonical prose for the ledger discipline ("the ledger rule"):
@@ -58,7 +58,7 @@ PRICES = {
     "claude-haiku-4-5": (1, 5),
 }
 CACHE_READ_X = 0.1    # cache-read tokens bill at ~0.1x the input price
-CACHE_WRITE_X = 1.25  # cache-write at 1.25x input (5-minute TTL — Claude Code's default)
+CACHE_WRITE_X = 1.25  # cache-write at 1.25x input (5-minute TTL, Claude Code's default)
 
 STAMP_RE = re.compile(
     r"^\s*-\s*(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:?\d{2}))\b")
@@ -264,7 +264,7 @@ def subagent_section(agents, ledger_rows, orch_cost):
             _ledger.format_duration(a["duration"]), cost_cell))
     lines.append("")
     if ledger_rows and len(agents) < ledger_rows:
-        lines.append("Split covers {} of {} ledger rows — a resumed run's earlier sessions "
+        lines.append("Split covers {} of {} ledger rows; a resumed run's earlier sessions "
                      "are not in this transcript's subagents dir.".format(len(agents), ledger_rows))
         lines.append("")
     bits = ["subagents ${:,.2f}".format(sub_cost)]
@@ -295,20 +295,20 @@ def orchestrator_body(path, tot, turns, model=None):
                      .format(PRICES_AS_OF, cost))
     lines.append(
         "- NOTE: cache-read is the same context re-read each turn (the bulk of a long run); "
-        "counts run up to ship time — the last few messages aren't in the transcript yet.")
+        "counts run up to ship time: the last few messages aren't in the transcript yet.")
     return "\n".join(lines)
 
 
 def run_print(path):
     if not path or not Path(path).is_file():
-        print("token_report: no transcript found — orchestrator total unavailable", file=sys.stderr)
+        print("token_report: no transcript found - orchestrator total unavailable", file=sys.stderr)
         return 1
     parsed = parse_transcript(path)
     if parsed is None:
-        print("token_report: no usage records in transcript — orchestrator total unavailable", file=sys.stderr)
+        print("token_report: no usage records in transcript - orchestrator total unavailable", file=sys.stderr)
         return 1
     tot, turns, model = parsed
-    print("## Orchestrator (main thread) — token consumption from session transcript")
+    print("## Orchestrator (main thread) - token consumption from session transcript")
     print(orchestrator_body(path, tot, turns, model))
     return 0
 
@@ -316,12 +316,12 @@ def run_print(path):
 def run_write(token_path, transcript, progress=None):
     p = Path(token_path)
     if not p.is_file():
-        print("token_report: {} does not exist — run check_tokens.py --init first".format(token_path),
+        print("token_report: {} does not exist - run check_tokens.py --init first".format(token_path),
               file=sys.stderr)
         return 1
     text = p.read_text(encoding="utf-8", errors="replace")
 
-    # Ledger-table figures come from the pre-tail text — the table region is untouched
+    # Ledger-table figures come from the pre-tail text: the table region is untouched
     # by the tail replacement, and this can never re-count the split table's rows.
     tokens_sum = _ledger.sum_data_rows(text)
     compute, n_rows = _ledger.sum_row_durations(text)

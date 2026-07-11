@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: "Maestro flow architecture & the solution flow diagram"
-description: "The Maestro framework: a UiPath Maestro flow (.flow) is an orchestration of nodes — connector, approval, script, subflow, agent, ixp — not a REFramework state machine. Use when Framework = maestro."
+description: "The Maestro framework: a UiPath Maestro flow (.flow) is an orchestration of nodes (connector, approval, script, subflow, agent, ixp), not a REFramework state machine. Use when Framework = maestro."
 timestamp: 2026-06-16
 tags: [rpa, maestro, reference]
 ---
@@ -10,23 +10,23 @@ tags: [rpa, maestro, reference]
 
 Used when **`Framework: maestro`** (the REFramework path is `refr-architecture.md`). A UiPath **Maestro flow**
 (`.flow`) is an **orchestration flow of nodes**, not a queue-based state machine: there is no Dispatcher/
-Performer, no `Config.xlsx`, no queue transaction loop. A flow wires a **trigger** through **nodes** —
-**connector** (Integration Service), **approval** (human-in-the-loop), **script**, **subflow**, **agent**
-(a UiPath Agent call), **ixp** (document understanding) — to an end. Build/validate/eval are delegated to
+Performer, no `Config.xlsx`, no queue transaction loop. A flow wires a **trigger** through **nodes**
+(**connector** (Integration Service), **approval** (human-in-the-loop), **script**, **subflow**, **agent**
+(a UiPath Agent call), **ixp** (document understanding)) to an end. Build/validate/eval are delegated to
 the `uipath-maestro-flow` skill (`uip maestro flow`).
 
 There are **two** architecture artifacts, mapping to the SDD:
 
-- **`architecture.md` (run/solution level) = the flow diagram (sdd:2):** the whole solution — every flow,
+- **`architecture.md` (run/solution level) = the flow diagram (sdd:2):** the whole solution: every flow,
   its trigger, the systems/connectors/agents it touches, and any subflows.
 - **per-process flow diagram (sdd:7.1.3):** one process's flow, the zoom-in (lives in that process's
   `tobe.md` / sdd:7.1.3).
 
 Both are mermaid and **must be validated** with
-`${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py` (safe node IDs — never `graph`/`end`/etc.;
+`${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py` (safe node IDs: never `graph`/`end`/etc.;
 quote labels containing `:` `/` `(`).
 
-## Flow diagram — whole solution
+## Flow diagram: whole solution
 
 Show the trigger, each node in order, the systems/connectors/agents touched, approvals, and any subflows.
 Example:
@@ -62,20 +62,20 @@ project.json            # Maestro flow project descriptor
 ```
 
 No `Framework/`, no `Main.xaml` state machine, no `Data/Config.xlsx`. Configuration/secrets are connections
-and Orchestrator assets referenced by the connector/agent nodes — never hardcoded.
+and Orchestrator assets referenced by the connector/agent nodes, never hardcoded.
 
 ## The Maestro build DAG (drives parallelism)
 
 `tasks.md` orders the build:
 
-1. **Shared components** (Wave 1) — anything in `.wi/components.md` the flows depend on, first.
-2. **Per-flow scaffolds** — each `.flow` (independent flows in parallel).
-3. **Subflows** — independent subflows within a flow in parallel; the main `.flow` serializes its wiring.
-4. **Wire-up** — connections / triggers / agent registrations via `uipath-platform`.
+1. **Shared components** (Wave 1): anything in `.wi/components.md` the flows depend on, first.
+2. **Per-flow scaffolds**: each `.flow` (independent flows in parallel).
+3. **Subflows**: independent subflows within a flow in parallel; the main `.flow` serializes its wiring.
+4. **Wire-up**: connections / triggers / agent registrations via `uipath-platform`.
 
 ## When Maestro fits
 
-Maestro suits orchestration-shaped work — human approvals/HITL, Integration Service connectors, UiPath
+Maestro suits orchestration-shaped work: human approvals/HITL, Integration Service connectors, UiPath
 Agent calls, long-running/wait-heavy steps, document understanding (ixp), branching across systems.
 High-volume queue-based batch transaction processing stays **REFramework** (`refr-architecture.md`). The
 brainstorm proposes the framework from this shape and the gate confirms it.

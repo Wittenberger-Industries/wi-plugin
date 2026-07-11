@@ -13,7 +13,7 @@ The mechanics behind the build phase's two levers: isolation (worktrees) and del
 ## Git worktrees
 
 A worktree is a second working directory backed by the same repo, checked out to its own branch. It lets
-a feature's changes live entirely apart from the main checkout — nothing half-built leaks into the user's
+a feature's changes live entirely apart from the main checkout: nothing half-built leaks into the user's
 working tree, and two features can build at once.
 
 ### Create (default at build start)
@@ -31,7 +31,7 @@ Then work happens in `../<repo>-wi-<slug>` on branch `wi/<slug>`. Record both in
 ```
 
 The feature folder arrives with the checkout: research commits the dossier on main at the design gate
-(`docs(<slug>): feature dossier (design gate)`), and the worktree branches from main — `.wi/features/<slug>/`
+(`docs(<slug>): feature dossier (design gate)`), and the worktree branches from main; `.wi/features/<slug>/`
 is in place from the first command. During build the worktree's copy is canonical, and main's copy catches
 up when the branch merges. Resume-safe: a dossier already present in the worktree needs nothing.
 
@@ -52,7 +52,7 @@ Never `git worktree remove --force` a tree with uncommitted work without telling
   adding a worktree. Everything else is identical.
 - **Existing worktree for this feature (resume):** reuse it; don't create a second.
 - **Restricted filesystems** (network/Windows mounts that forbid rmdir): put the worktree on a local
-  path instead — `git worktree add` accepts any absolute path. Symptoms to expect otherwise: pytest
+  path instead: `git worktree add` accepts any absolute path. Symptoms to expect otherwise: pytest
   tmpdir crashes and `git worktree remove` failing. scan's verify-the-commands step is the early warning.
 - **Sandboxed / no-branch environments (e.g. Codex sandbox):** if `git rev-parse --git-dir` differs from
   `git rev-parse --git-common-dir` (already in a linked worktree) or `git branch --show-current` is empty
@@ -60,22 +60,22 @@ Never `git worktree remove --force` a tree with uncommitted work without telling
   ship hand the user a suggested branch name, commit message, and PR body to apply via the platform's
   native controls. Note "Worktree: - (sandboxed)" in progress.md.
 
-If `superpowers:using-git-worktrees` is installed, prefer it — it handles edge cases (submodules, dirty
+If `superpowers:using-git-worktrees` is installed, prefer it; it handles edge cases (submodules, dirty
 trees) well. This file is the fallback.
 
 ## Subagent dispatch
 
 Each task runs in a **fresh** subagent so context doesn't accumulate across a long build. Use the
-`wi-task-runner` agent (`agents/wi-task-runner.md`). Scope its prompt tightly — give it the task and its
+`wi-task-runner` agent (`agents/wi-task-runner.md`). Scope its prompt tightly: give it the task and its
 immediate context, not the whole project.
 
 The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` /
 `copilot-tools.md`): Claude uses the Agent/Task tool, Copilot uses the `task` tool and `/fleet` for waves,
 Codex uses `spawn_agent` bounded by `[agents] max_threads`. The prompt **content** is inline on every
-platform — the skeleton below gives each runner its task block + context in full. The dispatch *target*
-differs: on Claude Code, dispatch the **registered `wi-task-runner` agent** (build:2's instruction — the
+platform: the skeleton below gives each runner its task block + context in full. The dispatch *target*
+differs: on Claude Code, dispatch the **registered `wi-task-runner` agent** (build:2's instruction: the
 plugin registers it, and tiered model routing rides the dispatch); only on platforms without reliable
-named-agent registration (Codex — named-role dispatch is unreliable across builds there) pass the prompt
+named-agent registration (Codex: named-role dispatch is unreliable across builds there) pass the prompt
 to a generic worker carrying the `agents/wi-task-runner.md` contract inline.
 
 ### Task-runner prompt skeleton
@@ -84,14 +84,14 @@ to a generic worker carrying the `agents/wi-task-runner.md` contract inline.
 You are implementing ONE task from the plan. Stay strictly within its scope.
 
 Environment: file access = <exact tools/paths the runner must use>; do NOT git commit/checkout/reset/
-stash and do NOT write progress.md — the orchestrator commits and ticks. Test execution this wave:
-<allowed — sole test-runner | authored-not-run — the orchestrator verifies serially>.
+stash and do NOT write progress.md; the orchestrator commits and ticks. Test execution this wave:
+<allowed (sole test-runner) | authored-not-run (the orchestrator verifies serially)>.
 
 Repo / worktree: <path>   Branch: <wi/slug>
 Constitution (obey these rules): <paste the relevant lines from .wi/constitution.md>
 Repo commands: test-one = <cmd>, lint = <cmd>, typecheck = <cmd>   (from .wi/repo-map.md)
 
-TASK <n> — <title>   [<tag>]
+TASK <n>: <title>   [<tag>]
 - Files: <paths>
 - Do: <the change>
 - Verify: <exact command that must pass>
@@ -106,33 +106,33 @@ Report back: files changed, the Verify command + its result, and anything that s
 the plan needs amending. Keep the report under ~15 lines. Do not touch files outside this task.
 ```
 
-The subagent returns that short report; you tick `progress.md` (you are its single writer during build —
+The subagent returns that short report; you tick `progress.md` (you are its single writer during build:
 runners report, they never write it), commit, and move on. You never pull the
-subagent's full transcript into your context — the report is enough.
+subagent's full transcript into your context; the report is enough.
 
 ### Parallel dispatch (the default)
 
 build runs in waves: every task whose dependencies are met and whose `Files` are disjoint from the other
 ready tasks is dispatched concurrently, in the same turn. Reports are reconciled as they return; the
-orchestrator is the only committer, so parallel edits in one worktree stay safe — runners touch disjoint
+orchestrator is the only committer, so parallel edits in one worktree stay safe: runners touch disjoint
 files, commits land serially. The git landmines that bind runners sharing a worktree (the no-stash /
 no-clean / no-reset list) are pinned once in `agents/wi-task-runner.md`, echoed by the prompt skeleton
 above. `superpowers:dispatching-parallel-agents` codifies the pattern if installed.
 
 The escalation ladder when parallel work would collide:
 
-1. **Disjoint files, shared feature worktree** (default) — cheapest: no extra environment setup, full speed
+1. **Disjoint files, shared feature worktree** (default); cheapest: no extra environment setup, full speed
    for almost every wave.
-2. **Per-task ephemeral worktree** — when two ready tasks genuinely must touch the same file, or a task's
+2. **Per-task ephemeral worktree**: when two ready tasks genuinely must touch the same file, or a task's
    tests interfere with siblings (fixed port, shared db file, global fixture):
    `git worktree add -b wi/<slug>-t<N> ../<repo>-wi-<slug>-t<N> wi/<slug>`, run the task there, merge back
-   into `wi/<slug>` in dependency order, then remove the worktree. Mind the cost — a fresh worktree often
+   into `wi/<slug>` in dependency order, then remove the worktree. Mind the cost: a fresh worktree often
    needs its own env (`uv sync` / `npm install`), so escalate when the conflict is real, not routinely.
-3. **Serialize** — last resort, when the DAG is a chain or merge-back conflicts would outweigh the win.
+3. **Serialize**: last resort, when the DAG is a chain or merge-back conflicts would outweigh the win.
 
 Test concurrency: separate processes running separate unit tests are usually fine. If `repo-map.md` flags
 the suite as **not parallel-safe** (shared on-disk DB, fixed ports, order-dependent tests), keep the
-*implementation* parallel but run the wave's `Verify` commands serially as reports return — or give the
+*implementation* parallel but run the wave's `Verify` commands serially as reports return, or give the
 colliding tasks their own worktrees. Exception: a wave whose ONLY test-executing task runs alone keeps
 full TDD execution in-runner.
 
@@ -141,4 +141,4 @@ full TDD execution in-runner.
 - One task → one commit. Subject: `<type>: <task title>` (`feat`, `fix`, `refactor`, `test`, `docs`).
 - Keep generated files, large blobs, and secrets out. If `scan` found a `.gitignore`, trust it; if a new
   artifact type appears, add it.
-- Don't squash yet — small commits make the ship-phase review legible. Squashing (if wanted) happens at PR.
+- Don't squash yet: small commits make the ship-phase review legible. Squashing (if wanted) happens at PR.

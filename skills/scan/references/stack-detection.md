@@ -32,28 +32,28 @@ Run something like `git ls-files | head -200` plus a look at the root. Map these
 | `.pre-commit-config.yaml` | pre-commit hooks | the hooks are the enforced lint/format set |
 | `Dockerfile` / `compose.yml` | containerized run | note how the app is started |
 
-**The Makefile / CI steps win.** If `pyproject.toml` says ruff but CI runs `make lint`, record `make lint`
-— that's what actually gates merges.
+**The Makefile / CI steps win.** If `pyproject.toml` says ruff but CI runs `make lint`, record `make lint`;
+that's what actually gates merges.
 
 ## Python specifics
 
 - **Test:** `pytest` (all) and `pytest <file>::<TestClass>::<test_name>` (one). With uv: `uv run pytest`.
 - **Lint/format:** `ruff check .` / `ruff format .` (modern); else flake8/black/isort as configured.
 - **Types:** `mypy <pkg>` or `pyright`, if configured in `pyproject.toml`.
-- **Layout:** `src/<pkg>/` (src layout) vs flat `<pkg>/`. Note which — it affects imports and test paths.
+- **Layout:** `src/<pkg>/` (src layout) vs flat `<pkg>/`. Note which; it affects imports and test paths.
 - **Env:** virtualenv? uv-managed? Record how to get a working interpreter.
 
 ## JS / TS specifics
 
 - The `scripts` block in `package.json` is the source of truth: `test`, `lint`, `typecheck`, `build`,
   `dev`. Record them verbatim with the detected runner (`pnpm test`, `npm run test`, ...).
-- Test runner is usually vitest or jest — note how to run a single test file.
+- Test runner is usually vitest or jest; note how to run a single test file.
 - Frontend framework (React/Next/Vue/Svelte) → flag for design-skill routing.
 
 ## Other stacks
 
 Go, Rust, Java/Gradle, Ruby, etc.: find the build tool's config, record its standard test/lint/build
-commands, and note anything non-standard. When genuinely unsure, write `UNKNOWN — ask` rather than guess.
+commands, and note anything non-standard. When genuinely unsure, write `UNKNOWN - ask` rather than guess.
 
 ## Verify before you record
 

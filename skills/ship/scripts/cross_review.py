@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Cross-provider diff review — an independent layer beside wi-code-checker's result mode.
+"""Cross-provider diff review: an independent layer beside wi-code-checker's result mode.
 
-Reads the target project's `.wi/models.md` (the tiered model routing config), and — when a second
-provider is configured — sends the diff + spec context to that model, possibly a different
+Reads the target project's `.wi/models.md` (the tiered model routing config), and, when a second
+provider is configured, sends the diff + spec context to that model, possibly a different
 provider/architecture than the session (e.g. GPT via OPENAI_API_KEY). A layer on top of
 wi-code-checker's result-mode pass, never a replacement for it. Writes the findings to a file.
 Stdlib only; no third-party deps.
@@ -15,7 +15,7 @@ Exit codes:
     0  review ran, verdict `## REVIEW PASSED`
     1  review ran, verdict `## ISSUES FOUND`
     2  config/usage error (bad file, cross-provider not configured, API failure)
-    3  no API key in the configured env var — the cross-provider layer is
+    3  no API key in the configured env var: the cross-provider layer is
        skipped; the wi-code-checker result pass runs regardless
 """
 
@@ -41,7 +41,7 @@ REVIEW_SYSTEM_PROMPT = (
     "against the provided spec/context with repo-level impact in mind: correctness, "
     "necessity (redundant or wasteful changes), alignment with the stated intent, "
     "and regressions it could cause elsewhere in the repo. Return markdown findings, "
-    "each with a severity — BLOCKER (would break the feature or the repo), WARNING "
+    "each with a severity: BLOCKER (would break the feature or the repo), WARNING "
     "(real risk needing a decision), or INFO. Cite file:line or hunk for every "
     "finding. End your reply with exactly one verdict marker on its own last line: "
     "`## REVIEW PASSED` if there are no BLOCKERs, else `## ISSUES FOUND`."
@@ -169,7 +169,7 @@ def run_review(cfg, diff_text, context_blobs, out_path):
     api_key = os.environ.get(provider["api_key_env"], "")
     if not api_key:
         print(
-            f"cross_review: no API key in ${provider['api_key_env']} — "
+            f"cross_review: no API key in ${provider['api_key_env']} - "
             "cross-provider layer skipped; the wi-code-checker result pass still runs",
             file=sys.stderr,
         )
@@ -210,7 +210,7 @@ def main(argv=None):
         return 2
     if not cross_provider_configured(cfg):
         print(
-            "cross_review: cross-provider not configured — nothing to run",
+            "cross_review: cross-provider not configured - nothing to run",
             file=sys.stderr,
         )
         return 2

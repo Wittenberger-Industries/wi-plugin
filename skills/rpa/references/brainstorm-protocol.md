@@ -1,111 +1,111 @@
 ---
 type: Reference
-title: "Brainstorm — refine the TO-BE (the one conversation)"
+title: "Brainstorm: refine the TO-BE (the one conversation)"
 description: "This is the interactive phase and the value of `wi:rpa`: a PDD is usually AS-IS-heavy and gap-ridden, so turn it into a buildable TO-BE."
 timestamp: 2026-06-09
 tags: [rpa, reference]
 ---
 
-# Brainstorm — refine the TO-BE (the one conversation)
+# Brainstorm: refine the TO-BE (the one conversation)
 
 This is the interactive phase and the value of `wi:rpa`: a PDD is usually AS-IS-heavy and gap-ridden, so turn
-it into a buildable TO-BE. **Refine the PDD's own ToBe — but do NOT trust it** (see protocol:0). Assume gaps *and
+it into a buildable TO-BE. **Refine the PDD's own ToBe, but do NOT trust it** (see protocol:0). Assume gaps *and
 errors* exist even when the PDD looks complete.
 
-**This is a real conversation with the USER — not a monologue, and `--auto` does not change that.** The
-flag collapses the stops *after* brainstorm (handoff confirmation, design gate) — the user who typed the
+**This is a real conversation with the USER, not a monologue, and `--auto` does not change that.** The
+flag collapses the stops *after* brainstorm (handoff confirmation, design gate); the user who typed the
 command is present for this conversation, so **put the open questions to them and WAIT for their answers**
 before writing the decision artifacts. Asking yourself a question and answering it (`… → my answer`) and
-logging it as an assumption is the **headless fallback, NOT a `--auto` behaviour** — it applies only when
+logging it as an assumption is the **headless fallback, NOT a `--auto` behaviour**: it applies only when
 no user can answer at all (an unattended dispatch: CI, a subagent, a scheduled run). Self-answering while
 a user is available, then asking for one bulk "approve" at the gate, **defeats the brainstorm**. Batch
 related questions so it's a handful of exchanges, not dozens, but the answers come from the user.
 
-**Step 0 — delegation check (mandatory).** If `superpowers:brainstorming` is installed, drive the dialogue with
-it; else run this protocol directly. **Either engine, the dialogue is with the USER** — if the brainstorming
+**Step 0: delegation check (mandatory).** If `superpowers:brainstorming` is installed, drive the dialogue with
+it; else run this protocol directly. **Either engine, the dialogue is with the USER**: if the brainstorming
 skill starts self-answering, stop and put the questions to the user yourself. A **headless run** still
 invokes the engine when present (it structures the questions; the answers are then self-resolved under the
-headless rule above and the stamp records both) — if the engine cannot run without a user, run this
-protocol directly and stamp `via wi fallback, self-answered (headless)`. **Stamp the mode in `progress.md`**
-— engine **and** interactivity: `brainstorm via superpowers:brainstorming | via wi fallback`, suffixed
+headless rule above and the stamp records both); if the engine cannot run without a user, run this
+protocol directly and stamp `via wi fallback, self-answered (headless)`. **Stamp the mode in `progress.md`**:
+engine **and** interactivity: `brainstorm via superpowers:brainstorming | via wi fallback`, suffixed
 `, dialogue` | `, self-answered (headless)` (e.g. `brainstorm via wi fallback, self-answered (headless)`).
 
-**Must-ask before the design gate (never skipped in dialogue — only a headless run self-resolves each as a
+**Must-ask before the design gate (never skipped in dialogue; only a headless run self-resolves each as a
 logged assumption, and says so):**
-1. **Scope** — confirm in/out (protocol:1).
-2. **Framework** — **REFramework or Maestro flow?** Propose from the process shape: **Maestro** for
+1. **Scope**: confirm in/out (protocol:1).
+2. **Framework**: **REFramework or Maestro flow?** Propose from the process shape: **Maestro** for
    orchestration-shaped work (approvals/HITL, Integration Service connectors, UiPath Agent calls,
    long-running/wait-heavy, ixp, branching across systems); **REFramework** for high-volume queue-based
    batch transactions (dispatcher/performer). State a one-line rationale; record in `progress.md`
    (`Framework:`). A headless run records the shape-heuristic proposal (or the constitution default,
    `reframework`, when the shape is ambiguous) as an assumption.
-3. **ToBe correctness** — the PDD's ToBe + diagram are a *draft*; confirm what's wrong or missing (protocol:0, protocol:2).
+3. **ToBe correctness**: the PDD's ToBe + diagram are a *draft*; confirm what's wrong or missing (protocol:0, protocol:2).
 4. **Dispatcher/Performer split + the queue handoff** (protocol:5).
 5. **Naming conventions** and **Orchestrator env / variables** (protocol:6).
-6. **Email / notification approach — never defaulted.** *Only when the process sends email or
+6. **Email / notification approach, never defaulted.** *Only when the process sends email or
    notifications:* if the PDD/inputs name the method, use exactly that; otherwise put the options to the
-   user — **IMAP/SMTP, desktop Outlook activities, Microsoft 365, Exchange, or an Integration Service
-   connector** — and record the confirmed choice (an assumption row + the SDD). Unresolved at the gate = an
-   **open dependency `D`** (blocking, protocol:7). A headless run does **not** pick an email framework — this is the
+   user (**IMAP/SMTP, desktop Outlook activities, Microsoft 365, Exchange, or an Integration Service
+   connector**) and record the confirmed choice (an assumption row + the SDD). Unresolved at the gate = an
+   **open dependency `D`** (blocking, protocol:7). A headless run does **not** pick an email framework; this is the
    one must-ask it never self-resolves: it **mocks the send** (protocol:2 mock boundary) and records the open dep.
-7. **Every open dependency `D`** — resolve it now, or have the user *explicitly* defer it (protocol:7 + the gate).
-8. **Rename / rebrand / migration only** — run the **Runtime State Inventory** (protocol:6a): the old name almost
+7. **Every open dependency `D`**: resolve it now, or have the user *explicitly* defer it (protocol:7 + the gate).
+8. **Rename / rebrand / migration only**: run the **Runtime State Inventory** (protocol:6a): the old name almost
    always lives on in Orchestrator resources and in-flight queue items a repo grep can't see.
 
-## 0. Baseline — and challenge it
+## 0. Baseline, and challenge it
 
 Read `pdd.md`, `.wi/inputs.md`, `.wi/components.md`, `.wi/rpa-constitution.md`. **Extract the PDD's
 existing ToBe section as the *starting* `tobe.md`** (only
-*derive* one from the AS-IS when the PDD has none) — **but the PDD's ToBe and its To-Be diagram are a draft,
+*derive* one from the AS-IS when the PDD has none), **but the PDD's ToBe and its To-Be diagram are a draft,
 often wrong or incomplete, NOT ground truth.** Actively challenge them with the user: does every step match
-reality? what's **missing** (a whole step or process — e.g. a master-data generation/refresh the diagram
+reality? what's **missing** (a whole step or process, e.g. a master-data generation/refresh the diagram
 omits)? is the diagram **self-consistent**, and consistent with the written steps + the Enrichment Matrix?
-Surface every contradiction and gap to the user — don't silently adopt or "fix" it. "Refine, don't trust":
+Surface every contradiction and gap to the user; don't silently adopt or "fix" it. "Refine, don't trust":
 refining *means* correcting, which means questioning first.
 
 ## 1. Decompose into processes (1..N)
 
-A PDD may describe several processes. Identify each distinct end-to-end **business process** — its own
-trigger, its own business outcome — and list them as the **process inventory**. Each becomes a process unit
+A PDD may describe several processes. Identify each distinct end-to-end **business process** (its own
+trigger, its own business outcome) and list them as the **process inventory**. Each becomes a process unit
 with its own `tobe.md` + an sdd:7 block.
 
-**Don't over-decompose — separate three things that look alike:**
+**Don't over-decompose; separate three things that look alike:**
 - A **business process** (own trigger + outcome) → its own inventory row.
-- A **deployable unit** of one process — REFramework **Dispatcher + Performer** are two packages implementing
+- A **deployable unit** of one process: REFramework **Dispatcher + Performer** are two packages implementing
   *one* process, not two processes. List them as units *under* the process, not as separate rows.
 - An **out-of-scope or mocked** step (e.g. a "daily SAP→CSV refresh" the build won't really do) → record it as
   out-of-scope with its PDD citation, not as a process to build.
 
 Fix **scope** here too: list what's **in** vs **out**, each with the PDD section that says so (e.g. one invoice
-type in, another out). Note dependencies between in-scope processes (B consumes A's output) — that ordering
+type in, another out). Note dependencies between in-scope processes (B consumes A's output); that ordering
 feeds the build DAG.
 
-## 2. Refine each process's TO-BE — the findings pass
+## 2. Refine each process's TO-BE: the findings pass
 
 Walk the steps and surface, proposing a resolution for each (confirm with the user; a headless run
 records an assumption):
 
-- **PDD contradictions / wrong diagram** — where the written steps, the To-Be diagram, the Enrichment Matrix,
+- **PDD contradictions / wrong diagram**: where the written steps, the To-Be diagram, the Enrichment Matrix,
   and the data inputs **disagree**, flag it; the PDD's own ToBe is the *most likely* thing to be wrong. Don't
-  reconcile it silently — ask the user.
-- **Missing steps** — data used but never sourced; "send report" with no "generate"; no "mark
+  reconcile it silently; ask the user.
+- **Missing steps**: data used but never sourced; "send report" with no "generate"; no "mark
   complete"/audit step; an "if approved" with no else.
-- **Redundant / collapsible** — AS-IS UI navigation that disappears under an API ("open app → find screen
+- **Redundant / collapsible**: AS-IS UI navigation that disappears under an API ("open app → find screen
   → search" → one `GetRecord`). Collapse them.
-- **Decisions & branches** — make each condition explicit; give every branch a defined outcome.
-- **Triggers & I/O** — what starts it (file/email/schedule/queue), the inputs per unit, the outputs and
+- **Decisions & branches**: make each condition explicit; give every branch a defined outcome.
+- **Triggers & I/O**: what starts it (file/email/schedule/queue), the inputs per unit, the outputs and
   destination.
-- **Exceptions** — per step: business (expected reject → no retry, route/notify) vs system (timeout/app
+- **Exceptions**: per step: business (expected reject → no retry, route/notify) vs system (timeout/app
   down → retry per Config). PDDs rarely cover this; always probe.
-- **Mock boundary** — which systems/steps are **real** vs **mocked/stubbed** for this build? Unknown
+- **Mock boundary**: which systems/steps are **real** vs **mocked/stubbed** for this build? Unknown
   integrations (a not-yet-specified SAP query), out-of-scope transfers, or test-only endpoints get mocked
-  (a folder drop, a stub) — establish this explicitly so the build knows what to wire vs fake.
+  (a folder drop, a stub); establish this explicitly so the build knows what to wire vs fake.
 
-## 3. Clarify implementation per step — inline, no bias
+## 3. Clarify implementation per step: inline, no bias
 
 For each step whose implementation is genuinely open, ask once: **"UI activity, API, or connector?"** and
 record the answer **inline on that step** in `tobe.md`. The curated `references/connectors.md` only
-*informs* the question neutrally ("an Outlook connector exists if you'd prefer it over UI") — **UI is a
+*informs* the question neutrally ("an Outlook connector exists if you'd prefer it over UI"); **UI is a
 perfectly valid answer** when there's no API or the interaction is inherently UI. Do not frame UI as wrong
 and do not produce a separate "everything-must-be-API" table.
 
@@ -117,7 +117,7 @@ become new sub-workflows.
 
 ## 5. Per process: transaction + shape (REFramework)
 
-- **Interrogate the Dispatcher/Performer split WITH the user — don't inherit the PDD's step order as the unit
+- **Interrogate the Dispatcher/Performer split WITH the user; don't inherit the PDD's step order as the unit
   boundary.** Walk each step and decide *together* whether it's **collection** (Dispatcher: query / read /
   download / enqueue) or **processing** (Performer: per-transaction work), then nail the **handoff contract** =
   exactly what crosses the queue (the item schema below). The PDD lists steps linearly; that is *not*
@@ -130,13 +130,13 @@ become new sub-workflows.
   from, and how many per run?"*
 - **Queue items carry references + keys, not resolved data or files.** A transaction holds the document
   **reference** (Storage Bucket / shared-folder path), its **unique id**, and the **lookup keys** the consumer
-  will need — *not* the file bytes, and *not* master-data fields the consumer can fetch itself. Keep the
+  will need, *not* the file bytes, and *not* master-data fields the consumer can fetch itself. Keep the
   collector (Dispatcher) lean: it *collects and references*; the **consumer (Performer) resolves every
   master-data lookup** (CSV/DB/dictionary) right before it writes them out. Cleaner responsibilities, smaller
   items, and no stale data frozen at enqueue time. Ask per field: "does the performer already have this, or a
   key to fetch it? then don't put the resolved value in the item."
 - **Enrichment timing = where the KEY is known, not where the lookup runs.** Note when each lookup key becomes
-  available — in the Dispatcher (from source metadata) or only in the Performer (post-extraction). The
+  available: in the Dispatcher (from source metadata) or only in the Performer (post-extraction). The
   Dispatcher passes the **key**; the Performer does the **lookup**. (Vendor keyed on an extracted field →
   fully performer-side; a store keyed on a source field → Dispatcher passes the store key, Performer looks up
   the record.)
@@ -145,7 +145,7 @@ become new sub-workflows.
   carried as a source field; a value the process itself **generates** (e.g. a new unique IDoc id) is created,
   not looked up. Only attribute a field to a source you've actually confirmed holds it (don't assume the
   queue/DocuWare/Agent carries it).
-- **Dev-run verification without a tenant — decide it NOW, not at build.** A queue-shaped design needs its
+- **Dev-run verification without a tenant: decide it NOW, not at build.** A queue-shaped design needs its
   queue to *run*, and the end-to-end verification task is the natural checker of most acceptance criteria.
   When the Orchestrator link is an open dep (no tenant connected), pick the strategy here and record it:
   either the e2e task **defers its queue-dependent runtime checks with that dep** (file-level assertions
@@ -156,38 +156,38 @@ become new sub-workflows.
 ## 6. Orchestrator provisioning & naming
 
 The SDD's infrastructure (sdd:1.3) and Orchestrator sections (sdd:7.2–7.6) need **concrete resource names + values**,
-and the back-half build provisions from them. **Ask the user for the real values** — anything they don't know
+and the back-half build provisions from them. **Ask the user for the real values**; anything they don't know
 becomes an **open dependency `D`** (surfaced at the gate), not a silent `(confirm)` placeholder you build past.
 Capture answers into `.wi/orchestrator.md`:
 
-- **Naming conventions** — the org's standard for workflow / argument / asset / queue / process names
+- **Naming conventions**: the org's standard for workflow / argument / asset / queue / process names
   (prefixes, casing, the `<Project>_<Unit>` pattern). Ask; don't invent one silently.
-- **Orchestrator link** — org / tenant / **folder** (+ the dev/test/prod folder split).
-- **Published process / package names** — one per process (e.g. `Acme_Dispatcher`, `Acme_Performer`).
-- **Queues** — name(s) + dev/test/prod split.
-- **Assets** — config assets + **credential names** (names ONLY, never values — they're Orchestrator credentials).
-- **Storage Buckets** — name + purpose (the document/file transport from protocol:5).
-- **Config / environment variables** — the `Config.xlsx` Settings/Constants the run needs **and their values
+- **Orchestrator link**: org / tenant / **folder** (+ the dev/test/prod folder split).
+- **Published process / package names**: one per process (e.g. `Acme_Dispatcher`, `Acme_Performer`).
+- **Queues**: name(s) + dev/test/prod split.
+- **Assets**: config assets + **credential names** (names ONLY, never values; they're Orchestrator credentials).
+- **Storage Buckets**: name + purpose (the document/file transport from protocol:5).
+- **Config / environment variables**: the `Config.xlsx` Settings/Constants the run needs **and their values
   per environment** (dev/test/prod): URLs, folder/UNC paths, poll interval, queue concurrency/retries,
-  target-system constants, feature toggles. Names *and* values — ask, don't default silently.
-- **UiPath Agent(s)** — if a step calls a UiPath Agent (e.g. a document-extraction agent), its **name** +
+  target-system constants, feature toggles. Names *and* values: ask, don't default silently.
+- **UiPath Agent(s)**: if a step calls a UiPath Agent (e.g. a document-extraction agent), its **name** +
   input/output contract (point at the sample output registered in `.wi/inputs.md`).
-- **Triggers** — time or queue, schedule, concurrency.
+- **Triggers**: time or queue, schedule, concurrency.
 
 In a headless run (or when the user doesn't have them yet) **propose convention-based names**
-(`<Solution>_<Process>_<Queue|Asset|Bucket>`) and log them as assumptions to confirm — a named default beats a
+(`<Solution>_<Process>_<Queue|Asset|Bucket>`) and log them as assumptions to confirm; a named default beats a
 blank sdd:7. Secrets stay names-only (constitution rule).
 
 ```markdown
 ---
 type: Orchestrator Manifest
-title: Orchestrator manifest — <solution>
-description: Concrete Orchestrator resources (folder, processes, queues, assets, buckets, agents, triggers) — names only.
+title: Orchestrator manifest (<solution>)
+description: Concrete Orchestrator resources (folder, processes, queues, assets, buckets, agents, triggers); names only.
 resource: <Orchestrator folder URL>
 timestamp: <YYYY-MM-DD>
 ---
 
-# Orchestrator manifest — <solution>
+# Orchestrator manifest (<solution>)
 
 ## Link
 - Org / tenant: <org> / <tenant>
@@ -203,36 +203,36 @@ timestamp: <YYYY-MM-DD>
 | Kind | Name | Purpose | Notes |
 |------|------|---------|-------|
 | Queue      | <Solution_Performer_Queue> | transactions   | SLA/retry |
-| Asset      | <Solution_Config>          | config         | — |
+| Asset      | <Solution_Config>          | config         | - |
 | Credential | <Solution_DocuWareCred>    | API auth       | NAME only; value lives in Orchestrator |
-| Bucket     | <Solution_Documents>       | file transport | — |
+| Bucket     | <Solution_Documents>       | file transport | - |
 
 ## Agents
 | Name | Runs on | Input | Output | Invoked by |
 |------|---------|-------|--------|------------|
 | <DocExtractionAgent> | Orchestrator/Agent | docText | <sample in inputs.md> | Performer |
 
-> `?` / `<...>` = unknown or proposed (convention default) — confirm at the design gate.
+> `?` / `<...>` = unknown or proposed (convention default); confirm at the design gate.
 ```
 
-## 6a. Runtime State Inventory — rename / rebrand / migration runs only
+## 6a. Runtime State Inventory: rename / rebrand / migration runs only
 
 Skip this for a greenfield automation. **When the run renames, rebrands, or migrates an existing automation,**
-the source/code changes are the easy part — the old identity also lives in **runtime state no repo grep can
+the source/code changes are the easy part; the old identity also lives in **runtime state no repo grep can
 see**, and the build will look green while production still references the old name. Sweep five categories and
 record each into `orchestrator.md` (a rename map) + `assumptions.md`, with a **separate migration task** in
-`tasks.md` (renaming how *new* items are written never fixes the *existing* ones). "None — verified by X" is
+`tasks.md` (renaming how *new* items are written never fixes the *existing* ones). "None - verified by X" is
 a valid answer; a **blank is not**.
 
-1. **In-flight / stored data** — queue items already enqueued under the old queue, transaction references and
+1. **In-flight / stored data**: queue items already enqueued under the old queue, transaction references and
    status keyed on the old string, Storage-Bucket paths, records in a target system.
-2. **Live Orchestrator config** — queue / asset / storage-bucket / **published-process** names, folder names,
+2. **Live Orchestrator config**: queue / asset / storage-bucket / **published-process** names, folder names,
    triggers, alerts/dashboards named after the thing (none of it in the repo).
-3. **OS / platform-registered** — robot/machine names, the **published package** name in the feed, Library
+3. **OS / platform-registered**: robot/machine names, the **published package** name in the feed, Library
    feed entries, scheduled triggers registered in Orchestrator.
-4. **Credential & asset *names*** — the Orchestrator credential/asset **keys** (names only) referencing the
+4. **Credential & asset *names***: the Orchestrator credential/asset **keys** (names only) referencing the
    old name; renaming the key and the workflow that reads it must move in lockstep.
-5. **Build artifacts** — the published `.nupkg` package name/version, generated process names, anything a
+5. **Build artifacts**: the published `.nupkg` package name/version, generated process names, anything a
    downstream consumer binds to by name.
 
 Every load-bearing row becomes an assumption + a migration task; the checker (plan mode) then verifies each
@@ -243,13 +243,13 @@ has a covering task.
 Every gap you filled, every default you applied, every "we assumed X because the PDD didn't say" → a row in
 the process's `assumptions.md`. In RPA the business sign-off is on these assumptions, so they are first-class.
 
-Keep a second register in the same file: **open dependencies `D1..Dn`** — referenced-but-missing inputs (a
+Keep a second register in the same file: **open dependencies `D1..Dn`**: referenced-but-missing inputs (a
 mapping xlsx, a dropped diagram) and genuine ambiguities the PDD can't settle. Each `Dn` names the gap, its
 impact, and who/what resolves it. **Open deps are blocking by default:** at the design gate, present each `Dn`
 to the user as a question and either **resolve it** (→ a confirmed assumption, e.g. "D4 store-key → A14") or get
 the user's **explicit decision to defer** (build the stub/mock, accept the risk). Do **not** silently proceed
-into the build with a `Dn` quietly marked "needs input later / before production" — **deferral is the user's
-call, not a default.** (`--auto` auto-approves the gate and a headless run has no user at all — both record
+into the build with a `Dn` quietly marked "needs input later / before production": **deferral is the user's
+call, not a default.** (`--auto` auto-approves the gate and a headless run has no user at all; both record
 each open dep for after-the-fact review and say so.)
 
 ## `tobe.md` format (per process)
@@ -257,19 +257,19 @@ each open dep for after-the-fact review and say so.)
 ```markdown
 ---
 type: TO-BE
-title: TO-BE — <process name>
+title: TO-BE (<process name>)
 description: <the refined target process, one line>
 feature: <run-slug>
 timestamp: <YYYY-MM-DD>
 ---
 
-# TO-BE — <process name>  (refined from PDD ToBe; <date>)
+# TO-BE (<process name>)  (refined from PDD ToBe; <date>)
 
 ## Trigger
 <what starts it; inputs per unit>
 
 ## Steps
-1. <step> — **impl: connector(Outlook) / API / UI activity** — <notes; reuses Component X?>
+1. <step>; **impl: connector(Outlook) / API / UI activity**; <notes; reuses Component X?>
 2. <decision: if <cond>> → <branch A> ; else → <branch B>
 3. ...
 
@@ -283,4 +283,4 @@ timestamp: <YYYY-MM-DD>
 
 Include a small **mermaid flowchart** of the TO-BE (validate with
 `${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py`). Keep `tobe.md` faithful to the refined
-process — the SDD turns it into the technical design.
+process; the SDD turns it into the technical design.

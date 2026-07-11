@@ -5,10 +5,10 @@ user-invocable: false
 description: >
   Turn a decided brief into an executable plan. Use this skill when the user says "/wi:plan", "plan this
   out", "write the spec", "break this into tasks", or as the plan phase of the research skill
-  (autonomous). Planning only writes inside .wi/ — no project code is touched yet.
+  (autonomous). Planning only writes inside .wi/; no project code is touched yet.
 ---
 
-# plan — brief → spec, tasks, pitfalls, ADR
+# plan: brief → spec, tasks, pitfalls, ADR
 
 Produce the artifacts that make build mechanical and review easy. Good planning front-loads the thinking
 so the build phase is mostly typing, and so a fresh subagent can pick up any single task and execute it
@@ -16,40 +16,40 @@ without re-reading the whole world.
 
 Inputs: `.wi/features/<slug>/brief.md`, the chosen approach in `research/`, `.wi/repo-map.md`, `.wi/constitution.md`.
 Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually written in the research phase).
-**No source edits — planning only writes inside `.wi/`. Build starts only after the design gate, where the user confirms the architecture + design.**
+**No source edits: planning only writes inside `.wi/`. Build starts only after the design gate, where the user confirms the architecture + design.**
 
 ## Procedure
 
 1. **Write the spec** → `spec.md` (template in `${CLAUDE_PLUGIN_ROOT}/skills/plan/references/spec-template.md`).
-   The non-negotiable part is **acceptance criteria that are testable** — each one should map to a check
+   The non-negotiable part is **acceptance criteria that are testable**: each one should map to a check
    build can actually run. If you can't state how you'd verify a criterion, it isn't done being specified.
 
-2. **Decide on an ADR (if research didn't already record it).** If the feature commits to anything hard to reverse — a datastore, a framework, an
-   external service, a public API or schema shape, an auth model — record it as the next **ADR-NNNN** in the
+2. **Decide on an ADR (if research didn't already record it).** If the feature commits to anything hard to reverse (a datastore, a framework, an
+   external service, a public API or schema shape, an auth model), record it as the next **ADR-NNNN** in the
    project-wide `.wi/adr/` log using `${CLAUDE_PLUGIN_ROOT}/skills/plan/references/adr-template.md`
    (global numbering; append the index.md row). Trivial
-   features get no ADR — don't manufacture decisions.
+   features get no ADR; don't manufacture decisions.
 
 3. **List the pitfalls** → `pitfalls.md`. Walk the catalog in
    `${CLAUDE_PLUGIN_ROOT}/skills/plan/references/pitfalls-catalog.md` and keep only the ones that genuinely
    apply to *this* change. For each, note the specific way it could bite here and how a task will prevent
    it. This is cheap foresight that saves an expensive debug later.
 
-   **Consume the research risks — all of them.** Every `Risks / unknowns` line from the researcher
+   **Consume the research risks, all of them.** Every `Risks / unknowns` line from the researcher
    reports (and any unanswered question left in `research/questions.md`) ends up in exactly one place:
    resolved here (say how), or a `pitfalls.md` entry with the task that prevents/verifies it. A risk line
-   that appears in no artifact was dropped — that's a defect, not a judgment call.
+   that appears in no artifact was dropped; that's a defect, not a judgment call.
 
 4. **Break it into tasks** → `tasks.md` (format below). Aim for small, independently verifiable steps.
-   Each task names the files it touches and the exact command/test that proves it. Default to TDD — **red
+   Each task names the files it touches and the exact command/test that proves it. Default to TDD; **red
    and green live inside one task**: the task's runner writes the failing test first, then implements to
-   green (`agents/wi-task-runner.md`); never plan a *separate* failing-test task — it can't "end green",
+   green (`agents/wi-task-runner.md`); never plan a *separate* failing-test task: it can't "end green",
    and in a parallel wave it races any sibling whose Verify runs the tests. **Delegation check:** if
-   `superpowers:writing-plans` is in your available skills you MUST use it for the decomposition —
-   capturing the result in this format — and log `plan via superpowers:writing-plans` to progress.md.
+   `superpowers:writing-plans` is in your available skills you MUST use it for the decomposition
+   (capturing the result in this format) and log `plan via superpowers:writing-plans` to progress.md.
    The inline format below is the fallback only when it's absent (log `plan via wi fallback`).
-   **Scope of that delegation:** wi's `tasks.md` **is** the plan artifact — no `docs/superpowers/plans/`
-   file — and the delegate's end-of-plan "execute now?" choice doesn't apply: build owns execution, and
+   **Scope of that delegation:** wi's `tasks.md` **is** the plan artifact (no `docs/superpowers/plans/`
+   file), and the delegate's end-of-plan "execute now?" choice doesn't apply: build owns execution, and
    only after the design gate.
 
    **Shape the plan for parallelism.** build dispatches every unblocked task concurrently, so the
@@ -57,24 +57,24 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
    (the scheduler uses them for conflict detection); don't add `Depends on` edges that aren't real; and
    when several tasks share a foundation (a schema, an interface, a fixture), make the foundation its own
    early task so the rest fan out as one wide wave. Scope each task's **Verify** to its *own* named
-   tests/commands, never the full suite — build's wave-end gate runs the suite serially at each boundary;
+   tests/commands, never the full suite: build's wave-end gate runs the suite serially at each boundary;
    a full-suite Verify inside a parallel wave races its siblings' red phases.
 
    **Docs follow structure.** If a task changes the architecture (new module, dependency, layer, external
-   service), the structure docs (`.wi/architecture.md`, `.wi/overview.md`) go stale — ship's docs-sync
+   service), the structure docs (`.wi/architecture.md`, `.wi/overview.md`) go stale; ship's docs-sync
    updates them, but when the doc work is substantial give it its own `[docs]` task.
 
 5. **Mirror the task titles** into `progress.md`, **leave Phase = `plan`**, and stop. plan does not own the
    design-gate transition: the research skill flips Phase = `design-gate` only after its plan-mode checker
    pass (research:2) has run over the finished plan. It then presents the architecture (ADR) + design
-   (spec) + wave overview to the user for confirmation — no code before their explicit go.
+   (spec) + wave overview to the user for confirmation: no code before their explicit go.
 
 ## `tasks.md` format
 
 ```markdown
 ---
 type: Task List
-title: Tasks — <feature title>
+title: "Tasks: <feature title>"
 description: Small ordered tasks (each with files + verify) and the build waves for this feature.
 feature: <slug>
 timestamp: <YYYY-MM-DD>
@@ -84,26 +84,26 @@ timestamp: <YYYY-MM-DD>
 
 > Ordered. Each task is small enough for one focused sitting and ends green.
 
-## Task 1 — <title>   [backend|frontend|infra|test|docs]
+## Task 1: <title>   [backend|frontend|infra|test|docs]
 - **Files:** <path/a>, <path/b>
 - **Do:** <precise change to make>
 - **Verify:** <exact test or command that must pass, e.g. `pytest tests/test_auth.py::test_login_ok`>
 - **Depends on:** <task ids, or ->
 
-## Task 2 — <title>   [backend]
+## Task 2: <title>   [backend]
 - **Files:** ...
 - **Do:** ...
 - **Verify:** ...
 - **Depends on:** 1
 
-## Waves  (derived from Depends on + Files — what build runs concurrently)
+## Waves  (derived from Depends on + Files: what build runs concurrently)
 - Wave 1: tasks 1, 2
 - Wave 2: tasks 3, 4, 5
 - Wave 3: task 6
 ```
 
-Tag frontend tasks so build routes them to a design skill (`docs` is a plain label — no routing behavior,
-unlike `frontend`). Keep verification concrete — "it works" is not
+Tag frontend tasks so build routes them to a design skill (`docs` is a plain label: no routing behavior,
+unlike `frontend`). Keep verification concrete: "it works" is not
 verification; a named test or command is. A plan whose tasks each end in a runnable check is a plan that
 builds and ships without drama.
 
@@ -115,7 +115,7 @@ naming the *specific* way it could bite here and the task that prevents it.
 ```markdown
 ---
 type: Pitfalls
-title: Pitfalls — <feature title>
+title: "Pitfalls: <feature title>"
 description: The failure modes that genuinely apply to this change, each with its preventing task.
 feature: <slug>
 timestamp: <YYYY-MM-DD>
@@ -123,14 +123,14 @@ timestamp: <YYYY-MM-DD>
 
 # Pitfalls: <feature title>
 
-- **<pitfall>** — how it could bite *here*: <specific>. Prevented by: <task # / named check>.
-- **<pitfall>** — <specific>. Prevented by: <task #>.
+- **<pitfall>**: how it could bite *here*: <specific>. Prevented by: <task # / named check>.
+- **<pitfall>**: <specific>. Prevented by: <task #>.
 ```
 
 ## Sizing heuristics
 
 - If a task can't name its verification, split it until each piece can.
 - If two tasks always change the same file in lockstep, merge them; if two *parallel* tasks merely brush
-  the same file, move the shared piece into its own prerequisite task — shared files serialize a wave.
-- 3-9 tasks is typical for a feature. Many more usually means the feature is too big — split it
+  the same file, move the shared piece into its own prerequisite task: shared files serialize a wave.
+- 3-9 tasks is typical for a feature. Many more usually means the feature is too big: split it
   (one feature = one PR).

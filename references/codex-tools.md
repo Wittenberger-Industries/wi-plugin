@@ -1,17 +1,17 @@
 ---
 type: Reference
-title: Codex CLI — tool & capability mapping for wi
+title: "Codex CLI: tool & capability mapping for wi"
 description: Claude Code → Codex CLI tool-name and capability equivalents used when running wi on Codex.
 timestamp: 2026-06-09
 tags: [codex, tools, portability, reference]
 ---
 
-# Codex CLI — tool & capability mapping for wi
+# Codex CLI: tool & capability mapping for wi
 
 wi's skills are written with Claude Code names. On Codex CLI, use these equivalents.
 
 ## ${CLAUDE_PLUGIN_ROOT}
-`${CLAUDE_PLUGIN_ROOT}` is the **wi plugin root** — the directory holding `skills/`, `agents/`, and
+`${CLAUDE_PLUGIN_ROOT}` is the **wi plugin root**: the directory holding `skills/`, `agents/`, and
 `.claude-plugin/`. Codex sets `CLAUDE_PLUGIN_ROOT` (and `PLUGIN_ROOT`) for compatibility, so most refs
 resolve as-is. If a ref doesn't resolve in a skill context, treat it as the installed wi plugin dir and
 read the file by its path under that root. This covers cross-skill refs such as `ship` reading
@@ -24,10 +24,10 @@ read the file by its path under that root. This covers cross-skill refs such as 
 | Bash / run a command | `shell` |
 | Grep / Glob | native search (`shell` with `rg`/`grep`/`find`) |
 | dispatch a subagent / task-runner | `spawn_agent` (parallel: multiple `spawn_agent`, or `spawn_agents_on_csv`) |
-| parallel waves | `spawn_agent` bounded by `[agents] max_threads` (default 6); inline the task-runner/researcher prompt — do not rely on named-role dispatch |
+| parallel waves | `spawn_agent` bounded by `[agents] max_threads` (default 6); inline the task-runner/researcher prompt; do not rely on named-role dispatch |
 | TodoWrite | `update_plan` |
 | WebFetch / WebSearch | `web_search` |
-| invoke a wi skill | skills load natively — `$skill-name` or `/skills` (entry points also as `$wi-scan`/`$wi-dev`/`$wi-rpa` once scan's bootstrap installs the flat aliases to `~/.agents/skills/`); just follow its instructions |
+| invoke a wi skill | skills load natively: `$skill-name` or `/skills` (entry points also as `$wi-scan`/`$wi-dev`/`$wi-rpa` once scan's bootstrap installs the flat aliases to `~/.agents/skills/`); just follow its instructions |
 
 ## /goal keep-alive
 Codex has a native `/goal`. Use the same condition line wi prints. For non-interactive runs, `codex exec`
