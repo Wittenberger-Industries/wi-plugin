@@ -33,8 +33,8 @@ Run it as wide as the DAG allows.
    reports completion (the only point the count exists) — `tokens.md` is **mandatory**; initialize it on the
    first delegation if absent
    (`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md` —
-   `python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3` on
-   Linux/macOS), and ship finalizes it (`token_report.py --write`) under a `check_tokens.py` close-out gate.
+   python fallback: `skills/research/references/workflow.md`), and ship finalizes it
+   (`token_report.py --write`) under a `check_tokens.py` close-out gate.
 5. **Register new components.** If the build created something reusable (a shared subflow, a notifier flow),
    add it to `.wi/components.md` so the next flow inherits it.
 

@@ -275,8 +275,7 @@ Add a second diagram only if it genuinely adds clarity.
 python ${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py .wi/architecture.md
 ```
 
-(`python` assumed on PATH; where it does not resolve, fall back to `py -3` on Windows or `python3` on
-Linux/macOS.)
+(python fallback: `skills/research/references/workflow.md` §Script invocation.)
 
 The bundled checker catches the actual failure modes (reserved-word node IDs, unquoted special-char
 labels, unbalanced `subgraph`/`end`, unclosed fence) and, when `mmdc` (mermaid-cli) is installed, also
