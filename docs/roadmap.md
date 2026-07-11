@@ -19,8 +19,7 @@ pick-up, into `docs/plans/`, and rides in the PR.
 
 | Slot | Issue | What | Version | Effort · Risk | Why this order |
 |---|---|---|---|---|---|
-| next | **#48** drop legacy/backward-compat support | Delete the seven compat families (pre-1.3/pre-rename shims, 4-column ledger acceptance, validate.py 7c carve-out); dev classifier → 5 classes, feature-folder-cases → 4 cases | **v1.9.0** (removes supported behavior → minor) | M · Low by decree (compat is a declared non-goal; the issue's stays-list is **binding**) | Delete before compressing — no point compressing text #41 would then re-touch |
-| then | **#41** compress skill prose | One file per PR (mandated): **ship → research → build → dev**, then rpa/scan; rationale moves to `docs/wi-design-notes/<skill>.md` | v1.9.1+ (patch per pass) | L · Medium (judgment-heavy; strongest guardrails) | Last of the sweep by design — benefits from #35 (measure), #39 (template), #40 (dedup), #42 (directive present), #48 (legacy text gone) |
+| next | **#41** compress skill prose | One file per PR (mandated): **ship → research → build → dev**, then rpa/scan; rationale moves to `docs/wi-design-notes/<skill>.md` | v1.9.1+ (patch per pass) | L · Medium (judgment-heavy; strongest guardrails) | Last of the sweep by design — benefits from #35 (measure), #39 (template), #40 (dedup), #42 (directive present), #48 (legacy text gone, shipped v1.9.0) |
 | then | **#53** ledger split labels | `token_report.py` split rows labeled from `agent-<id>.meta.json` `description` (+ the description==Source convention) instead of 48-char prompt prefixes | minor (artifact format) | S · Low | After #48 (shared `_ledger.py`/`check_tokens.py`/tests surface); small — may interleave between #41 passes (disjoint files) |
 | then | **#52** dispatch-time skill pointer | Generalized capability-tag → registry → resolved SKILL.md path in the dispatch; frontend first; fixes the unreachable `[frontend]` delegation (charters have no Skill tool) | minor (runner behavior) | S–M · Low–Medium | After #41's build/dev passes — touches `build/SKILL.md` + a charter (hotspots, strictly serial). Owner decision 2026-07-11: pointer, **not** a Skill-bearing variant agent; Checkpoint B's baseline-b runners empirically validated the read-the-skill-file mechanism |
 | parallel, gated | **#43** Grok Build platform | Fourth platform adapter (`references/grok-tools.md`, keep-alive `/goal`-family branch, AGENTS.md row, bootstrap, models.md xAI entry) | minor | M · Low–Medium | Independent of the sweep; **gated on Grok Build beta access** — every runtime claim verified on a real session. The planned **release/1.8.0 → Grok "baseline-c" comparison** doubles as its verification run (evidence method: the Checkpoint B harness) |
@@ -31,7 +30,8 @@ pick-up, into `docs/plans/`, and rides in the PR.
 - **Strictly serial on the hotspots** — `build/SKILL.md`, `ship/SKILL.md`, `dev/SKILL.md`,
   `wi-directory.md`, `workflow.md`: never two branches editing them at once. Stacked PRs,
   squash-merge, rebase + retarget the next after each merge.
-- **#48 before #41** (delete before compressing) — same logic as dedup-before-compress.
+- **#48 before #41** (delete before compressing) — **satisfied**: #48 shipped as v1.9.0 (PR #54) before any
+  #41 pass.
 - **#41 is one file per PR**, each independently revertible, each shipping its rules inventory +
   loaded-token delta.
 - **Agent charters are the most sensitive surface** (autonomous, no human in the loop): minimal
@@ -61,13 +61,6 @@ pick-up, into `docs/plans/`, and rides in the PR.
 
 ## Pick-up notes (carried from the triage doc + the issues)
 
-- **#48** — inventory first (grep `legacy` / `pre-1.` / `pre-rename` / `old-named` / `old filename`),
-  classify every hit against the issue's binding stays-list ("legacy" describing the *user's* code
-  stays; self-repair behaviors keep their mechanism, lose only the pre-1.x framing; graceful
-  `unavailable` stays), then delete the seven compat families; PR body carries the
-  deleted-vs-relabeled disposition table. Dry-runs: old-named models config → fresh setup; a
-  pre-rename work-unit folder → treated as unscanned; current-format flows unchanged. Retires the
-  #35 legacy-ledger guardrail.
 - **#41** — order by loaded-per-run impact (ship → research → build → dev, then rpa/scan); rationale
   to `docs/wi-design-notes/`; report the loaded-token delta per pass. The proven verification
   pattern for prose refactors: per-branch fixture dry-run subagents + load-alone Q&A subagents +
@@ -79,3 +72,12 @@ pick-up, into `docs/plans/`, and rides in the PR.
 - **#43** — all runtime claims (install path, namespace, `/goal` semantics vs wi's condition
   template, model ids) verified on a real Grok Build session before merge; keep-alive lands in the
   `/goal` family branch with the headless `-p`/`--max-turns`/`--continue` fallback.
+
+## Shipped (roadmap-era)
+
+- **#48** drop legacy/backward-compat support — **v1.9.0**, PR #54 (2026-07-11). Seven
+  compat families deleted (deleted-vs-relabeled disposition table in the PR body); dev classifier =
+  five classes, `feature-folder-cases.md` = four case sections; validate.py bans `.wi/goals`
+  unconditionally; the ledger gate accepts only the Duration format (retires the #35 legacy-ledger
+  guardrail). Stays-list honored — `agents/` byte-identical, self-repair mechanisms relabeled, not
+  removed. Plan: `docs/plans/2026-07-11-prd2-48-drop-legacy.md`. −294 words of shipped prose.
