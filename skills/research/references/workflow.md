@@ -15,16 +15,23 @@ after it, the pipeline makes and records decisions on its own.
 
 ## State machine
 
+```mermaid
+flowchart LR
+  scan["scan — once, project-level"] -.-> dev["/wi:dev"]
+  dev --> bstorm["brainstorm (interactive)"]
+  bstorm -- "handoff" --> research
+  subgraph rskill["research skill"]
+    research --> plan --> gate["DESIGN GATE (interactive*)"]
+  end
+  gate -- "approve / auto-approve" --> build
+  subgraph keepalive["build + ship — kept alive by /goal or Autopilot"]
+    build --> ship
+  end
+  ship --> done
 ```
-scan (once, project-level)
-        |
-  /wi:dev --> brainstorm --(handoff)--> research -> plan -> [DESIGN GATE] -> build -> ship -> done
-(interactive)                          |_ research skill _|  (interactive*)  |_ build+ship, kept alive
-                                                                              by /goal or Autopilot _|
 
-* the design gate is interactive by default; `/wi:dev --auto` auto-approves it (the same summary is
-  still recorded in progress.md).
-```
+\* the design gate is interactive by default; `/wi:dev --auto` auto-approves it (the same summary is
+still recorded in progress.md).
 
 `progress.md`'s Phase field names the state. Resume = read it and re-enter that phase (design-gate
 re-entry has one guard — see the contracts note below). After the handoff, the only user interaction is
