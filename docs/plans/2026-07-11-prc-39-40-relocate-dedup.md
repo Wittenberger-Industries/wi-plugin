@@ -87,7 +87,7 @@ the order below.
 
 ## Legacy migration
 
-**Tell:** the repo's work units still live under `.wi/goals/` (the pre-rename folder).
+**Tell:** the repo's work units still live under the pre-rename folder (`goals`, not `features`).
 
 A repo whose work units still live under the pre-rename folder gets a one-time
 `git mv .wi/goals .wi/features` before proceeding — commit it; the dossiers inside are untouched.
@@ -157,7 +157,8 @@ after the dep merges), or proceed off `main` deliberately.
    asked. Then **classify the idea before creating anything** — **new / resume / in-flight-overlap /
    done-collision / roadmap-row / legacy-repo** (tells: an in-flight `features/*/progress.md` reading as
    this same idea → resume; others merely in flight → overlap; a done feature with this name →
-   done-collision; a matching `.wi/roadmap.md` row → roadmap-row; a pre-rename `.wi/goals/` → legacy).
+   done-collision; a matching `.wi/roadmap.md` row → roadmap-row; a pre-rename work-unit folder
+   (`goals`, not `features`) → legacy).
    Anything but a plain new feature → follow `${CLAUDE_PLUGIN_ROOT}/references/feature-folder-cases.md`
    for every case whose tell fires, before creating anything. The common path: derive a kebab-case name,
    prefix the **next global 4-digit ordinal** so `<slug>` = `NNNN-<name>` (e.g. `0001-stripe-webhooks`;
@@ -177,7 +178,7 @@ after the dep merges), or proceed off `main` deliberately.
 **Files:** Modify `skills/research/references/wi-directory.md:46-50` (Slugs bullet), `skills/rpa/SKILL.md:33-34`.
 
 - [ ] **Step 1:** wi-directory Slugs bullet — append at its end: `Creation-time edge cases (resume, in-flight overlap, done-collision, roadmap rows, legacy migration): ${CLAUDE_PLUGIN_ROOT}/references/feature-folder-cases.md.` (backtick-quote the path).
-- [ ] **Step 2:** rpa step 2 — replace `a repo whose work units still live under the pre-rename folder gets a one-time` + `` `git mv .wi/goals .wi/features` before anything else; `` with `a legacy repo (pre-rename ` + backtick + `.wi/goals/` + backtick + `) gets the one-time migration in ${CLAUDE_PLUGIN_ROOT}/references/feature-folder-cases.md before anything else;` (path backticked). This is #39's rpa audit outcome: legacy migration is rpa step 2's only inline edge-case branch (ordinal detail already lives in ingest.md §1); the factoring is mechanical, so it lands in this PR per the triage's pick-up note.
+- [ ] **Step 2:** rpa step 2 — replace `a repo whose work units still live under the pre-rename folder gets a one-time` + `` `git mv .wi/goals .wi/features` before anything else; `` with `a legacy repo (work units under the pre-rename ` + backtick + `goals` + backtick + ` folder) gets the one-time migration in ${CLAUDE_PLUGIN_ROOT}/references/feature-folder-cases.md before anything else;` (path backticked; the `.wi/goals` literal is lint-restricted to lines carrying the migration command — validate.py 7c). This is #39's rpa audit outcome: legacy migration is rpa step 2's only inline edge-case branch (ordinal detail already lives in ingest.md §1); the factoring is mechanical, so it lands in this PR per the triage's pick-up note.
 - [ ] **Step 3:** `python scripts/validate.py` → 0; tails intact.
 - [ ] **Step 4:** Commit: `feat: wi-directory xref + rpa legacy pointer to feature-folder-cases (#39)`.
 
