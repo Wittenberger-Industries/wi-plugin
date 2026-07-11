@@ -1,6 +1,6 @@
 {
   "name": "wi",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "An opinionated, low-token engineering loop for Claude Code, Codex CLI, and Copilot CLI, built for keep-alive-driven work. /wi:scan documents and bootstraps a project (--refresh drift-checks the map and consolidates learnings); /wi:dev brainstorms a feature with you, designs, confirms architecture + design at the design gate (or --auto), then implements to an open pull request — arming a keep-alive loop (Claude/Codex /goal or Copilot Autopilot) as the persistence wrapper. Parallel subagent waves, isolated git worktrees, project-wide ADR-NNNN decision log, end-of-run token report. State in a committed .wi/ directory. Soft-integrates obra/superpowers and frontend-design. /wi:rpa builds UiPath RPA: parse a PDD (markitdown) -> refine the TO-BE -> SDD/architecture/assumptions -> design gate (approve the framework — REFramework or Maestro — and the build paradigm: XAML-only or coded) -> solution via the UiPath skills -> Workflow Analyzer gate -> PR. One run per PDD (1..N processes); reuses the wi spine.",
   "skills": "./skills/"
 }
