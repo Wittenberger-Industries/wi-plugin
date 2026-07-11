@@ -28,10 +28,11 @@ A repo whose work units still live under the pre-rename folder gets a one-time
 **Tell:** applies at every creation; the edge cases in the parenthetical are what this section is for.
 
 Derive a kebab-case name, then prefix the **next global 4-digit ordinal** so `<slug>` = `NNNN-<name>`
-(e.g. `0001-stripe-webhooks`) — mirroring `ADR-NNNN`: the ordinal is global across `.wi/features/`,
-monotonic, assigned **once at creation, never renumbered** (next = highest existing `.wi/features/`
-ordinal + 1, else `0001`; legacy unnumbered features are left as-is and ignored by the scan; a resumed
-feature keeps its number; a roadmap row's name is numbered when its folder is first created).
+(e.g. `0001-stripe-webhooks`) — the full numbering rule (mirroring `ADR-NNNN`: global, monotonic,
+assigned **once at creation, never renumbered**; next = highest existing ordinal + 1, else `0001`) is
+wi-directory.md's **Slugs bullet**. Case notes: legacy unnumbered features are left as-is and ignored by
+the next-number scan; a resumed feature keeps its number; a roadmap row's name is numbered when its
+folder is first created.
 
 ## Resume detection
 

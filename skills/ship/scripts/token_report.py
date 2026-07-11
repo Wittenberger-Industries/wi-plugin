@@ -28,7 +28,8 @@ Subagent split (Claude Code): each dispatch's transcript lives at
 `message.model`, and OS timestamps — parsed here into a per-agent split, duration, and
 cost estimate (exact tokens × published list prices; clearly labeled an estimate).
 
-Stdlib only.
+Stdlib only. Canonical prose for the ledger discipline ("the ledger rule"):
+skills/research/references/wi-directory.md, tokens.md template section.
 """
 import argparse
 import json

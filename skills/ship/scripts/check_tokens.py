@@ -10,6 +10,8 @@ type: Token Ledger, >=1 integer-token row, Subagents sum filled, Orchestrator re
 a real figure OR the honest "unavailable" sentinel, NOT the PENDING placeholder).
 Otherwise exit 1 and print the first failing check. A non-zero exit is the hard guardrail:
 ship must not mark Phase=done, so the keep-alive loop keeps working the feature. Stdlib only.
+Canonical prose for the ledger discipline ("the ledger rule"):
+skills/research/references/wi-directory.md, tokens.md template section.
 """
 import argparse
 import sys
