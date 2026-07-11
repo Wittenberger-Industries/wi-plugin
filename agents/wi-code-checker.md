@@ -64,8 +64,8 @@ running the line review inline preserves the reviewer-isolation property. Re-spl
 second agent is not an improvement.
 
 **RPA runs (`wi:rpa`).** Same job, different artifact names — map them: `spec.md` → **`sdd.md`**
-(acceptance criteria in the SDD's acceptance-criteria section — §10 in the base ToC; locked decisions
-across §1-§7), `pitfalls.md` → **`assumptions.md`**, `constitution.md` → **`rpa-constitution.md`**,
+(acceptance criteria in the SDD's acceptance-criteria section — sdd:10 in the base ToC; locked decisions
+across sdd:1-7), `pitfalls.md` → **`assumptions.md`**, `constitution.md` → **`rpa-constitution.md`**,
 `brief.md` → **`pdd.md`**, plus **`orchestrator.md`** (the resource manifest) and any
 **Runtime State Inventory** rows for a rename/rebrand. In `result` mode the "diff / built tree" is the
 generated REFramework project.
@@ -123,8 +123,8 @@ Write `.wi/features/<slug>/verification.md` (`type: Verification`) — the cover
 with its severity, mode, and concrete evidence (`file:line`, task #, or "no covering task"). In result mode
 the line-level pass gets its own `## Line-level findings` section beside the feature-level findings — same
 BLOCKER / WARNING / INFO taxonomy, evidence as `file:line`. It is
-**ephemeral** — ship folds the verdict + any waived findings into `PR.md` (ship §5), then the dossier
-tidy (§6) prunes it like research notes, so the flow's fixed dossier manifest is preserved. Frontmatter:
+**ephemeral** — ship folds the verdict + any waived findings into `PR.md` (ship:5), then the dossier
+tidy (ship:6) prunes it like research notes, so the flow's fixed dossier manifest is preserved. Frontmatter:
 
 ```markdown
 ---

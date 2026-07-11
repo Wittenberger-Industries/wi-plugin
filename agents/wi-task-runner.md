@@ -54,7 +54,7 @@ why nothing's written yet, then either make the change or report blocked. Readin
 
 - Obey the constitution rules you were given. They override your habits.
 - **Frontend tasks route to the design skill — never build UI blind** (the canonical rule:
-  `skills/research/references/integrations.md` §Frontend work). Task tagged `[frontend]` + a design skill
+  `skills/research/references/integrations.md` "Frontend work"). Task tagged `[frontend]` + a design skill
   available in your skills (your dispatch normally names it; if it didn't, check your skills list) → you
   **MUST** build/refine the markup *through it*, not from memory, and state `frontend via frontend-design`
   (or `via <skill>`) in your report — the orchestrator logs it to `progress.md`. Only if no design skill

@@ -49,7 +49,7 @@ the design gate.
 | build | post-gate loop (/goal or Autopilot keeps it alive) | autonomous | tasks, spec, constitution | source, ticked tasks | tasks already all ticked |
 | ship | post-gate loop | autonomous | the diff, spec, constitution | commits, PR (remote checks verified) | never |
 
-*Design-gate re-entry guard (research §0): resuming into `design-gate` requires a fresh plan-mode
+*Design-gate re-entry guard (research:0): resuming into `design-gate` requires a fresh plan-mode
 `verification.md` — missing, or older than `spec.md`/`tasks.md`, means the pre-gate checker pass runs
 first, then the gate renders.*
 

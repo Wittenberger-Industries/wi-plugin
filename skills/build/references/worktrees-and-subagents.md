@@ -41,7 +41,7 @@ untracked there. Resume-safe either way: a dossier already present in the worktr
 ### Finish / clean up (done by the ship phase)
 
 ```bash
-git worktree remove ../<repo>-wi-<slug>     # only after ship §8's remote-checks gate lands (green / none / user-accepted red)
+git worktree remove ../<repo>-wi-<slug>     # only after ship:8's remote-checks gate lands (green / none / user-accepted red)
 git branch -d wi/<slug>                      # if fully merged
 ```
 
@@ -76,7 +76,7 @@ The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/referenc
 `copilot-tools.md`): Claude uses the Agent/Task tool, Copilot uses the `task` tool and `/fleet` for waves,
 Codex uses `spawn_agent` bounded by `[agents] max_threads`. The prompt **content** is inline on every
 platform — the skeleton below gives each runner its task block + context in full. The dispatch *target*
-differs: on Claude Code, dispatch the **registered `wi-task-runner` agent** (build §2's instruction — the
+differs: on Claude Code, dispatch the **registered `wi-task-runner` agent** (build:2's instruction — the
 plugin registers it, and tiered model routing rides the dispatch); only on platforms without reliable
 named-agent registration (Codex — named-role dispatch is unreliable across builds there) pass the prompt
 to a generic worker carrying the `agents/wi-task-runner.md` contract inline.

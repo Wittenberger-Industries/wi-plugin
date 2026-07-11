@@ -47,7 +47,7 @@ Plus a plugin check that may install the skills wi delegates to.
 
    **If greenfield (empty, or no stack detectable), run a guided setup — don't just mark it UNKNOWN.**
    The point is to give later phases real ground truth. In one focused round (AskUserQuestion, folded into
-   the constitution-confirm of step 4 so the user answers once), define:
+   the constitution-confirm of scan:4 so the user answers once), define:
    - primary language(s) + version, framework(s), and package manager;
    - the intended **test / lint / format / typecheck / run** commands.
    Offer sensible per-language defaults and let the user confirm or override — e.g. Python →
@@ -124,7 +124,7 @@ the index only stays useful if it stays lean:
 3. **Prune stale:** the code/tool the learning warns about is gone (verify against the repo, not memory)
    → delete the detail file and its index line.
 4. **Target:** keep the index readable at a glance (roughly ≤30 lines). If it's bigger after
-   consolidation, the bar for "worth a line" in ship §4 was too low — note that in the report.
+   consolidation, the bar for "worth a line" in ship:4 was too low — note that in the report.
 
 Glossary gets the same light pass: merge duplicate/aliased terms, drop ones the codebase no longer uses.
 ADRs are **immutable history — never pruned** (supersede with a new ADR instead).
@@ -275,7 +275,7 @@ Add a second diagram only if it genuinely adds clarity.
 python ${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py .wi/architecture.md
 ```
 
-(python fallback: `references/workflow.md` §Script invocation.)
+(python fallback: `references/workflow.md` "Script invocation".)
 
 The bundled checker catches the actual failure modes (reserved-word node IDs, unquoted special-char
 labels, unbalanced `subgraph`/`end`, unclosed fence) and, when `mmdc` (mermaid-cli) is installed, also

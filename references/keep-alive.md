@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: The keep-alive handoff — /goal & Autopilot templates
-description: Canonical keep-alive handoff block — the /goal condition line (Claude Code/Codex), the Copilot Autopilot command, and the unattended-run warning. dev §4 and research §4 print from here.
+description: Canonical keep-alive handoff block — the /goal condition line (Claude Code/Codex), the Copilot Autopilot command, and the unattended-run warning. dev:4 and research:4 print from here.
 timestamp: 2026-07-03
 tags: [keep-alive, goal, autopilot, handoff, portability, reference]
 ---
@@ -12,14 +12,14 @@ wi pairs with a keep-alive loop for persistence: armed at handoff, the run conti
 its condition holds (wi works without it, just less robustly through a stalled turn). Claude Code and
 Codex CLI use their built-in `/goal`; Copilot CLI has no predicate `/goal` and relaunches under
 **Autopilot** with the condition in the prompt. This file is the **single source of the exact templates**
-— dev §4 and research §4 print from here; edit the block here, never a copy in a skill.
+— dev:4 and research:4 print from here; edit the block here, never a copy in a skill.
 
 Before printing, fill `<slug>` and `<lint + test commands>` with the exact commands from `repo-map.md` —
 never arm a condition no checker can verify (dev's preflight guards this). A command repo-map records as
 `n/a — not configured` (e.g. no linter exists) is **dropped from the condition**, not a blocker: render
 with the commands that do exist — a test-only condition is valid. Only `UNKNOWN — ask` blocks arming.
 No git remote at all → **don't arm anything**: the PR-open condition can never hold on a remote-less
-repo (ship closes out locally instead — ship §7); dev's preflight checks this before printing.
+repo (ship closes out locally instead — ship:7); dev's preflight checks this before printing.
 
 - **Claude Code / Codex CLI** (both have a built-in `/goal`):
 

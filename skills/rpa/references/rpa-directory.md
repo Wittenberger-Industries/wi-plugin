@@ -27,8 +27,8 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
     └── 0001-<run-slug>/     # one /wi:rpa run = one PDD -> solution; NNNN- global ordinal (creation order)
         ├── progress.md      # state machine for the run (single source of truth)
         ├── pdd.md           # the ingested PDD (faithful to source .docx)
-        ├── architecture.md  # the whole-solution Runtime diagram (SDD §2): dispatcher + all performers
-        ├── sdd.md           # ONE Solution Design Document (§7.1.x repeated per process)
+        ├── architecture.md  # the whole-solution Runtime diagram (sdd:2): dispatcher + all performers
+        ├── sdd.md           # ONE Solution Design Document (sdd:7.1.x repeated per process)
         ├── process-inventory.md   # the N processes + dependencies
         ├── assumptions.md   # gap/assumption register (per-process sections) + PDD->SDD trace
         ├── tasks.md         # the multi-process build DAG (components -> processes -> sub-workflows)
@@ -38,7 +38,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
         ├── PR.md            # PR description
         └── processes/
             └── <process>/
-                └── tobe.md  # refined TO-BE (from the PDD's ToBe) + the per-process flow diagram (SDD §7.1.3)
+                └── tobe.md  # refined TO-BE (from the PDD's ToBe) + the per-process flow diagram (sdd:7.1.3)
 ```
 
 ## Conventions
@@ -61,14 +61,14 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
   reads when progress.md says `Flow: rpa`): `progress.md`, `pdd.md`, `architecture.md`, `sdd.md`,
   `process-inventory.md`, `assumptions.md`, `tasks.md`, `tokens.md`, `PR.md`, plus `processes/<p>/tobe.md`
   per process. `verification.md` and `cross-review.md` are ephemeral — ship's prune list for the rpa flow
-  (no `research/` exists here): their verdicts fold into `PR.md` (ship §5), then ship's dossier tidy
+  (no `research/` exists here): their verdicts fold into `PR.md` (ship:5), then ship's dossier tidy
   prunes them (same rule as the dev flow).
 - **The SDD structure is overridable** (clients differ): an existing project `sdd.md`'s ToC wins; else
   `.wi/sdd-template.md`; else the bundled base ToC (see `references/sdd-template.md`).
 - **`architecture.md` is the whole-solution Runtime diagram** — dispatcher + every performer (2nd/3rd) +
-  queues + systems + Orchestrator. Per-process flow diagrams live in each `tobe.md` (and feed SDD §7.1.3).
+  queues + systems + Orchestrator. Per-process flow diagrams live in each `tobe.md` (and feed sdd:7.1.3).
 - **`orchestrator.md` is the resource manifest** — the concrete Orchestrator names (folder, processes,
-  queues, assets, buckets, agents, triggers) elicited in brainstorm; SDD §1.3/§3.1/§7.2–7.6 are filled from
+  queues, assets, buckets, agents, triggers) elicited in brainstorm; sdd:1.3/sdd:3.1/sdd:7.2–7.6 are filled from
   it, and the back-half build provisions from it. Secret/credential **names** only, never values.
 - **Faithful `pdd.md`.** Don't edit it to "fix" the process — refinement lives in `tobe.md`.
 - ADRs for hard-to-reverse choices (REFramework vs coded, dispatcher split, queue model) go in the
@@ -143,7 +143,7 @@ timestamp: <YYYY-MM-DD>
 ---
 type: TO-BE
 title: <process name> — TO-BE
-description: The refined TO-BE flow for this process (feeds SDD §7.1.3).
+description: The refined TO-BE flow for this process (feeds sdd:7.1.3).
 feature: <run-slug>
 timestamp: <YYYY-MM-DD>
 ---
@@ -178,7 +178,7 @@ timestamp: <YYYY-MM-DD>
 - **Worktree:** <path or ->   **Branch:** <branch or ->
 
 ## Model routing (resolved)
-<!-- written when progress.md is seeded (dev step 1-2 / rpa step 2) from .wi/models.md; dispatches
+<!-- written when progress.md is seeded (dev:1-2 / rpa:2) from .wi/models.md; dispatches
      read THIS block, not models.md. Rewrite only when absent or .wi/models.md changed after the
      stamp (models.md's resolve-once rule). Keep the stamp mid-line — Log-span parsing keys on
      stamps that OPEN a line. -->

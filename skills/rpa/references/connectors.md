@@ -40,7 +40,7 @@ not listed, or for specifics (current connector names, scopes, activities), **de
 
 Notes:
 - Prefer connectors/APIs for **maintainability** (selectors break; APIs are stable) — but only when one
-  genuinely exists. Record the choice + rationale inline in `tobe.md` and in SDD §6.
+  genuinely exists. Record the choice + rationale inline in `tobe.md` and in sdd:6.
 - Credentials/secrets always become Orchestrator **assets/credentials** (names in the SDD), never
   hardcoded.
 - Keep this list short and current-ish; it's a prompt, not an inventory. `uipath-platform` has the real,

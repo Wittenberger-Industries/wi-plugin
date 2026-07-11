@@ -9,9 +9,9 @@ tags: [sdd, template, okf, rpa]
 # SDD template
 
 The Solution Design Document is the high-fidelity spec handed to `uipath-rpa` — the "robust
-prompt" meant to one-shot the build. **One SDD per solution**, with §7 repeated per process. Pull from
+prompt" meant to one-shot the build. **One SDD per solution**, with sdd:7 repeated per process. Pull from
 `tobe.md`, `.wi/inputs.md`, `.wi/components.md`, the rpa-constitution, and the assumptions. Reference,
-don't duplicate. Fill §1.3, §3.1 and §7.2–7.6 from `.wi/orchestrator.md` (the resource manifest elicited in
+don't duplicate. Fill sdd:1.3, sdd:3.1 and sdd:7.2–7.6 from `.wi/orchestrator.md` (the resource manifest elicited in
 the brainstorm) — concrete names, not placeholders.
 
 ## Choosing the structure (ToC) — precedence
@@ -33,13 +33,13 @@ whatever number it lands on, rather than dropping it: the checker (plan + result
 verification gate verify the run against the SDD's acceptance-criteria section, wherever it sits.
 
 **The ToC is framework-aware** (`progress.md` → `Framework:`). The base ToC below is the **REFramework**
-shape. On the **Maestro** path, reshape these sections: **§2** becomes the **flow diagram** (from
-`maestro-architecture.md`); **§3.1** the Maestro project/flow layout (the `.flow` files, not REFramework);
-**§7.1.x** the flow's **nodes** (each node's type — connector / approval / script / subflow / agent / ixp —
-its inputs/outputs, and the connection/agent it uses), **not** a transaction + queue-item schema; **§7.2–7.6**
+shape. On the **Maestro** path, reshape these sections: **sdd:2** becomes the **flow diagram** (from
+`maestro-architecture.md`); **sdd:3.1** the Maestro project/flow layout (the `.flow` files, not REFramework);
+**sdd:7.1.x** the flow's **nodes** (each node's type — connector / approval / script / subflow / agent / ixp —
+its inputs/outputs, and the connection/agent it uses), **not** a transaction + queue-item schema; **sdd:7.2–7.6**
 become Maestro **connections, triggers, and agent registrations** — Orchestrator **queues** and `Config.xlsx`
-do not apply. §7.1.3 stays the per-process flow diagram for both, and the acceptance-criteria section
-(§10) applies unchanged on either path.
+do not apply. sdd:7.1.3 stays the per-process flow diagram for both, and the acceptance-criteria section
+(sdd:10) applies unchanged on either path.
 
 ## Base ToC (UiPath enterprise standard)
 
@@ -119,4 +119,4 @@ timestamp: <YYYY-MM-DD>
 ```
 
 A good SDD lets a fresh builder (the UiPath skill or a human) implement the solution without re-reading the
-PDD. §2 is the whole-solution architecture; §7.1.3 is per-process flow. §10 is what "done" means.
+PDD. sdd:2 is the whole-solution architecture; sdd:7.1.3 is per-process flow. sdd:10 is what "done" means.

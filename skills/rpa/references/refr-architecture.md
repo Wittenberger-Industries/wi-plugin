@@ -13,11 +13,11 @@ the **Robotic Enterprise Framework** (REFramework): a state-machine template wit
 processing and built-in retry/exception handling. There are **two** architecture artifacts, mapping to the
 SDD:
 
-- **`architecture.md` (run/solution level) = the "Runtime diagram" (SDD §2):** the **whole solution** —
+- **`architecture.md` (run/solution level) = the "Runtime diagram" (sdd:2):** the **whole solution** —
   the Dispatcher, **every Performer (including a 2nd/3rd)**, all queues, the external systems, and the
   Orchestrator. This is the detailed picture of the entire process landscape, not a single process.
-- **per-process flow diagram (SDD §7.1.3):** one process's TO-BE flow, the zoom-in (lives in that
-  process's `tobe.md` / SDD §7.1.3).
+- **per-process flow diagram (sdd:7.1.3):** one process's TO-BE flow, the zoom-in (lives in that
+  process's `tobe.md` / sdd:7.1.3).
 
 Both are mermaid and **must be validated** with
 `${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py` (safe node IDs — never `graph`/`end`/etc.;

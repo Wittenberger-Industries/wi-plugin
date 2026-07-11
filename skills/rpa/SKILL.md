@@ -33,11 +33,11 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/ingest.md`: a legacy repo (work units under the
    pre-rename `goals` folder) gets the one-time migration in
    `${CLAUDE_PLUGIN_ROOT}/references/feature-folder-cases.md` before anything else; then derive the **numbered run-slug**
-   (`NNNN-<name>` — the next global 4-digit ordinal, mirroring `ADR-NNNN`; see ingest.md §1); catalog the
+   (`NNNN-<name>` — the next global 4-digit ordinal, mirroring `ADR-NNNN`; see ingest:1); catalog the
    supporting files in the repo (API refs, CSV/mapping tables, sample data, screenshots) into
    `.wi/inputs.md`; detect reusable components into `.wi/components.md`; convert the PDD to `pdd.md` with
    markitdown (skip if it's already Markdown). Run the **model routing first-run setup** here too
-   (`${CLAUDE_PLUGIN_ROOT}/references/models.md` §First-run setup): absent → one preset question
+   (`${CLAUDE_PLUGIN_ROOT}/references/models.md` "First-run setup"): absent → one preset question
    (`--auto` → simple, logged); present → apply, warn once on an orchestrator-tier mismatch; a pre-1.3
    legacy config → rename per that section. Never re-ask. Resolve the routing once now (models.md's
    **resolve-once rule**) and
@@ -46,7 +46,7 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    (`rpa-build` resolves override → `wi-task-runner` role → `inherit` — a routing role label, not a
    registered agent; there is no `agents/rpa-build.md`), and at ship the cross-provider diff review
    layers on top of wi-code-checker's result-mode pass, per the same rules as `wi:ship`. The
-   project-level `.wi/` outputs of steps 1–3 (`inputs.md`, `components.md`,
+   project-level `.wi/` outputs of rpa:1–3 (`inputs.md`, `components.md`,
    `orchestrator.md`, `models.md`, a first-run `rpa-constitution.md`) are **committed where written**
    (`chore(wi): …` — the project-level rule in `wi-directory.md`), so the post-gate worktree carries them.
 3. **Brainstorm — refine the TO-BE (the one conversation).** Follow
@@ -71,29 +71,29 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    - **`sdd.md`** — one Solution Design Document. **Choose the ToC** per the precedence in
      `references/sdd-template.md` (an existing project SDD's ToC wins → `.wi/sdd-template.md` → the bundled
      base ToC) — and **shape it to the `Framework`** (REFramework vs Maestro sections, per that template).
-     §7.1.x repeats per process; §7.1.3 is each process's flow diagram (kept in its `tobe.md`);
-     §1.3/§3.1/§7.2–7.6 are filled from `.wi/orchestrator.md` (the elicited resource names).
+     sdd:7.1.x repeats per process; sdd:7.1.3 is each process's flow diagram (kept in its `tobe.md`);
+     sdd:1.3/sdd:3.1/sdd:7.2–7.6 are filled from `.wi/orchestrator.md` (the elicited resource names).
    - per process: **`tobe.md`** (refined from the PDD's ToBe + its flow diagram); `assumptions.md` and
      `process-inventory.md` at run level.
    - **`tasks.md`** = the multi-process build DAG: shared components first, then processes, then each
      process's independent sub-workflows — parallel where the DAG allows. Include the **dev-verification
-     strategy** decided in brainstorm (protocol §5) when the tenant link is an open dep — defer the
+     strategy** decided in brainstorm (protocol:5) when the tenant link is an open dep — defer the
      queue-dependent runtime checks with that dep, or the named local substitute as its own task — so the
      gate approves *how the build will verify*, not just what it builds.
    - **ADR(s)** — the hard-to-reverse choices this run locked (framework `reframework` | `maestro`, the
      dispatcher/performer split, the queue model) each go to the project-wide `.wi/adr/` log as the next
      `ADR-NNNN` + its index row, committed where written (`docs(wi): ADR-NNNN <title>` — rpa-directory.md's
      rule, same as the dev flow); the gate's **Approach (ADR-NNNN)** line cites it. Nothing hard to
-     reverse → no ADR (plan §2's rule: don't manufacture decisions).
+     reverse → no ADR (plan:2's rule: don't manufacture decisions).
 5. **Design gate.** **Pre-gate check (checker · plan mode):** first scaffold the token ledger (idempotent):
    `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md`
-   (python fallback: workflow.md §Script invocation) — the checker is a subagent: append its `tokens.md` row the moment its
+   (python fallback: workflow.md "Script invocation") — the checker is a subagent: append its `tokens.md` row the moment its
    completion notification arrives, per wi-directory.md's **ledger rule** (exact tokens + `Duration`,
    `unavailable` when unobservable — a round returning without a notification records `unavailable`,
-   never an estimate). This mirrors the dev flow's research-start scaffold; step 6's scaffold-if-absent
+   never an estimate). This mirrors the dev flow's research-start scaffold; rpa:6's scaffold-if-absent
    remains the fallback. Each checker round appends its own row. Then, before rendering the gate, dispatch the
    **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `plan` mode over `sdd.md` (its
-   acceptance-criteria section — §10 in the base ToC — plus locked decisions), `tasks.md`, `assumptions.md`,
+   acceptance-criteria section — sdd:10 in the base ToC — plus locked decisions), `tasks.md`, `assumptions.md`,
    `orchestrator.md`, `rpa-constitution.md`, and any
    Runtime State Inventory rows — it builds a feature-backward coverage matrix and returns BLOCKER/WARNING/INFO,
    writing `verification.md`. A BLOCKER (an uncovered SDD criterion, a silently down-scoped decision, an
@@ -145,7 +145,7 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    coded-allowed → `.cs` workflows ok; scaffold each unit as REFramework per the SDD, never Blank),
    append each unit's tokens to `tokens.md` (scaffold it first if absent:
    `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md` —
-   python fallback: workflow.md §Script invocation), and register any new reusable component back into
+   python fallback: workflow.md "Script invocation"), and register any new reusable component back into
    `.wi/components.md`.
 7. **Verify & ship.** Gate = `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/verification-gate.md`, **branched on
    `Framework`**: REFramework → approved paradigm + Workflow Analyzer + `uip` validate; Maestro →
@@ -153,7 +153,7 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    + the **checker · result mode** — one dispatch: the feature-level pass over the SDD's
    acceptance-criteria section plus the inline line-level review (verification-gate.md). Then reuse the **ship**
    skill (`wi:ship`) for the docs-sync, PR (`PR.md` committed, then `gh pr create --body-file`), close-out
-   checklist (including the remote-checks gate — ship §8 verifies the PR's remote checks before any
+   checklist (including the remote-checks gate — ship:8 verifies the PR's remote checks before any
    cleanup), **compound/learnings** (confirm + promote the candidate `.wi/learnings/<run-slug>.md` written at
    the gate; update its `.wi/learnings.md` index line), and the **token report (`tokens.md` — finalized
    before the dossier commit, mandatory)**.
@@ -168,7 +168,7 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
    red build. Record the published package name + version (+ folder) into `orchestrator.md` and the final
    report.
    **Ship is dev-shaped — map its artifacts to the RPA ones:** gate → the RPA verification gate above;
-   `spec.md` (acceptance criteria, review) → **`sdd.md`** (acceptance + §7 process details); `pitfalls.md` →
+   `spec.md` (acceptance criteria, review) → **`sdd.md`** (acceptance + sdd:7 process details); `pitfalls.md` →
    the **`assumptions.md`** register; `brief.md` → **`pdd.md`**; `repo-map.md` → n/a. The dev dossier
    tidy becomes the **RPA dossier** (rpa-directory.md's run manifest): `progress.md`, `pdd.md`, `sdd.md`,
    `architecture.md`, `assumptions.md`, `process-inventory.md`, per-process `tobe.md`, `tasks.md`,
@@ -181,6 +181,6 @@ The design gate, isolated worktrees, **parallel build waves**, the ship PR + **d
 diagrams kept current), **compound/learnings**, the **token report**, `check_mermaid.py`, and
 plugin-bootstrap all work unchanged — `wi:rpa` swaps the *domain* (UiPath/SDD/PDD) into the same machine.
 
-**Superpowers precedence** (integrations.md §Who initiates —
+**Superpowers precedence** (integrations.md "Who initiates" —
 `${CLAUDE_PLUGIN_ROOT}/skills/research/references/integrations.md`): delegation points only, never
 self-triggered mid-phase; wi's artifact formats always win.

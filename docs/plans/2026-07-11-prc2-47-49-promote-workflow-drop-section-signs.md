@@ -45,18 +45,21 @@ Only `skills/research/SKILL.md` uses the `${CLAUDE_PLUGIN_ROOT}/` form (mechanic
 
 ## #49 — sweep inventory by replacement shape (baseline: 121 section-sign lines across 30 files)
 
-Shapes (one rule per citation shape, from the issue):
+**Amended convention (owner decision, 2026-07-11, mid-PR):** the issue's spelled-out `step N` / `section N` forms were rejected during implementation as too wordy per cite; the owner chose the **`name:N` locator** (the `file:line` idiom) for every numbered citation instead. Quoted headings stay. Pre-existing cite-shaped `step N` / `section N` words in shipped text (from PR C-era edits) convert to locators too, so the repo carries exactly one convention.
+
+Shapes (one rule per citation shape):
 
 1. **Named section → quoted heading.** `workflow.md "Script invocation"` (10 sites), `integrations.md "Who initiates"` (dev, rpa, AGENTS.md), `integrations.md "Frontend work"` (build, wi-task-runner), `models.md "First-run setup"` (dev, rpa). Targets verified verbatim: `## Script invocation`, `### Who initiates: wi does`, `## Frontend work`, `## First-run setup (dev / rpa entry points)` — the quoted text is the heading's stable prefix, as the issue's own examples spell it.
-2. **Numbered skill step → step N / steps N/M.** ship (steps are `## N ·` headings; ~20 lines, incl. internal self-cites), build, research (`### N -` pipeline steps, incl. step 1c), dev, plan, rpa, scan; cross-file cites keep the skill name (`ship step 8`, `research step 0`, `build step 2`, `plan step 2`, `rpa/SKILL step 7`, `wi:ship step 2`).
-3. **Numbered document/ToC section → section N / sections N–M.** SDD ToC cites (`section 10 in the base ToC`, `sections 1.3/3.1/7.2–7.6`, `section 7.1.3`, `sections 1-7`) across sdd-template, rpa-directory, refr-/maestro-architecture, verification-gate (rpa), brainstorm-protocol, connectors, build-uipath, wi-code-checker, rpa/SKILL, README diagram label; brainstorm-protocol's **own** numbered sections (`## 0.` … `## 7.`, `## 6a.`) and ingest.md's (`## 1.` … `## 4.`) take the same shape (`section 5`, `section 6a`, `protocol section 0` where cited from ingest).
+2. **Numbered skill step → `skill:N` locator.** `ship:8`, `build:2`, `research:0`, `research:1c`, `plan:2`, `dev:4`, `rpa:6`, `scan:4`. In-file self-cites carry the file's own name (`ship:2` inside ship/SKILL — a bare `:2` is never valid); discrete lists repeat the locator (`ship:1/ship:8`); `wi:ship step 2` normalizes to `ship:2` (no double colon); `rpa/SKILL step 7` → `rpa:7`.
+3. **Numbered document/ToC section → `doc:N` locator.** `sdd:10 in the base ToC`, `sdd:7.1.3`, `sdd:1.3/sdd:3.1/sdd:7.2–7.6` (discrete lists repeat; ranges collapse into one locator: `sdd:1-7`, `sdd:7.2–7.6`) across sdd-template, rpa-directory, refr-/maestro-architecture, verification-gate (rpa), brainstorm-protocol, connectors, build-uipath, wi-code-checker, rpa/SKILL, README diagram label; brainstorm-protocol's **own** numbered sections cite as `protocol:5`, `protocol:6a` (its established shorthand), ingest.md's as `ingest:1` (never `ingest.md:1` — that reads as a line number).
 
 Files in the sweep (section-sign line counts at baseline): ship/SKILL 20 · brainstorm-protocol 13 · rpa/SKILL 12 · sdd-template 9 · rpa-directory 7 · rpa verification-gate 6 · integrations 5 · models 4 · wi-code-checker 4 (5 symbols — **charter: symbol swap only**) · research/SKILL, wi-directory, dev/SKILL, keep-alive, refr-architecture, maestro-architecture, build-uipath, validate.py 3 each · build/SKILL, worktrees-and-subagents, scan/SKILL, build-maestro 2 each · plan/SKILL, workflow.md, connectors, ingest, uipath-bootstrap, ship verification-gate, wi-task-runner (charter), README.md, AGENTS.md 1 each.
 
 README.md and AGENTS.md sit outside the lint scope but are shipped repo text citing the same conventions — swept for consistency (2 lines total).
 
-- [ ] Sweep shapes 1–3 across `skills/ agents/ references/` + README.md + AGENTS.md; reflow lines the longer form overflows; `docs/` untouched.
-- [ ] `scripts/validate.py`: retarget `DEAD_SDD_S13` to the retired anchor's new spelling (case-insensitive `section 13`, word-bounded), update its message; add the section-sign ban over the existing `lint_scope` (skills / agents / references / .claude-plugin); update the module docstring (which itself drops the symbol).
+- [ ] Sweep shapes 1–3 across `skills/ agents/ references/` + README.md + AGENTS.md; reflow lines where needed; `docs/` untouched.
+- [ ] Convert pre-existing cite-shaped `step N` / `section N` words in lint scope to locators (models.md first-run/dispatch lines, feature-folder-cases.md, rpa verification-gate's `rpa step 7`, …) — citation forms only; headings, labels, and step-intro lines (the cite *targets*) stay.
+- [ ] `scripts/validate.py`: retarget `DEAD_SDD_S13` to the retired anchor's new spellings (`sdd:13` or case-insensitive `section 13`, word-bounded), update its message; add the section-sign ban over the existing `lint_scope` (skills / agents / references / .claude-plugin); update the module docstring (which itself drops the symbol and names the locator convention).
 - [ ] Commit 3: validate.py + pytest green; `grep -rn "§" skills agents references .claude-plugin` → zero hits.
 
 ## Verification (PR-level)

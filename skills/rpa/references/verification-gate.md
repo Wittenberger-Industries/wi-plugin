@@ -14,7 +14,7 @@ time-bounded** (a hands-off run must never stall on a prompt; a hang is a blocke
 
 **Publishing is not part of this gate.** Pushing the package to a tenant (`progress.md` → `Publish: feed |
 deploy`) is a separate, **post-gate** ship action that runs only on an already-green build with the PR open
-(see rpa/SKILL.md step 7) — it never gates "done" and never runs on a red build.
+(see rpa:7) — it never gates "done" and never runs on a red build.
 
 ## Framework branch (check `progress.md` → `Framework:` first)
 
@@ -75,10 +75,10 @@ claim green you didn't verify).
 ## Checker (result mode) — feature-level + line-level, one dispatch
 
 Beyond the tooling above, dispatch the **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `result`
-mode — **one dispatch, two sequential passes**, same interface and logging as `wi:ship` §2:
+mode — **one dispatch, two sequential passes**, same interface and logging as ship:2:
 
-- **Feature-level pass** — against **the SDD's acceptance-criteria section** (§10 in the base ToC) + the
-  locked decisions (the SDD's §1-§7, the `rpa-constitution`, any ADR): it confirms each is **delivered and
+- **Feature-level pass** — against **the SDD's acceptance-criteria section** (sdd:10 in the base ToC) + the
+  locked decisions (sdd:1-7, the `rpa-constitution`, any ADR): it confirms each is **delivered and
   wired in the generated project**, not just present. Coverage-level, distinct from the Analyzer's rules.
 - **Line-level pass** — the same dispatch carries the code review inline. Before dispatching, resolve the
   line-review source: if `superpowers:requesting-code-review` is in your available skills, locate its
@@ -91,7 +91,7 @@ mode — **one dispatch, two sequential passes**, same interface and logging as 
 
 **Mixture of Agents (optional, off by default)** — when `progress.md`'s resolved-routing block's MoA row
 includes `review` in its `points` (mirroring `.wi/models.md`'s `## Mixture of Agents` section), this
-dispatch mirrors `wi:ship` §2's MoA branch (rpa runs mirror the review point only): instead of one
+dispatch mirrors ship:2's MoA branch (rpa runs mirror the review point only): instead of one
 checker dispatch, dispatch N proposer checkers (one per listed `proposers` tier) in parallel with
 IDENTICAL prompts (result mode, both passes — `sdd.md`'s acceptance
 criteria as the spec analogue — and the same `Line review template:` line) plus the marker
@@ -111,7 +111,7 @@ Findings from both passes land in `verification.md` (the feature-level matrix pl
 `## Line-level findings` section) in the BLOCKER/WARNING/INFO taxonomy, refreshing it. A result-mode
 **BLOCKER** — an unmet SDD criterion, a decision silently reduced to a stub/mock not signed off, or a
 line-level defect of that gravity — **loops back to build** (**max 2 review→fix rounds**, shared with the
-cross-provider findings when that layer is configured — `wi:ship` §2's rule); ship never opens the PR on a
+cross-provider findings when that layer is configured — ship:2's rule); ship never opens the PR on a
 run the checker says isn't met.
 
 ## What "green" means
@@ -131,6 +131,6 @@ No PASS without a fresh run this session — analyzer/validate output from *this
 earlier and not "should pass". A red gate stops the ship: fix the workflow (loop back to build) or, if the
 SDD was wrong, amend it deliberately and note it. Never weaken a rule to go green.
 
-This gate is the **local** half: the PR's remote checks are verified at ship §8 — which rpa step 7 reuses
+This gate is the **local** half: the PR's remote checks are verified at ship:8 — which rpa:7 reuses
 — after the PR opens, and the final report names the two separately
 (`local gate: green · PR checks: N/N green · deployment: ready`).

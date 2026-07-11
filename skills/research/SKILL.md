@@ -25,7 +25,7 @@ keep-alive loop (`/goal` or Autopilot) if the user armed it.
 - **Hold the budget.** workflow.md's **context budget** is a hard rule: `constitution.md`,
   `repo-map.md`, `progress.md`, plus the one active artifact (`brief.md` while researching;
   `spec.md`/`tasks.md` while planning). Researchers read sources and return short reports — never
-  pull their material into this context. Re-entry (§0) reads `progress.md` + the active artifact,
+  pull their material into this context. Re-entry (research:0) reads `progress.md` + the active artifact,
   not prior-phase files.
 - **Delegate, summarize, discard.** Researchers run in parallel subagents and return short reports; append
   each one's `tokens.md` row the moment its completion notification arrives — the figure exists only
@@ -39,9 +39,9 @@ keep-alive loop (`/goal` or Autopilot) if the user armed it.
 
 ### 0 - Engage & resume
 First act, always: append a Log line to `progress.md` — `research engine engaged (wi <version>)`, reading
-<version> from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (don't guess; if that file isn't reachable — e.g. a per-skill Copilot install — omit the version rather than inventing one) — so it's auditable on disk. Then scaffold the token ledger (idempotent — no-op if it exists): `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<slug>/tokens.md` (python fallback: workflow.md §Script invocation). Then re-enter the phase it names (research | plan | design-gate). **Design-gate re-entry
+<version> from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (don't guess; if that file isn't reachable — e.g. a per-skill Copilot install — omit the version rather than inventing one) — so it's auditable on disk. Then scaffold the token ledger (idempotent — no-op if it exists): `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<slug>/tokens.md` (python fallback: workflow.md "Script invocation"). Then re-enter the phase it names (research | plan | design-gate). **Design-gate re-entry
 guard:** resuming at `design-gate` requires a fresh plan-mode `verification.md` (`type: Verification`) in
-the feature folder; if it is missing or predates the current `spec.md`/`tasks.md`, run the §2 pre-gate checker
+the feature folder; if it is missing or predates the current `spec.md`/`tasks.md`, run the research:2 pre-gate checker
 pass first, then present the gate.
 
 ### 1 - Research -> pick the approach

@@ -38,7 +38,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
         ├── cross-review.md # cross-provider diff review (ship; only when configured) — EPHEMERAL, pruned with verification.md
         ├── .logs/          # redirected command output (gates, CI pulls — workflow.md's output house rule) — self-gitignored, EPHEMERAL
         ├── tokens.md       # token ledger: exact subagent usage + orchestrator (finalized by ship pre-PR)
-        └── PR.md           # the PR description (ship §5) — committed, consumed by gh pr create
+        └── PR.md           # the PR description (ship:5) — committed, consumed by gh pr create
 ```
 
 ## Conventions
@@ -72,7 +72,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 - **`research/`, `verification.md`, `cross-review.md`, and `.logs/` are ephemeral.** Working notes exist to produce
   the ADR and spec; the checker's `verification.md` feeds the design gate (plan mode) and the ship review
   (result mode); `cross-review.md` is the cross-provider diff review's output (ship, only when configured).
-  Their verdicts + any waived findings fold into `PR.md` (ship §5), then the dossier tidy (§6) prunes all
+  Their verdicts + any waived findings fold into `PR.md` (ship:5), then the dossier tidy (ship:6) prunes all
   four before the PR (unless the constitution says keep them). This bullet is ship's prune list for the
   dev flow — the tidy prunes exactly what it names. `.logs/` holds redirected command output (workflow.md's
   output house rule); its own `.gitignore` (containing `*`) keeps it out of `git status` and every dossier
@@ -147,7 +147,7 @@ timestamp: <YYYY-MM-DD>
 - **Branch:** <branch or "-">
 
 ## Model routing (resolved)
-<!-- written when progress.md is seeded (dev step 1-2 / rpa step 2) from .wi/models.md; dispatches
+<!-- written when progress.md is seeded (dev:1-2 / rpa:2) from .wi/models.md; dispatches
      read THIS block, not models.md. Rewrite only when absent or .wi/models.md changed after the
      stamp (models.md's resolve-once rule). Keep the stamp mid-line — Log-span parsing keys on
      stamps that OPEN a line. -->
@@ -208,7 +208,7 @@ timestamp: <YYYY-MM-DD>
 
 ## Orchestrator
 
-_PENDING — the ledger is scaffolded by `check_tokens.py --init` (research §0), rows appended live, and
+_PENDING — the ledger is scaffolded by `check_tokens.py --init` (research:0), rows appended live, and
 ship replaces this section during the dossier tidy (BEFORE the dossier commit and the PR) by running
 `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>`, which parses the
 session transcript (per-turn `usage`: output, fresh input, cache write/read) and recomputes the Subagents

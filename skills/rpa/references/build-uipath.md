@@ -20,7 +20,7 @@ Precondition: the design gate passed (SDD + assumptions confirmed, or `--auto`),
 
 ## 1. Isolate
 
-The worktree + branch (`wi/<run-slug>`) are created at rpa §6 — framework-neutral, exactly as
+The worktree + branch (`wi/<run-slug>`) are created at rpa:6 — framework-neutral, exactly as
 `wi:build` does it (`${CLAUDE_PLUGIN_ROOT}/skills/build/references/worktrees-and-subagents.md`; use
 `superpowers:using-git-worktrees` if installed) — and the run dossier arrives with the checkout: it
 was committed on main at the design gate (`docs(<run-slug>): feature dossier (design gate)`), and the
@@ -78,7 +78,7 @@ DAG allows (independent processes and independent sub-workflows in parallel):
    reports completion (the only point the count exists) — `tokens.md` is **mandatory**, not optional;
    initialize it on the first delegation if absent
    (`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md` —
-   python fallback: `references/workflow.md` §Script invocation), and ship finalizes it
+   python fallback: `references/workflow.md` "Script invocation"), and ship finalizes it
    (`token_report.py --write`) under a `check_tokens.py` close-out gate.
 5. **Register new components.** If the build created something reusable (a generic login, a notifier),
    add it to `.wi/components.md` so the next process inherits it.
@@ -86,7 +86,7 @@ DAG allows (independent processes and independent sub-workflows in parallel):
 ## 3. Orchestrator wire-up (if in scope)
 
 For queues/assets/credentials/triggers, delegate to `uipath-platform` (it owns the `uip` CLI + Orchestrator
-APIs). Names come from the SDD §7 resource manifest. Never hardcode secrets — create assets/credentials.
+APIs). Names come from the sdd:7 resource manifest. Never hardcode secrets — create assets/credentials.
 
 ## 4. Scope & safety
 
@@ -96,7 +96,7 @@ commit secrets or local robot artifacts; respect `.gitignore` for `.local`, `*.u
 **Shared-worktree git landmines** — the parallel build waves share one worktree, same as `wi:build`, and
 the same landmines bind every wave: the canonical list (no-stash / no-clean / no-reset, and how to park
 WIP safely) lives in `agents/wi-task-runner.md`'s shared-worktree rules — one statement, both flows. The
-orchestrator commits per unit (step 2.4); a delegated build never runs destructive git.
+orchestrator commits per unit (build-uipath:2.4); a delegated build never runs destructive git.
 
 ## Notes
 

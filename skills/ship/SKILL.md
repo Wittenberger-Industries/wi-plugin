@@ -18,8 +18,8 @@ Inputs: the feature branch/worktree, `spec.md` (acceptance criteria), `pitfalls.
 `repo-map.md`.
 
 Hold exactly that (workflow.md's **context budget** — `spec.md` + `pitfalls.md` are this phase's
-artifacts, read by section where possible): the diff enters as `--stat` + hunks (§2), command output
-as exit code + tail (§1/§8), and the checker — not you — re-reads the repo.
+artifacts, read by section where possible): the diff enters as `--stat` + hunks (ship:2), command output
+as exit code + tail (ship:1/ship:8), and the checker — not you — re-reads the repo.
 
 First act once engaged: append `- <ts> **Update** phase = ship (ship engine engaged (wi <version>))` to
 progress.md's Log — full ISO-8601 stamp from the OS clock (`date -Iseconds` /
@@ -98,7 +98,7 @@ Findings from both checker passes and the cross-provider layer feed the same loo
 criterion, a decision silently reduced to a stub, a correctness bug in the diff — sends the feature
 **back to build**, **max 2 review→fix rounds** shared across all of it; whatever remains goes with its
 severity into `PR.md`'s Verification. A BLOCKER from any layer blocks the PR. `cross-review.md` is
-ephemeral (pruned in §6, after §5 distills it into `PR.md`). Ship never opens the PR on a feature
+ephemeral (pruned in ship:6, after ship:5 distills it into `PR.md`). Ship never opens the PR on a feature
 wi-code-checker says isn't delivered.
 
 Address findings before proceeding; note anything deliberately deferred.
@@ -115,8 +115,8 @@ The feature is built and verified — make the docs match reality before the PR.
   Then validate it for real before committing:
   `python ${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py .wi/architecture.md` — the bundled
   checker catches reserved-word node IDs, unquoted labels, and unbalanced `subgraph`/`end` (and renders
-  via `mmdc` when available). Fix every error it reports. (python fallback: workflow.md §Script
-  invocation — holds for every script in this SKILL.)
+  via `mmdc` when available). Fix every error it reports. (python fallback: workflow.md "Script
+  invocation" — holds for every script in this SKILL.)
 - **Project overview & commands:** if organization, stack, or run steps changed, update `.wi/overview.md`;
   if the command list changed, update `.wi/repo-map.md`.
 - **Repo docs the change touched or staled:** READMEs, `docs/`, public-surface docstrings/examples that
@@ -187,7 +187,7 @@ not console output**: save it as `.wi/features/<slug>/PR.md` and commit it (`doc
 It is part of the dossier in both flows and exists **whether or not** a PR can be opened this run — it is
 what `gh pr create --body-file` consumes, and what a human uses if they must create the PR by hand. It
 opens with OKF frontmatter (`type: PR Description`); the PR **body** is everything *below* that
-frontmatter, so the frontmatter is stripped before feeding `gh` (§7) — it's dossier metadata, not PR text.
+frontmatter, so the frontmatter is stripped before feeding `gh` (ship:7) — it's dossier metadata, not PR text.
 Template:
 
 ```markdown
@@ -217,7 +217,7 @@ timestamp: <YYYY-MM-DD>
 
 ### Verification
 <checker result-mode verdict: every acceptance criterion + locked decision delivered and wired; any waived
-findings with severity. Distilled from verification.md; the dossier tidy (§6) then prunes it.>
+findings with severity. Distilled from verification.md; the dossier tidy (ship:6) then prunes it.>
 
 ### Risk & rollout
 <feature flag? migration order? back-out plan. From spec.md Rollout.>
@@ -240,7 +240,7 @@ findings with severity. Distilled from verification.md; the dossier tidy (§6) t
   means `dev`** — features created before the line existed are dev). It keys which directory reference
   defines the sweep whitelist, the ephemera list, and the dossier manifest below: `dev` →
   `${CLAUDE_PLUGIN_ROOT}/skills/research/references/wi-directory.md`, `rpa` →
-  `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/rpa-directory.md`. **RPA runs: see rpa/SKILL §7** for how
+  `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/rpa-directory.md`. **RPA runs: see rpa:7** for how
   ship's dev-named artifacts (spec.md, pitfalls.md, brief.md) map to the RPA ones. Then:
   1. *Sweep strays:* every feature-specific file must live under `.wi/features/<slug>/`. Anything this run left
      loose in `.wi/` or elsewhere (scratch notes, drafts, working files) moves into the slug folder or is
@@ -251,11 +251,11 @@ findings with severity. Distilled from verification.md; the dossier tidy (§6) t
      When in doubt the directory reference wins; never sweep a file it marks project-level.
   2. *Prune the ephemera* — the flow's directory reference names them (dev: wi-directory.md's ephemera
      bullet; rpa: rpa-directory.md's run-dossier bullet); prune exactly that list, nothing more. Their
-     value must already be distilled — §5 folded the checker/diff-review verdicts into `PR.md`'s
+     value must already be distilled — ship:5 folded the checker/diff-review verdicts into `PR.md`'s
      Verification; research notes live on in the ADR and `spec.md`. If something is still load-bearing,
-     fold it in first. Prune tracked ephemera with `git rm -f` (the §2 result-mode checker refreshed
+     fold it in first. Prune tracked ephemera with `git rm -f` (the ship:2 result-mode checker refreshed
      `verification.md` *after* the commit that last touched it, so a plain `git rm` refuses on the local
-     modifications); a never-committed one (`cross-review.md` is written at §2 and typically never
+     modifications); a never-committed one (`cross-review.md` is written at ship:2 and typically never
      committed) is untracked — plain-delete it, `git rm` has no pathspec to match (prune a review file
      left under its pre-1.3 legacy name too; `.logs/` is likewise never tracked (self-gitignored) —
      plain-delete the directory).
@@ -278,7 +278,7 @@ findings with severity. Distilled from verification.md; the dossier tidy (§6) t
   4. *What remains is the fixed dossier for this flow* — take the manifest from the flow's directory
      reference, not from memory: `dev` → wi-directory.md's seven-file dossier (progress, brief, spec,
      tasks, pitfalls, tokens, PR); `rpa` → rpa-directory.md's run dossier (the SDD pack plus per-process
-     `tobe.md`). Either way it is the durable record of the feature (`PR.md` was written in §5, so this
+     `tobe.md`). Either way it is the durable record of the feature (`PR.md` was written in ship:5, so this
      tidy commit carries the complete dossier).
   5. Commit it: `chore(<slug>): tidy feature dossier`.
 
@@ -301,7 +301,7 @@ a `core.autocrlf=true` checkout, where the `---` delimiters arrive as `---\r` an
 miss them.)
 
 Log the PR URL in `progress.md` as `- <ts> **Update** PR opened: <url>` — full OS-clock stamp; this
-exact wording is the stamp `token_report.py` reads as the end of the second autonomous span. §8
+exact wording is the stamp `token_report.py` reads as the end of the second autonomous span. ship:8
 verifies the PR's remote checks before any cleanup.
 
 **A pushed branch is not a shipped feature.** If `gh` is unavailable or `pr create` fails, the run is **not
@@ -311,7 +311,7 @@ above) —
 — plus the failure reason, and tell the user in the final report that the PR still needs creating. Never silently stop at the push. **Never
 force-push.** If `superpowers:finishing-a-development-branch` is installed, consult it for the close-out
 **decision** (merge / PR / keep) in interactive runs — in an autonomous run that decision is already made
-(the PR). The worktree and branch **mechanics stay wi's own (§8)**: wi's sibling-dir worktrees fail that
+(the PR). The worktree and branch **mechanics stay wi's own (ship:8)**: wi's sibling-dir worktrees fail that
 skill's `.worktrees/`-only provenance rule, so never delegate the removal itself. (A delegation point —
 see the precedence rule in `skills/research/references/integrations.md`.)
 
@@ -319,16 +319,16 @@ see the precedence rule in `skills/research/references/integrations.md`.)
 *impossible*, not failed — don't loop on them. Record `Close-out: local (no remote)` in `progress.md`'s
 Decisions/blockers together with the recovery pair to run once a remote exists — the
 `git push -u origin wi/<slug>` and the frontmatter-stripped `gh pr create` command above — then proceed
-to §8; its PR checkbox passes on that recorded substitute, and with no remote there are no remote checks:
+to ship:8; its PR checkbox passes on that recorded substitute, and with no remote there are no remote checks:
 log `remote checks: none configured` and the remote-checks box passes on it under the recorded local
 close-out. Everything else in ship (gate, docs-sync, dossier, tokens) already ran for real, so the branch
 is merge-ready the moment a remote appears.
 
 ## 8 · Remote checks, then close out — checklist, then the report
 
-**The remote-checks gate — before any cleanup.** The §1 gate was local; the PR's checks — CI runs and
+**The remote-checks gate — before any cleanup.** The ship:1 gate was local; the PR's checks — CI runs and
 deployment checks (e.g. Vercel) — are the authoritative signal, and they run remotely *after* the push.
-The PR must be green, not just the worktree. Re-create the log dir first if the §6 tidy pruned it —
+The PR must be green, not just the worktree. Re-create the log dir first if the ship:6 tidy pruned it —
 `mkdir -p .wi/features/<slug>/.logs && printf '*\n' > .wi/features/<slug>/.logs/.gitignore`
 (idempotent; keeps it self-gitignored so a red-path fix commit can never stage CI logs —
 workflow.md's output house rule). Then give the checks a moment to register and watch them to
@@ -342,7 +342,7 @@ substitute.
 
 - **Green** — every reported check (or every **required** check, where branch protection defines them)
   concluded successfully. Log the evidence in `progress.md`: `remote checks: N/N green` plus the check
-  names, conclusions, and run URLs. It lives there by design: `verification.md` was pruned at §6 and
+  names, conclusions, and run URLs. It lives there by design: `verification.md` was pruned at ship:6 and
   `PR.md` was committed before the push, so neither can carry evidence that only exists after the PR
   opens — `progress.md` carries it, and the final report repeats it.
 - **Red** — **the run is not done and the keep-alive condition is not satisfied.** Pull the failing logs
@@ -363,7 +363,7 @@ substitute.
 
 **Cleanup runs only after the remote gate lands** (green / none configured / user-accepted red) —
 worktree removal comes after remote verification by design: a fix loop needs its workspace.
-After the PR is open (or merged, or the §7 no-remote close-out is recorded), clean up: remove the
+After the PR is open (or merged, or the ship:7 no-remote close-out is recorded), clean up: remove the
 worktree (safe once the branch is pushed — or, under a no-remote close-out, once the dossier commit is on
 the local branch), and
 delete the **local** branch only if it is fully merged (`git branch -d`, which refuses otherwise — see
@@ -372,7 +372,7 @@ the worktree reference); the remote branch and an open PR are never deleted. The
 `done` is **earned by this checklist**; an unticked box means ship is not finished, no matter what the
 console already said:
 
-- [ ] PR is **open** and its URL is logged in `progress.md` (two substitutes, §7: branch pushed + failure
+- [ ] PR is **open** and its URL is logged in `progress.md` (two substitutes, ship:7: branch pushed + failure
       reason + the frontmatter-stripped `gh pr create …` recovery command recorded as a blocker; or — no
       remote exists — `Close-out: local (no remote)` + the push/PR recovery pair recorded)
 - [ ] Remote checks: N/N green logged with run URLs — or none configured logged, or red — accepted by
@@ -386,7 +386,7 @@ console already said:
       reading the file by eye — the exit code is the close-out condition the keep-alive loop waits on.
 - [ ] `.wi/learnings.md` index has this feature's line (and the detail file exists if one was warranted)
 - [ ] dossier = exactly the flow's manifest (per progress.md `Flow:`, missing = dev — dev: the seven-file
-      dossier in wi-directory.md; rpa: the run dossier in rpa-directory.md; **RPA runs: see rpa/SKILL §7
+      dossier in wi-directory.md; rpa: the run dossier in rpa-directory.md; **RPA runs: see the rpa:7
       mapping**); ephemera pruned (the flow's directory reference names them); no strays anywhere
       in `.wi/`
 - [ ] worktree removed; local branch deleted only if fully merged (`git branch -d` refuses otherwise) —

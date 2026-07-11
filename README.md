@@ -89,7 +89,7 @@ flowchart TD
   subgraph rpalane["/wi:rpa — UiPath solution"]
     pddin["PDD (.docx)"] --> ingest["ingest — markitdown -> pdd.md; register inputs + reusable components"]
     ingest --> tobe["refine the TO-BE (YOU) — gaps, exceptions, framework proposal"]
-    tobe --> sddplan["plan — sdd.md (acceptance criteria §10), architecture, assumptions, tasks DAG"]
+    tobe --> sddplan["plan — sdd.md (acceptance criteria sdd:10), architecture, assumptions, tasks DAG"]
   end
 
   scan["/wi:scan — once per project: repo-map, constitution, architecture"] -.-> brainstorm

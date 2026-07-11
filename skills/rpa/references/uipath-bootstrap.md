@@ -16,7 +16,7 @@ them and **offer** to install what's missing (never hard-fail silently — say w
 Microsoft's doc→Markdown converter. Used to turn a `.docx`/`.pdf`/`.pptx` PDD into `pdd.md`.
 
 - **Check:** `markitdown --version` (or `python -c "import markitdown"` — python fallback:
-  `references/workflow.md` §Script invocation).
+  `references/workflow.md` "Script invocation").
 - **Install:** `pip install 'markitdown[docx,pdf,pptx]'` (or `[all]`). Python 3.10+. If `pip` isn't
   available, `uv pip install 'markitdown[docx,pdf,pptx]'` in a venv.
 - If the PDD is already Markdown, markitdown isn't strictly needed for that file — but install it anyway

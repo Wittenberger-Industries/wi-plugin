@@ -66,7 +66,7 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
 
 5. **Mirror the task titles** into `progress.md`, **leave Phase = `plan`**, and stop. plan does not own the
    design-gate transition: the research skill flips Phase = `design-gate` only after its plan-mode checker
-   pass (research §2) has run over the finished plan. It then presents the architecture (ADR) + design
+   pass (research:2) has run over the finished plan. It then presents the architecture (ADR) + design
    (spec) + wave overview to the user for confirmation — no code before their explicit go.
 
 ## `tasks.md` format

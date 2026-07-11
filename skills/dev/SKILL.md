@@ -26,12 +26,12 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
    don't proceed without a repo map and constitution. If it exists but looks stale — `scanned` stamp older
    than ~2 weeks, or config/lock/CI files changed since it — run the scan skill's **`--refresh`** drift
    pass (cheap; updates facts + consolidates learnings) before building on the map.
-   **Model routing first-run setup** (`${CLAUDE_PLUGIN_ROOT}/references/models.md` §First-run setup):
+   **Model routing first-run setup** (`${CLAUDE_PLUGIN_ROOT}/references/models.md` "First-run setup"):
    `.wi/models.md` absent → ask once and write+commit per that section (`--auto` → the **simple** preset,
    logged as an assumption); present → apply it silently, warning once if the session model is below the
    configured orchestrator tier; a pre-1.3 legacy config → rename per that section. Never re-ask an
    existing config. Finish by resolving the routing once (override → role →
-   `inherit` per dispatch kind — models.md's **resolve-once rule**); step 2 records it as the
+   `inherit` per dispatch kind — models.md's **resolve-once rule**); dev:2 records it as the
    `## Model routing (resolved)` block when `progress.md` is seeded, and a resumed feature missing the
    block gets it written on re-entry. Every later dispatch reads the block, not `.wi/models.md`.
 2. **Open the feature folder — or route the edge case first.** Parse flags: `--auto` sets **Gate mode:
@@ -66,7 +66,7 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
      brainstorm round to fill it.
    - **A PR-open condition needs a remote.** `git remote` prints nothing → do **not** print or arm the
      keep-alive at all: the condition can never hold and an armed loop would spin forever. Note in
-     progress.md that the run ends at ship's no-remote close-out (ship §7) and the keep-alive applies once
+     progress.md that the run ends at ship's no-remote close-out (ship:7) and the keep-alive applies once
      a remote exists. (All checks resolve inside the brainstorm stop — they are not a new gate.)
    Both green → recap the brief in 3-5 lines, then print the keep-alive handoff for the current platform
    **verbatim from `${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`** — the single source of the platform
@@ -109,7 +109,7 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
   `roadmap.md` line (tell them which feature it became); contradicts the approved design/ADR → pause,
   re-open the design gate with a delta summary (approve / amend / stop), continue on the answer. The run
   never derails on input, and input never vanishes.
-- **Superpowers precedence** (integrations.md §Who initiates —
+- **Superpowers precedence** (integrations.md "Who initiates" —
   `${CLAUDE_PLUGIN_ROOT}/skills/research/references/integrations.md`): delegation points only, never
   self-triggered mid-phase; wi's artifact formats always win.
 - Keep dev thin: it sequences; the phase skills do the work; the keep-alive loop (`/goal` or Autopilot) keeps it alive.

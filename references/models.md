@@ -110,7 +110,7 @@ tier, including `fable`).
 
 ## First-run setup (dev / rpa entry points)
 
-When `.wi/models.md` is **absent** at a wi entry skill (dev step 1, rpa step 2): **interactive** → ask once
+When `.wi/models.md` is **absent** at a wi entry skill (dev:1, rpa:2): **interactive** → ask once
 — *"Model routing: smart, simple, or custom?"* — pre-fill from the chosen preset (`wi-researcher`'s literal
 is computed once as one tier below the chosen orchestrator tier), confirm the per-role rows (and any
 per-agent override), write the file **and commit it** (`chore(wi): models config` — the project-level rule
@@ -122,11 +122,11 @@ pre-1.3 config under the old filename (the tell: an old-named `.wi/*.md` carryin
 `## Cross-provider config` sections) is renamed to `.wi/models.md` with its frontmatter set to
 `type: Model Routing Config` — the section format is unchanged. Setup ends by resolving the routing once
 and recording it as the `## Model routing (resolved)` block when the feature's `progress.md` is seeded
-(dev step 2 / rpa's run seed) — the resolve-once rule below.
+(dev:2 / rpa's run seed) — the resolve-once rule below.
 
 ## Dispatch rule (build, research, ship, rpa) — resolve once, dispatch many
 
-**Resolve at entry.** At dev step 1 / rpa step 2 — or at the first dispatch that finds no block
+**Resolve at entry.** At dev:1 / rpa:2 — or at the first dispatch that finds no block
 (legacy features, pre-1.7 runs) — resolve every dispatch kind **once**: per-agent override → the
 agent's own role → `inherit` (`wi-code-checker` reads the `wi-code-checker` role, `wi-researcher`
 reads `wi-researcher`, `wi-task-runner` reads `wi-task-runner`; RPA build delegations resolve
@@ -166,7 +166,7 @@ role's Claude tier:
 ### The cross-provider diff review (a layer beside wi-code-checker's result mode)
 
 Not a per-tool-call interceptor (running every reviewer role cross-provider was rejected as cost-prohibitive; only this independent cross-provider layer at ship survived): it's an
-**independent third-party line-level review of the finished diff**, run by ship §2 conceptually beside its
+**independent third-party line-level review of the finished diff**, run by ship:2 conceptually beside its
 self-review — and, when `check_points: per-wave`, additionally at each build wave-end gate over that
 wave's diff. The point is **model diversity**: the checker itself is Claude-family (subagents can only run
 Claude models); this script is how another model family gets a look at the diff. It is a different check,
@@ -178,7 +178,7 @@ it cannot verify things are actually wired, and it does not write `verification.
    constitution rules.
 2. Run `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/cross_review.py --config .wi/models.md
    --diff <patch> --context <spec> --out .wi/features/<slug>/cross-review.md` (python fallback:
-   `references/workflow.md` §Script invocation).
+   `references/workflow.md` "Script invocation").
 3. Exit `0` = `## REVIEW PASSED`; `1` = `## ISSUES FOUND` — treat findings like any checker finding:
    BLOCKER → fix (loop back to build), WARNING/INFO → address or record. Both layers share the **max 2
    review→fix rounds** budget; whatever remains after round 2 is surfaced, with
@@ -187,8 +187,8 @@ it cannot verify things are actually wired, and it does not write `verification.
    continue; wi-code-checker's result-mode dispatch is unconditional and runs regardless. The
    cross-provider script works alone — the orchestrator hands it the diff and takes back findings; it does
    not steer the review.
-4. `cross-review.md` is **ephemeral** like `verification.md`: ship §5 distills the verdict into `PR.md`,
-   then the dossier tidy (§6) prunes both.
+4. `cross-review.md` is **ephemeral** like `verification.md`: ship:5 distills the verdict into `PR.md`,
+   then the dossier tidy (ship:6) prunes both.
 
 The cross-provider review is a standalone layer: it needs only the `## Cross-provider config` section and
 works even when every role is `inherit` (no tier routing in use). The escalation contract in

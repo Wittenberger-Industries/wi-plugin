@@ -9,7 +9,7 @@ tags: [rpa, reference]
 # Brainstorm — refine the TO-BE (the one conversation)
 
 This is the interactive phase and the value of `wi:rpa`: a PDD is usually AS-IS-heavy and gap-ridden, so turn
-it into a buildable TO-BE. **Refine the PDD's own ToBe — but do NOT trust it** (see §0). Assume gaps *and
+it into a buildable TO-BE. **Refine the PDD's own ToBe — but do NOT trust it** (see protocol:0). Assume gaps *and
 errors* exist even when the PDD looks complete.
 
 **This is a real conversation with the USER — not a monologue, and `--auto` does not change that.** The
@@ -32,24 +32,24 @@ protocol directly and stamp `via wi fallback, self-answered (headless)`. **Stamp
 
 **Must-ask before the design gate (never skipped in dialogue — only a headless run self-resolves each as a
 logged assumption, and says so):**
-1. **Scope** — confirm in/out (§1).
+1. **Scope** — confirm in/out (protocol:1).
 2. **Framework** — **REFramework or Maestro flow?** Propose from the process shape: **Maestro** for
    orchestration-shaped work (approvals/HITL, Integration Service connectors, UiPath Agent calls,
    long-running/wait-heavy, ixp, branching across systems); **REFramework** for high-volume queue-based
    batch transactions (dispatcher/performer). State a one-line rationale; record in `progress.md`
    (`Framework:`). A headless run records the shape-heuristic proposal (or the constitution default,
    `reframework`, when the shape is ambiguous) as an assumption.
-3. **ToBe correctness** — the PDD's ToBe + diagram are a *draft*; confirm what's wrong or missing (§0, §2).
-4. **Dispatcher/Performer split + the queue handoff** (§5).
-5. **Naming conventions** and **Orchestrator env / variables** (§6).
+3. **ToBe correctness** — the PDD's ToBe + diagram are a *draft*; confirm what's wrong or missing (protocol:0, protocol:2).
+4. **Dispatcher/Performer split + the queue handoff** (protocol:5).
+5. **Naming conventions** and **Orchestrator env / variables** (protocol:6).
 6. **Email / notification approach — never defaulted.** *Only when the process sends email or
    notifications:* if the PDD/inputs name the method, use exactly that; otherwise put the options to the
    user — **IMAP/SMTP, desktop Outlook activities, Microsoft 365, Exchange, or an Integration Service
    connector** — and record the confirmed choice (an assumption row + the SDD). Unresolved at the gate = an
-   **open dependency `D`** (blocking, §7). A headless run does **not** pick an email framework — this is the
-   one must-ask it never self-resolves: it **mocks the send** (§2 mock boundary) and records the open dep.
-7. **Every open dependency `D`** — resolve it now, or have the user *explicitly* defer it (§7 + the gate).
-8. **Rename / rebrand / migration only** — run the **Runtime State Inventory** (§6a): the old name almost
+   **open dependency `D`** (blocking, protocol:7). A headless run does **not** pick an email framework — this is the
+   one must-ask it never self-resolves: it **mocks the send** (protocol:2 mock boundary) and records the open dep.
+7. **Every open dependency `D`** — resolve it now, or have the user *explicitly* defer it (protocol:7 + the gate).
+8. **Rename / rebrand / migration only** — run the **Runtime State Inventory** (protocol:6a): the old name almost
    always lives on in Orchestrator resources and in-flight queue items a repo grep can't see.
 
 ## 0. Baseline — and challenge it
@@ -67,7 +67,7 @@ refining *means* correcting, which means questioning first.
 
 A PDD may describe several processes. Identify each distinct end-to-end **business process** — its own
 trigger, its own business outcome — and list them as the **process inventory**. Each becomes a process unit
-with its own `tobe.md` + an SDD §7 block.
+with its own `tobe.md` + an sdd:7 block.
 
 **Don't over-decompose — separate three things that look alike:**
 - A **business process** (own trigger + outcome) → its own inventory row.
@@ -155,7 +155,7 @@ become new sub-workflows.
 
 ## 6. Orchestrator provisioning & naming
 
-The SDD's infrastructure (§1.3) and Orchestrator sections (§7.2–7.6) need **concrete resource names + values**,
+The SDD's infrastructure (sdd:1.3) and Orchestrator sections (sdd:7.2–7.6) need **concrete resource names + values**,
 and the back-half build provisions from them. **Ask the user for the real values** — anything they don't know
 becomes an **open dependency `D`** (surfaced at the gate), not a silent `(confirm)` placeholder you build past.
 Capture answers into `.wi/orchestrator.md`:
@@ -166,7 +166,7 @@ Capture answers into `.wi/orchestrator.md`:
 - **Published process / package names** — one per process (e.g. `Acme_Dispatcher`, `Acme_Performer`).
 - **Queues** — name(s) + dev/test/prod split.
 - **Assets** — config assets + **credential names** (names ONLY, never values — they're Orchestrator credentials).
-- **Storage Buckets** — name + purpose (the document/file transport from §5).
+- **Storage Buckets** — name + purpose (the document/file transport from protocol:5).
 - **Config / environment variables** — the `Config.xlsx` Settings/Constants the run needs **and their values
   per environment** (dev/test/prod): URLs, folder/UNC paths, poll interval, queue concurrency/retries,
   target-system constants, feature toggles. Names *and* values — ask, don't default silently.
@@ -176,7 +176,7 @@ Capture answers into `.wi/orchestrator.md`:
 
 In a headless run (or when the user doesn't have them yet) **propose convention-based names**
 (`<Solution>_<Process>_<Queue|Asset|Bucket>`) and log them as assumptions to confirm — a named default beats a
-blank §7. Secrets stay names-only (constitution rule).
+blank sdd:7. Secrets stay names-only (constitution rule).
 
 ```markdown
 ---

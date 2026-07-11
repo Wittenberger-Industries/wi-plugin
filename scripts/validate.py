@@ -28,14 +28,16 @@ Checks (from the repo root, detected automatically):
   7. Mechanical lints, scoped to skills/ · agents/ · references/ · .claude-plugin/ (never docs/ or tests/,
      which legitimately archive the very strings banned in shipped text): every SKILL.md `description`
      stays under the 1024-char agent-skills cap; skill + reference descriptions don't trail off mid-thought
-     (a truncated/lazy `...` or `..`); and four dead strings are banned — the retired `uipath-rpa-workflows`
+     (a truncated/lazy `...` or `..`); the section-sign symbol (U+00A7) is banned outright — citations
+     use the name:N locator (ship:8, sdd:7.1.3, protocol:5) or a quoted heading (workflow.md
+     "Script invocation"); and four dead strings are banned — the retired `uipath-rpa-workflows`
      slug, the pre-rename work-unit dir `.wi/goals` (the unit is a feature; the dir is `.wi/features` —
      only the one-time `git mv .wi/goals .wi/features` migration line, which lives in
      references/feature-folder-cases.md's legacy case, may name the old path),
      `python3` launching a bundled `${CLAUDE_PLUGIN_ROOT}` script (the broken Windows Store stub;
      prose `python3`/`py -3` fallback notes are not flagged, only actual invocations), and the retired
-     `sdd.md §13` acceptance-criteria anchor (now the semantic 'acceptance-criteria section', §10 in the
-     base ToC).
+     sdd.md acceptance-criteria anchor spelled `sdd:13` or `section 13` (the acceptance-criteria
+     section is sdd:10 in the base ToC).
 
 Exit 0 if all pass; non-zero otherwise. Stdlib only (PyYAML optional).
 """
@@ -301,7 +303,8 @@ DEAD_SLUG = re.compile(r"uipath-rpa-workflows")
 DEAD_GOALS_DIR = re.compile(r"\.wi/goals")  # goal->feature rename (M1): the work-unit dir is .wi/features
 MIGRATION_CMD = "git mv .wi/goals .wi/features"  # the one sanctioned mention (dev/rpa legacy migration)
 PY3_INVOKE = re.compile(r"python3[ \t]+\$\{CLAUDE_PLUGIN_ROOT\}")  # an invocation — bare prose `python3` won't match
-DEAD_SDD_S13 = re.compile(r"§13")  # the SDD acceptance-criteria anchor is semantic (§10 in the base ToC)
+SECTION_SIGN = re.compile("§")  # the section-sign symbol is banned in shipped text (#49): cite name:N locators or quoted headings
+DEAD_SDD_S13 = re.compile(r"(?i)\b(?:sdd:13|section 13)\b")  # the SDD acceptance-criteria anchor is semantic (sdd:10 in the base ToC)
 lint_scope = (
     sorted(ROOT.glob("skills/**/*.md"))
     + sorted(ROOT.glob("agents/*.md"))
@@ -320,8 +323,10 @@ for f in lint_scope:
         errors.append(f"{rel}: dead path '.wi/goals' — the work unit is a feature; use '.wi/features' (goal->feature rename)")
     if PY3_INVOKE.search(txt):
         errors.append(f"{rel}: 'python3 ${{CLAUDE_PLUGIN_ROOT}}' invocation — use 'python' (python3 is the broken Store stub on Windows)")
+    if SECTION_SIGN.search(txt):
+        errors.append(f"{rel}: section-sign (U+00A7) — cite a name:N locator (ship:8, sdd:7.1.3) or a quoted heading instead")
     if DEAD_SDD_S13.search(txt):
-        errors.append(f"{rel}: dead anchor '§13' — reference the SDD's acceptance-criteria section semantically (§10 in the base ToC)")
+        errors.append(f"{rel}: dead anchor 'sdd:13' — the SDD's acceptance-criteria section is sdd:10 in the base ToC")
 
 # Report -------------------------------------------------------------------
 note = "" if HAVE_YAML else "  [PyYAML absent → YAML parse skipped; `pip install pyyaml` for the full check]"

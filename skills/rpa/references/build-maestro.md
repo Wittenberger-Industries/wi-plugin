@@ -12,7 +12,7 @@ Used when **`Framework: maestro`** (the REFramework path is `build-uipath.md`). 
 and the artifacts; **`uipath-maestro-flow` owns the build** — borrow, don't reinvent.
 
 Precondition: the design gate passed (recorded in `progress.md`) and the worktree exists with the
-run dossier committed in-tree — rpa §6's framework-neutral isolate, same as the REFramework path.
+run dossier committed in-tree — rpa:6's framework-neutral isolate, same as the REFramework path.
 First act: append `rpa build engaged (wi <version>)` to the log.
 
 ## 1. Execute the build DAG in waves (from `tasks.md`)
@@ -33,7 +33,7 @@ Run it as wide as the DAG allows.
    reports completion (the only point the count exists) — `tokens.md` is **mandatory**; initialize it on the
    first delegation if absent
    (`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md` —
-   python fallback: `references/workflow.md` §Script invocation), and ship finalizes it
+   python fallback: `references/workflow.md` "Script invocation"), and ship finalizes it
    (`token_report.py --write`) under a `check_tokens.py` close-out gate.
 5. **Register new components.** If the build created something reusable (a shared subflow, a notifier flow),
    add it to `.wi/components.md` so the next flow inherits it.

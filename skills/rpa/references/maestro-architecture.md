@@ -17,10 +17,10 @@ the `uipath-maestro-flow` skill (`uip maestro flow`).
 
 There are **two** architecture artifacts, mapping to the SDD:
 
-- **`architecture.md` (run/solution level) = the flow diagram (SDD §2):** the whole solution — every flow,
+- **`architecture.md` (run/solution level) = the flow diagram (sdd:2):** the whole solution — every flow,
   its trigger, the systems/connectors/agents it touches, and any subflows.
-- **per-process flow diagram (SDD §7.1.3):** one process's flow, the zoom-in (lives in that process's
-  `tobe.md` / SDD §7.1.3).
+- **per-process flow diagram (sdd:7.1.3):** one process's flow, the zoom-in (lives in that process's
+  `tobe.md` / sdd:7.1.3).
 
 Both are mermaid and **must be validated** with
 `${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py` (safe node IDs — never `graph`/`end`/etc.;

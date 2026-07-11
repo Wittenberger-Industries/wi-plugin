@@ -37,7 +37,7 @@ against it.
   by natural language ("ship it").
 - Persistence: wi hands off to a keep-alive loop at the end of brainstorm — Claude/Codex use built-in
   `/goal`; Copilot uses Autopilot flags (see the tool map). wi runs without it too, just less robustly.
-- Superpowers precedence (integrations.md §Who initiates — `skills/research/references/integrations.md`):
+- Superpowers precedence (integrations.md "Who initiates" — `skills/research/references/integrations.md`):
   delegation points only, never self-triggered mid-phase; wi's artifact formats always win.
 
 These skills auto-trigger from their `description` fields. When a user's request matches one, use it.

@@ -1,14 +1,14 @@
 ---
 type: Reference
 title: "Feature-folder cases — the rare branches of opening a feature"
-description: "On-demand handling for the non-default cases hit when opening a feature folder — legacy migration, ordinal edge cases, resume, in-flight overlap, done-slug collision, roadmap rows — factored verbatim out of dev step 2; loaded only when the classifier lands on one."
+description: "On-demand handling for the non-default cases hit when opening a feature folder — legacy migration, ordinal edge cases, resume, in-flight overlap, done-slug collision, roadmap rows — factored verbatim out of dev:2; loaded only when the classifier lands on one."
 timestamp: 2026-07-11
 tags: [dev, feature-folder, resume, roadmap, reference]
 ---
 
 # Feature-folder cases — the rare branches of opening a feature
 
-`dev` step 2 classifies every idea — **new / resume / in-flight-overlap / done-collision / roadmap-row /
+dev:2 classifies every idea — **new / resume / in-flight-overlap / done-collision / roadmap-row /
 legacy-repo** — and opens this file for anything but a plain new feature (`rpa`'s run seed routes its
 legacy case here too). Each case carries its detection tell and its handling, factored verbatim out of
 the skill so nothing changes in substance; the common path (derive slug, assign the next global ordinal,
