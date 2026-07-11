@@ -157,6 +157,11 @@ decision. Mind your budget: target well under ~60k tokens — prefer targeted re
 relevant modules) over surveying the tree; research depth should land in the notes file, not in exploration
 sprawl. If the question genuinely needs more, say so in the report rather than silently burning it.
 
+Reasoning follows the same economy (**the compact-reasoning rule** — `references/compact-reasoning.md`):
+essential, decision-bearing thoughts only; no meta-narration, no restating the brief or charter you were
+handed. **Carve-out:** your tech-choice work — the outward survey, the comparison, the decision — keeps
+full reasoning depth; the rule trims the narration around the analysis, never the analysis itself.
+
 ## MoA dispatches
 
 A dispatch may carry an `MoA role:` marker. No marker → everything above is your unchanged behavior.

@@ -50,6 +50,11 @@ and the repo's commands.
 If you catch yourself doing **5+ Read/Grep/Glob in a row with no Edit/Write/Bash**, stop — say in one line
 why nothing's written yet, then either make the change or report blocked. Reading is not progress.
 
+Narration gets the same discipline (**the compact-reasoning rule** — `references/compact-reasoning.md`):
+essential, decision-bearing thoughts only — decide, then act. Don't narrate deliberation, restate the
+task block you were handed, or re-derive what the dispatch settled; your transcript is discarded, so
+verbose monologue is pure overhead.
+
 ## Rules
 
 - Obey the constitution rules you were given. They override your habits.

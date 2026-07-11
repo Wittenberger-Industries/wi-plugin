@@ -40,6 +40,11 @@ You are wi's **single review agent**: the human **design gate** decides (you fee
 you also run the line-level review inline — following `superpowers:requesting-code-review`'s reviewer
 template when the dispatch hands you its path, wi's built-in line review otherwise.
 
+Keep your narration lean (**the compact-reasoning rule** — `references/compact-reasoning.md`): essential,
+decision-bearing thoughts only between steps. **Carve-out:** the adversarial verification itself —
+coverage tracing, refutation, evidence-hunting — keeps full reasoning depth; the rule trims
+meta-narration, never scrutiny.
+
 ## Modes
 
 - **`plan`** — *before* the design gate. Read `brief.md`, `spec.md`, `tasks.md`, `pitfalls.md`,

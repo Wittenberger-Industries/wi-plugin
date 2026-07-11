@@ -24,7 +24,10 @@ workflow.md's **context budget**: hold `tasks.md` (the active artifact) plus `pr
 two project files; consult `spec.md` **by section** when a task needs a criterion verbatim. Runners
 read everything else — never pre-read a runner's source files "to prepare" a dispatch. On re-entry,
 `progress.md`'s ticks + Log are the build's state; don't re-Read prior-phase artifacts to
-reconstruct it.
+reconstruct it. Reason lean throughout (the **compact-reasoning rule** —
+`${CLAUDE_PLUGIN_ROOT}/references/compact-reasoning.md`): scheduling, dispatch, and report handling get
+essential, decision-bearing thoughts only — never a re-derivation of what `tasks.md`/`progress.md`
+already settle.
 
 ## 1 · Isolate (default: worktree + branch)
 

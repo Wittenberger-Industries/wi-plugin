@@ -180,6 +180,9 @@ It has the same two interactions as `wi:dev`: the **brainstorm** (here, the deep
 The design gate, isolated worktrees, **parallel build waves**, the ship PR + **docs-sync** (architecture
 diagrams kept current), **compound/learnings**, the **token report**, `check_mermaid.py`, and
 plugin-bootstrap all work unchanged — `wi:rpa` swaps the *domain* (UiPath/SDD/PDD) into the same machine.
+So does the **compact-reasoning rule** (`${CLAUDE_PLUGIN_ROOT}/references/compact-reasoning.md`) —
+essential, decision-bearing thoughts only across ingest, scheduling, and delegation; the SDD
+decomposition and the design gate keep full depth (the note's carve-outs).
 
 **Superpowers precedence** (integrations.md "Who initiates" —
 `${CLAUDE_PLUGIN_ROOT}/skills/research/references/integrations.md`): delegation points only, never

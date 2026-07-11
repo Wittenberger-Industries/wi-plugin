@@ -101,6 +101,10 @@ Copilot uses Autopilot: wi provides the method (skills, artifacts, gates), the l
   `progress.md`; resume detection reads each in-flight feature's `progress.md` — nothing else; the
   handoff preflight checks `brief.md` once. Bigger reads are delegated — the phase skills' subagents
   do the reading.
+- **Compact reasoning, run-wide** (the **compact-reasoning rule** —
+  `${CLAUDE_PLUGIN_ROOT}/references/compact-reasoning.md`): across the autonomous stretch, essential,
+  decision-bearing thoughts only — classification, preflight, and sequencing are decided, not narrated.
+  The note's carve-outs (plan decomposition, the design gates) keep full depth.
 - If brainstorming reveals several features, capture them in `.wi/roadmap.md` — committed where written
   (`docs(wi): roadmap`) — and run each as its own `/wi:dev`. One feature = one PR.
 - **Mid-run user input is routed, never absorbed silently.** If the user interjects during the autonomous
