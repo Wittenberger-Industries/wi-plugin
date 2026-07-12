@@ -53,7 +53,7 @@ elapsed time or the orchestrator's own dispatch/arrival stamps (OS clock); write
 
 ## Orchestrator
 
-_PENDING: ship replaces this section during the dossier tidy (BEFORE the dossier commit and the PR) by running `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>`, which parses the session transcript, fills the duration totals from the ledger rows + progress.md phase spans, and appends the exact per-subagent split (Claude Code). That parsed figure is the only reliable orchestrator measure; if the parse fails it writes `Orchestrator: unavailable for this run`; never a substitute, estimate, or invented figure. A tokens.md still reading PENDING after ship is a defect._
+_PENDING: ship replaces this section during the dossier tidy (BEFORE the dossier commit and the PR) by running `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>` on Claude Code; on a non-Claude host the platform tool map names the finalizer (Grok Build: `grok_token_report.py --write`, references/grok-tools.md). It parses the session data, fills the duration totals from the ledger rows + progress.md phase spans, and appends the exact per-subagent split. That parsed figure is the only reliable orchestrator measure; if the parse fails it writes `Orchestrator: unavailable for this run`; never a substitute, estimate, or invented figure. A tokens.md still reading PENDING after ship is a defect._
 """
 
 

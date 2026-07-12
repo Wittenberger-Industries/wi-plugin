@@ -221,8 +221,10 @@ timestamp: <YYYY-MM-DD>
 
 _PENDING: the ledger is scaffolded by `check_tokens.py --init` (research:0), rows appended live, and
 ship replaces this section during the dossier tidy (BEFORE the dossier commit and the PR) by running
-`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>`, which parses the
-session transcript (per-turn `usage`: output, fresh input, cache write/read) and recomputes the Subagents
+`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write <this file>` on Claude Code
+(a non-Claude host runs the finalizer its platform tool map names - Grok Build:
+`grok_token_report.py --write`), which parses the
+session data (per-turn `usage`: output, fresh input, cache write/read) and recomputes the Subagents
 sum. That parsed figure is the **only** reliable orchestrator measure; if the parse fails it writes
 `Orchestrator: unavailable for this run`; never a substitute, estimate, or invented figure. At close-out
 `check_tokens.py <this file>` gates `Phase = done`: a tokens.md still reading PENDING (or missing rows,

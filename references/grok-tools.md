@@ -141,13 +141,17 @@ hosts)".
 - **In-run rows:** the per-dispatch token figure is unobservable at dispatch return, so append each row
   with Tokens `0` and Basis `Grok: tokens unobservable in-run (0 = placeholder, not a measurement)`;
   the Duration cell is exact (the completion notification / OS stamps), `_ledger`-parseable format
-  (`1m25s`, never bare `121s`).
+  (`1m25s`, never bare `121s`). **Append the wave's rows at each wave gate**: Grok completions are
+  pull-based (`get_command_or_subagent_output`), so append-on-notification silently skips dispatches
+  (a live run logged 5 of 17); the wave gate is the reliable append point.
 - **Finalize (ship's dossier tidy):** run
   `python <resolved-root>/skills/ship/scripts/grok_token_report.py --write .wi/features/<slug>/tokens.md`
   INSTEAD of `token_report.py --write`. Grok persists **exact** per-subagent figures
   (`subagent_finished.tokens_used` in the session's `updates.jsonl`), so the finalizer sets the
   Subagents (exact) sum from the session split, appends the per-agent split section, and fills the
-  duration totals. The parent session has **no cumulative I/O on disk** (context-window occupancy
+  duration totals - subtracting the **measured human approval-waits** (`events.jsonl`
+  `permission_resolved.wait_ms`) that fall inside the autonomous windows from the wall-clock, with the
+  subtraction recorded as its own Orchestrator line ("excl. manual steps", made literal). The parent session has **no cumulative I/O on disk** (context-window occupancy
   only), so the Orchestrator line stays the honest `unavailable` sentinel with the occupancy facts
   beneath it; never add occupancy to the subagent total. `/usage` on screen may be copied verbatim
   like Copilot's rule.

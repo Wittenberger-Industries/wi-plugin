@@ -236,7 +236,9 @@ findings with severity. Distilled from verification.md; the dossier tidy (ship:6
   3. *Finalize `tokens.md`: NOW, inside the dossier commit*, or it never rides the PR:
      `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/token_report.py --write .wi/features/<slug>/tokens.md`
      (auto-detects the active session transcript; `--transcript <path>` / `--progress <path>` to
-     override). It rewrites the `## Orchestrator` section in place, recomputes the **Subagents
+     override). That is the Claude Code finalizer; a **non-Claude host runs the one its platform tool
+     map names** (Grok Build: `grok_token_report.py --write`, same flags;
+     `${CLAUDE_PLUGIN_ROOT}/references/grok-tools.md`). It rewrites the `## Orchestrator` section in place, recomputes the **Subagents
      (exact)** sum from the ledger rows, fills the **duration totals** (Σ compute from the rows'
      Duration cells; wall-clock from `progress.md`'s stamped phase spans), and on Claude Code appends
      the per-dispatch **`## Subagent detail`** split, writing the honest `unavailable` wherever a
