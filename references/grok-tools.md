@@ -71,7 +71,7 @@ Grok Build versions.
 | TodoWrite | `todo_write` |
 | WebSearch | `web_search` |
 | WebFetch | `web_fetch` or the build's fetch-style tool, if present; else `web_search` with a URL ? |
-| invoke a wi skill | user-invocable skills load as bare slash commands: `/scan`, `/dev`, `/rpa` (the phase skills are `user-invocable: false`, so `/ship` etc. are not commands). On a name clash the qualifier is **scope-based** (`/user:scan`, `/local:scan`), NOT `/wi:scan` (colon-qualification is agents-only), and a built-in of the same name wins. For a collision-free branded form, install the flat `wi-*` aliases into `~/.grok/skills/` -> `/wi-scan`, `/wi-dev`, `/wi-rpa`. Natural-language auto-trigger also works. (confirmed S4) |
+| invoke a wi skill | user-invocable skills load as bare slash commands: `/scan`, `/dev`, `/rpa` (the phase skills are `user-invocable: false`, so `/ship` etc. are not commands). On a name clash the qualifier is **scope-based** (`/user:scan`, `/local:scan`), NOT `/wi:scan` (colon-qualification is agents-only), and a built-in of the same name wins. For a collision-free branded form, install the flat `wi-*` forwarding aliases into `~/.agents/skills/` (the shared flat-skills dir Grok scans, same target as Copilot/Codex; never into Grok's own `~/.grok/skills/`) -> `/wi-scan`, `/wi-dev`, `/wi-rpa`. Natural-language auto-trigger also works. (confirmed S4) |
 | resolve a skill's `SKILL.md` path (dispatch pointer for pinned runners) | it is under the skill's install dir (the resolved wi root's `skills/<skill>/SKILL.md`, or `~/.agents/skills/<skill>/SKILL.md` for flat aliases); the orchestrator resolves it once and passes it in the `[frontend]`-style dispatch |
 
 ## Subagent dispatch (inline, Codex-style)

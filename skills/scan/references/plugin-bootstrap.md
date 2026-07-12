@@ -39,9 +39,9 @@ wi ships flat **forwarding aliases** that read as one token: `/wi-scan`, `/wi-de
 Grok) and `$wi-scan`, `$wi-dev`, `$wi-rpa` (Codex), which are also the collision-free branded form on Grok.
 
 As part of the same offer below, ask once whether to install them: copy each directory under
-`${CLAUDE_PLUGIN_ROOT}/references/skill-aliases/` (i.e. `wi-scan/`, `wi-dev/`, `wi-rpa/`) into the flat
-skills directory the harness reads (`~/.agents/skills/` for Copilot/Codex, `~/.grok/skills/` for Grok
-Build; create it if absent; overwriting an
+`${CLAUDE_PLUGIN_ROOT}/references/skill-aliases/` (i.e. `wi-scan/`, `wi-dev/`, `wi-rpa/`) into
+`~/.agents/skills/`, the shared flat-skills directory these harnesses read (Copilot, Codex, and Grok Build
+all scan it; never a harness's own managed dir like `~/.grok/skills/`; create it if absent; overwriting an
 existing `wi-*` alias there is fine, they are wi's own forwarders). The aliases are version-independent
 (they forward to whatever wi plugin is installed), so this is a one-time copy per machine, not a
 per-update chore. Declining costs nothing: the plugin forms keep working.
