@@ -15,7 +15,7 @@ The contract: brainstorming decides the *what*; the research skill proposes the 
 gate** is where the user confirms it; after their go, nothing more is asked until the PR is up.
 **`--auto` collapses everything after brainstorm**, so brainstorm becomes the only stop and the run
 goes straight through to a PR. wi pairs with a **keep-alive loop** for persistence: `/goal` on Claude
-Code & Codex, Autopilot on Copilot.
+Code & Codex, Grok Build's model-judged `/goal`, Autopilot on Copilot.
 
 Design rationale for this skill lives in the wi repo's `docs/wi-design-notes/dev.md` (maintainer doc,
 never loaded at runtime).
@@ -67,9 +67,10 @@ never loaded at runtime).
      are not a new gate.)
    All green → recap the brief in 3-5 lines, then print the keep-alive handoff for the current platform
    **verbatim from `${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`**, the single source of the platform
-   templates (`/goal` on Claude Code & Codex, the Autopilot relaunch + unattended-run warning on
-   Copilot). The per-platform mechanism is in `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` /
-   `copilot-tools.md`. **Then branch on Gate mode (from `progress.md`):**
+   templates (`/goal` on Claude Code & Codex, Grok Build's model-judged `/goal`, the Autopilot relaunch +
+   unattended-run warning on Copilot). The per-platform mechanism is in
+   `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` / `copilot-tools.md` / `grok-tools.md`.
+   **Then branch on Gate mode (from `progress.md`):**
    - **auto-approve** (`--auto`): do **not** ask for confirmation; the user already chose hands-off. Set
      Phase = `research`, stamp the Log line (`- <ts> **Update** phase = research`; it starts the run's
      autonomous clock), and continue straight into the design phase **in the same turn**. Brainstorm was

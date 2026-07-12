@@ -59,6 +59,9 @@ Never `git worktree remove --force` a tree with uncommitted work without telling
   (detached HEAD), do **not** create a worktree or try to push. Work in place, commit per task, and at
   ship hand the user a suggested branch name, commit message, and PR body to apply via the platform's
   native controls. Note "Worktree: - (sandboxed)" in progress.md.
+- **Grok Build session worktrees:** Grok's own `grok -w` session worktree is an optional outer shell;
+  keep the wi feature worktree canonical and do **not** nest it inside a session worktree. Subagent
+  `isolation: worktree` (`spawn_subagent`) stays the level-2 escalate only, exactly like the ladder below.
 
 If `superpowers:using-git-worktrees` is installed, prefer it; it handles edge cases (submodules, dirty
 trees) well. This file is the fallback.
@@ -70,8 +73,10 @@ Each task runs in a **fresh** subagent so context doesn't accumulate across a lo
 immediate context, not the whole project.
 
 The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` /
-`copilot-tools.md`): Claude uses the Agent/Task tool, Copilot uses the `task` tool and `/fleet` for waves,
-Codex uses `spawn_agent` bounded by `[agents] max_threads`. The prompt **content** is inline on every
+`copilot-tools.md` / `grok-tools.md`): Claude uses the Agent/Task tool, Copilot uses the `task` tool and
+`/fleet` for waves, Codex uses `spawn_agent` bounded by `[agents] max_threads`, Grok Build uses
+`spawn_subagent` with the built-in `general-purpose` type and the runner prompt inline. The prompt
+**content** is inline on every
 platform: the skeleton below gives each runner its task block + context in full. The dispatch *target*
 differs: on Claude Code, dispatch the **registered `wi-task-runner` agent** (build:2's instruction: the
 plugin registers it, and tiered model routing rides the dispatch); only on platforms without reliable
