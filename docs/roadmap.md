@@ -66,6 +66,20 @@ below stays owner-postponed; un-postpone it or file new work to continue.
 
 ## Shipped (roadmap-era)
 
+- **#70 + #71** Grok ledger follow-ups: **v1.12.1**, PR #72 (2026-07-12, same day as #43; both measured
+  on baseline-d, the first run of published 1.12.0). **#70**: ship finalized tokens.md with
+  `token_report.py` unconditionally (the template `_PENDING` text and ship's finalize line named it with
+  no platform fork; a Grok run under-logged 5 of 17 rows) - the platform pointer now rides the point of
+  use (`_ledger.py` TEMPLATE + wi-directory copy + ship:6's finalize line: non-Claude hosts run the
+  finalizer their tool map names, Grok = `grok_token_report.py --write`), and grok-tools.md adds the
+  wave-gate row-append rule (Grok completions are pull-based; append-on-notification silently skips).
+  **#71**: `grok_token_report.py --write` now subtracts measured human approval-waits
+  (`events.jsonl` `permission_resolved.wait_ms`, summed inside the autonomous phase windows only) from
+  the wall-clock and records the subtraction as its own Orchestrator line ("excl. manual steps" made
+  literal; print mode reports the session-wide wait). Baseline-d evidence: one unattended prompt =
+  21m50s of a 57m52s wall; net 36m02s ~= the 36m50s compute sum. 2 new tests (70 total), verified
+  against the real session; Claude-side behavior byte-identical; three-way parity at 1.12.1.
+
 - **#43** Grok Build as the fourth platform: **v1.12.0**, PR #69 (2026-07-12). Thin adapter, every
   runtime claim measured on a real Grok Build 0.2.93 session (S1-S8 spike + two-run live E2E; record:
   `docs/plans/2026-07-12-43-grok-spike-results.md`). Corrected issue #43's own framing three ways: Grok's
