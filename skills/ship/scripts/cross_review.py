@@ -35,6 +35,9 @@ PROVIDER_DEFAULTS = {
     "check_points": "at-finish",
 }
 
+# xAI is OpenAI-compatible: `provider: xai` rides the _call_openai path with this default base.
+XAI_BASE = "https://api.x.ai/v1"
+
 REVIEW_SYSTEM_PROMPT = (
     "You are an independent third-party code reviewer (Cross-provider reviewer). You did not "
     "write this code and you do not negotiate with its author. Review the diff "
@@ -96,11 +99,29 @@ def parse_models_config(text):
         if len(cells) >= 2:
             overrides[cells[0].strip("*` ")] = cells[1].strip("*` ")
 
+    # Platform model map: first non-separator row names the hosts; each later row maps a tier.
+    platform_map = {}
+    pm_lines = [ln.strip() for ln in _section(body, "Platform model map") if ln.strip().startswith("|")]
+    pm_lines = [ln for ln in pm_lines if set(ln.strip("|")) - {"-", " ", ":"}]  # drop separator rows
+    if pm_lines:
+        header = [c.strip().lower() for c in pm_lines[0].strip("|").split("|")]
+        for ln in pm_lines[1:]:
+            cells = [c.strip("*` ") for c in ln.strip("|").split("|")]
+            tier = cells[0]
+            for col in range(1, len(header)):
+                if col < len(cells) and cells[col]:
+                    platform_map.setdefault(header[col], {})[tier] = cells[col]
+
+    # xAI is OpenAI-compatible; default its base_url when the user left it empty or at the OpenAI default.
+    if provider.get("provider") == "xai" and provider.get("base_url") in ("", PROVIDER_DEFAULTS["base_url"]):
+        provider["base_url"] = XAI_BASE
+
     return {
         "preset": preset,
         "roles": roles,
         "cross_provider": provider,
         "overrides": overrides,
+        "platform_map": platform_map,
     }
 
 
@@ -117,6 +138,20 @@ def model_for(agent, cfg):
     if agent in cfg.get("overrides", {}):
         return cfg["overrides"][agent]
     return cfg.get("roles", {}).get(agent, "inherit")
+
+
+def platform_model_for(agent, cfg, host="claude"):
+    """Concrete model for a wi-dispatched agent on a given host.
+
+    The canonical tier from `model_for` is the model on a Claude host (or when no `## Platform model
+    map` is configured). On a non-Claude host, map that tier through the host's column; an unmapped
+    tier (or `inherit`) passes through verbatim. Pure helper: it is the executable spec of the map
+    contract the orchestrator follows when it writes the resolved routing block, not the dispatch path.
+    """
+    tier = model_for(agent, cfg)
+    if host == "claude" or not cfg:
+        return tier
+    return cfg.get("platform_map", {}).get(host, {}).get(tier, tier)
 
 
 def _call_openai(provider, api_key, system, user):
@@ -180,6 +215,7 @@ def run_review(cfg, diff_text, context_blobs, out_path):
          "## Diff under review\n```diff\n" + diff_text + "\n```"]
     ).strip()
 
+    # openai + xai (OpenAI-compatible) share the /chat/completions shape; anthropic uses /v1/messages.
     call = _call_anthropic if provider["provider"] == "anthropic" else _call_openai
     try:
         reply = call(provider, api_key, REVIEW_SYSTEM_PROMPT, user)

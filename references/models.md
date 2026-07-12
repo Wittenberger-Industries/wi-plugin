@@ -76,6 +76,41 @@ timestamp: <YYYY-MM-DD>
 Claude tiers are the Agent-dispatch tokens `fable | opus | sonnet | haiku`, plus `inherit` (= the session
 model). The cross-provider model is the *provider's* model id, independent of the Claude tier tokens.
 
+## Platform model resolution (non-Claude hosts)
+
+The Roles-table tokens (`fable | opus | sonnet | haiku`) are the **canonical routing tiers**, defined on
+Claude. On a **non-Claude host** every dispatch runs that host's own models, so the resolve-once step maps
+each tier to a concrete host model through an optional `## Platform model map`:
+
+```markdown
+## Platform model map
+| Tier | grok |
+|------|------|
+| fable | grok-4.5 |
+| opus | grok-4.5 |
+| sonnet | grok-composer-2.5-fast |
+| haiku | grok-composer-2.5-fast |
+```
+
+- Columns are host names (`grok`); rows map a canonical tier to that host's model id (resolved from
+  `grok models` at config time: `grok-4.5` is the strong/default model, `grok-composer-2.5-fast` the
+  cheap/fast one). An unmapped tier, or `inherit`, passes through unchanged.
+- **Host detection:** the host is `grok` when the run follows `references/grok-tools.md` (wi was invoked
+  under the `grok` CLI); otherwise the host is `claude` and the tier tokens are used as-is. Codex and
+  Copilot are `claude`-tier hosts here unless they later gain their own map column.
+- The `## Model routing (resolved)` block records the concrete per-role model for the running host: a
+  Grok model id on a Grok host, the Claude tier token on Claude. `orchestrator` stays informational (the
+  session model, set by the host's own model selector).
+- **Cross-provider diversity on a Grok host:** point the cross-provider layer at `openai` or `anthropic`,
+  not `xai` (a Grok host reviewing with a Grok model is same-family, which defeats the diversity purpose).
+  The `provider: xai` entry is for the *other* hosts.
+- The map is optional: absent it, non-Claude hosts run every dispatch at the session model (`inherit`
+  behavior), the same as today.
+
+The cross-provider `provider` accepts `openai | anthropic | xai | none`. `xai` uses xAI's
+OpenAI-compatible endpoint: set `model` (e.g. `grok-4.5`) and `api_key_env` (`XAI_API_KEY`); `base_url`
+defaults to `https://api.x.ai/v1` when unset.
+
 ## Presets
 
 | Role | **smart** | **simple** |
