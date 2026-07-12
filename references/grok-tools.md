@@ -73,7 +73,7 @@ Ids confirmed live on Grok Build `0.2.93` (spike, 2026-07-12) from the session t
 | Bash / run a command | `run_terminal_command` |
 | Grep / Glob | `grep` (native) / `list_dir`; shell fallback (`run_terminal_command` with `rg`/`find`) |
 | dispatch a subagent / task-runner | `spawn_subagent` (built-in types `general-purpose \| explore \| plan`, depth limit 1; `isolation`, `background`, `capability_mode` optional) |
-| parallel waves | multiple `spawn_subagent` calls in one turn; inline the runner/researcher prompt (do not rely on named-role dispatch; the live session registered only 2 of wi's 3 agents) |
+| parallel waves | multiple `spawn_subagent` calls in one turn; inline the runner/researcher prompt (do not rely on named-role dispatch: registration is convenience, not the contract) |
 | TodoWrite | no `todo_write`; the closest is the `tasks__*` family (`tasks__create`, `tasks__update`, ...), else keep a plain markdown checklist in the reply |
 | AskUserQuestion | `ask_user_question` |
 | WebSearch | `web_search` |
@@ -84,7 +84,11 @@ Ids confirmed live on Grok Build `0.2.93` (spike, 2026-07-12) from the session t
 ## Subagent dispatch (inline, Codex-style)
 
 Grok's tool is `spawn_subagent`. Dispatch each wi role as `general-purpose` with the role's contract
-inlined into the prompt; do **not** assume the named `wi-task-runner` agent resolves (SPIKE S7):
+inlined into the prompt; do **not** assume a named wi agent resolves - registration is convenience, not
+the contract. Gotcha (measured on `0.2.93`): agent registration **fails closed on the frontmatter
+`color`** - an unsupported value silently drops the agent, no log line (bad: `magenta`, `white`, `gray`;
+good: `cyan`, `green`, `red`, `blue`, `yellow`, `purple`, `orange`, `pink`). wi's charters use supported
+colors; if an agent is missing from `grok inspect`, check `color` first.
 
 | wi role | Grok dispatch |
 |---------|----------------|
