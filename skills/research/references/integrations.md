@@ -25,6 +25,14 @@ absent. Every delegating phase logs its mode to progress.md: `<phase> via <skill
 fallback (<skill> absent)`, so a run's delegation behavior is auditable afterwards. Running a fallback
 while the preferred skill is installed is a defect.
 
+This file is also the canonical **capability -> skill registry**: each row (and the "Frontend work"
+mapping below) maps a wi capability to the skill(s) that serve it and the fallback. Pinned runners have
+no Skill tool, so a capability-tagged task reaches its skill by pointer, not invocation: the orchestrator
+resolves the mapped skill's `SKILL.md` absolute path once per run (progress.md's
+`## Skill paths (resolved)` block) and the dispatch hands the runner that path to Read. Adding a new
+skill-mediated capability is therefore a **registry row plus a plan tag** (today `[frontend]`) and
+nothing else: the pointer protocol, the charters, and the plan format are unchanged.
+
 ## Delegation matrix
 
 | wi phase | superpowers skill (REQUIRED when installed) | initiator | artifact mapping | fallback when absent |
@@ -66,10 +74,12 @@ tree), route `[frontend]` tasks to a design skill instead of writing markup blin
 
 **Delegation is mandatory when the skill is present**, the same rule as the phase table above. A
 `[frontend]` task built without `frontend-design` while it's installed is a defect, not a style choice.
-Operationally: `build` passes the routing into each `[frontend]` task-runner's charter, the runner builds
-the UI through the design skill and logs `frontend via frontend-design` (or `frontend via wi fallback
-(frontend-design absent)`) to `progress.md`, and ship's checker (result mode) flags any `[frontend]` UI
-that shipped blind while the skill was installed. Backend and glue tasks stay in the normal build loop; a
+Operationally (the pointer protocol above): pinned runners have no Skill tool, so `build` resolves the
+design skill's `SKILL.md` path once per run (progress.md's `## Skill paths (resolved)` block) and each
+`[frontend]` dispatch hands the runner that path; the runner Reads it, builds the UI through the guidance,
+and logs `frontend via frontend-design` (or `frontend via wi fallback (frontend-design absent)`) to
+`progress.md`, and ship's checker (result mode) flags any `[frontend]` UI that shipped blind while the
+skill was installed. Backend and glue tasks stay in the normal build loop; a
 single feature can mix both (tasks are tagged).
 
 ## Backend / Python

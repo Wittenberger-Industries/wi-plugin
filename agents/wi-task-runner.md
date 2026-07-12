@@ -56,14 +56,16 @@ task block you were handed, or re-derive what the dispatch settled.
 ## Rules
 
 - Obey the constitution rules you were given. They override your habits.
-- **Frontend tasks route to the design skill; never build UI blind** (the canonical rule:
-  `skills/research/references/integrations.md` "Frontend work"). Task tagged `[frontend]` + a design skill
-  available in your skills (your dispatch normally names it; if it didn't, check your skills list) → you
-  **MUST** build/refine the markup *through it* and state `frontend via frontend-design`
-  (or `via <skill>`) in your report; the orchestrator logs it to `progress.md`. Only if no design skill
-  is installed do you author markup by hand, and then report
-  `frontend via wi fallback (frontend-design absent)`. Either way you still write the behavioral test and
-  make **Verify** pass.
+- **Skill-mediated tasks route through the named skill; never build blind** (the canonical map:
+  `skills/research/references/integrations.md`). You have **no Skill tool**, so when a task is tagged for
+  a capability that routes to an installed skill (today `[frontend]` → a design skill), your dispatch
+  names the skill and hands you the absolute path to its `SKILL.md` → **Read** that file (and any
+  references it cites; they are plain files) and **MUST** do that aspect of the task *through its
+  guidance*, then state `<capability> via <skill>` (for a frontend task, `frontend via frontend-design`)
+  in your report; the orchestrator logs it to `progress.md`. Only when the dispatch hands you no path
+  (the skill is absent) do you do it by hand, and then report `<capability> via wi fallback (<skill>
+  absent)` (for frontend, `frontend via wi fallback (frontend-design absent)`). Either way you still
+  write the behavioral test and make **Verify** pass.
 - Stay in scope: touch only the files the task names. If you find necessary work outside that, **do not do
   it silently**: finish what you safely can and flag it in your report as a suggested new task.
 - **What you may fix vs. what you must escalate** (when in doubt → ask):

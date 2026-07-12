@@ -62,11 +62,17 @@ run it as wide as the DAG allows. Repeat until every task is ticked:
    (`${CLAUDE_PLUGIN_ROOT}/references/models.md`'s resolve-once rule). A model that errors as unavailable
    → re-dispatch on `inherit` and note it in `progress.md` (the block stands). No config → inherit.
 3. **TDD per task** (per the constitution): failing test first, minimal implementation, green, refactor.
-   **Frontend routing is operational, not just asserted** (integrations.md "Frontend work": delegation
-   is mandatory when installed): a task tagged `[frontend]` MUST have its dispatch name the available
-   design skill, the runner builds the UI *through it* and reports `frontend via frontend-design` (or
-   `frontend via wi fallback (frontend-design absent)`), and you log that line to `progress.md` when
-   the report returns (runners never write `progress.md`). Still verify behavior.
+   **Skill-mediated routing is operational, not just asserted** (integrations.md: delegation is mandatory
+   when installed). Pinned runners have no Skill tool, so for a task tagged for a skill-mediated
+   capability (today `[frontend]` → a design skill) resolve the mapped skill's `SKILL.md` absolute path
+   **once per run** into `progress.md`'s `## Skill paths (resolved)` block (block absent, or the `.wi/`
+   skill set changed after its stamp → resolve now, same staleness rule as the routing block;
+   capability→skill map is integrations.md; a run with no tagged task resolves nothing). The dispatch then
+   names the skill and hands the runner that path; the runner Reads it and does that aspect *through* the
+   guidance and reports `<capability> via <skill>` (a frontend task: `frontend via frontend-design`, or
+   `frontend via wi fallback (frontend-design absent)` when the path is unresolvable), and you log that
+   line to `progress.md` when the report returns (runners never write `progress.md`). Still verify
+   behavior.
 4. **As each report returns:** check its Verify result and **honor its `Self-Check` line**: tick
    `progress.md` and commit the task (`<type>: <task title>`) only when the runner reports
    `Self-Check: PASS`; a stub or an unmet Verify means the task is *not* done, no matter what the

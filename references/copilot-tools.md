@@ -39,6 +39,7 @@ why per-skill `gh skill install` is discouraged: cross-skill refs such as `ship`
 | WebFetch | `web_fetch` |
 | WebSearch | no equivalent; use `web_fetch` with a search URL |
 | invoke a wi skill | skills load natively: `/wi <skill>` (plugin), `/wi-scan`/`/wi-dev`/`/wi-rpa` (flat aliases), or auto-trigger by description |
+| resolve a skill's `SKILL.md` path (dispatch pointer for pinned runners) | it is under the skill's install dir (`~/.copilot/installed-plugins/<...>/SKILL.md`, or the clone dir from `/skills add`); the orchestrator resolves it once and passes it in the `[frontend]`-style dispatch |
 
 ## /goal keep-alive
 Copilot has no predicate `/goal`. Use **Autopilot**: relaunch with the completion condition in the prompt:

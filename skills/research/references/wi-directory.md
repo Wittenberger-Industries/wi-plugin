@@ -155,6 +155,13 @@ timestamp: <YYYY-MM-DD>
 - orchestrator=<tier> (informational) · checker=<tier> · researcher=<tier> · task-runner=<tier> · rpa-build=<tier>
 - cross-provider=<none | provider model (at-finish | per-wave)> · MoA=<none | points=<…>; proposers=<…>; layers=<n>; aggregator=<tier>>
 
+## Skill paths (resolved)
+<!-- LAZY: written the first time the run dispatches a capability-tagged task (e.g. [frontend]); a run
+     with no such task omits this whole block. Maps each mapped skill (capability->skill is
+     integrations.md) to the absolute path of its SKILL.md, or "absent" when not installed. Same
+     staleness rule as the routing block; pinned runners Read this path (they have no Skill tool). -->
+- frontend-design: <abs path to SKILL.md | absent>
+
 ## Log
 - <YYYY-MM-DDTHH:MM:SS±hh:mm> **Created** feature, phase = brainstorm
 

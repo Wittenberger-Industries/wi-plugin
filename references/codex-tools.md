@@ -28,6 +28,7 @@ read the file by its path under that root. This covers cross-skill refs such as 
 | TodoWrite | `update_plan` |
 | WebFetch / WebSearch | `web_search` |
 | invoke a wi skill | skills load natively: `$skill-name` or `/skills` (entry points also as `$wi-scan`/`$wi-dev`/`$wi-rpa` once scan's bootstrap installs the flat aliases to `~/.agents/skills/`); just follow its instructions |
+| resolve a skill's `SKILL.md` path (dispatch pointer for pinned runners) | it is under the skill's native install dir (`~/.agents/skills/<skill>/SKILL.md`, or the plugin/clone dir wi was installed from); the orchestrator resolves it once and passes it in the `[frontend]`-style dispatch |
 
 ## /goal keep-alive
 Codex has a native `/goal`. Use the same condition line wi prints. For non-interactive runs, `codex exec`
