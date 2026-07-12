@@ -66,6 +66,20 @@ below stays owner-postponed; un-postpone it or file new work to continue.
 
 ## Shipped (roadmap-era)
 
+- **Witloop rebrand**: **v1.12.2**, PR #73 (2026-07-12, owner-directed, no issue number). The commercial
+  rename: plugin id `wi` -> `wit` (commands `/wit:*` on Claude, `/wit-*` Copilot/Grok aliases, `$wit-*`
+  Codex), marketplace `wi` -> `witloop` (install `wit@witloop`), GitHub repo `wi-plugin` -> `witloop`
+  (old path redirects; local clones should `git remote set-url`), state dir `.wi/` -> `.wit/` (scan/dev
+  carry a legacy-rename clause: offer `git mv .wi .wit`, auto under `--auto`), agents -> `wit-code-checker`
+  / `wit-researcher` / `wit-task-runner`, aliases -> `wit-*`, `wit-directory.md`, `docs/design-notes/`
+  (was `wi-design-notes/`). Frozen archives (`docs/plans/`, `docs/specs/`) and this Shipped section keep
+  the historical `wi` spelling; validate.py's dead-dir ban covers both `.wi/goals` and `.wit/goals`.
+  README gained a Migrating-from-wi block plus explicit Grok Build install commands (and grok-tools.md's
+  Claude-cache path corrected to `witloop/wit`, keyed marketplace/plugin). **Breaking for installed
+  users** (id + marketplace + state dir); migration in the README. validate.py + 70 tests + CI green;
+  three-way manifest parity at 1.12.2. Name rationale: wit = intelligence + Wittenberger heritage,
+  loop = the product category; collision-checked against Loopwright/Specwright (existing tools).
+
 - **#70 + #71** Grok ledger follow-ups: **v1.12.1**, PR #72 (2026-07-12, same day as #43; both measured
   on baseline-d, the first run of published 1.12.0). **#70**: ship finalized tokens.md with
   `token_report.py` unconditionally (the template `_PENDING` text and ship's finalize line named it with
