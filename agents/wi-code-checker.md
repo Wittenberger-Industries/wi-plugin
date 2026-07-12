@@ -2,7 +2,7 @@
 type: Agent
 name: wi-code-checker
 model: inherit            # a dispatch may pin a cheaper tier for this verification pass; inherit is the portable default
-color: magenta
+color: purple
 tools: ["Read", "Grep", "Glob", "Bash", "Write"]
 description: |
   Verification for wi that works backward from the feature's acceptance criteria: read-only toward the project, two modes. PLAN mode (before the design gate): verify the

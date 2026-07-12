@@ -1,15 +1,15 @@
 ---
 type: Readme
 title: "WI: a cross-platform agentic dev loop"
-description: An opinionated, low-token dev loop (scan/dev/rpa) that runs on Claude Code, Codex CLI, and Copilot CLI from one source.
+description: An opinionated, low-token dev loop (scan/dev/rpa) that runs on Claude Code, Codex CLI, Copilot CLI, and Grok Build from one source.
 timestamp: 2026-06-14
 tags: [wi, readme, overview]
 ---
 
 # WI: a cross-platform agentic dev loop
 
-`wi` is an opinionated, low-token development loop that runs on **Claude Code**, **Codex CLI**, and
-**GitHub Copilot CLI** from one source. You scan a project once, then drive each feature with a single
+`wi` is an opinionated, low-token development loop that runs on **Claude Code**, **Codex CLI**,
+**GitHub Copilot CLI**, and **Grok Build** from one source. You scan a project once, then drive each feature with a single
 command that talks to you twice (brainstorm and a design gate) and otherwise runs to a pull request on
 its own.
 
@@ -20,7 +20,8 @@ its own.
 | **`/wi:rpa "pdd"`** | Parses a PDD (markitdown), refines the TO-BE, writes an SDD + architecture + assumptions, then builds a REFramework or Maestro solution via the UiPath skills (XAML-only or coded, your choice at the design gate) to a PR. One run per PDD (1..N processes); `--auto` supported. |
 
 On Claude the commands are `/wi:scan`, `/wi:dev`, `/wi:rpa`; on Copilot they read `/wi-scan`, `/wi-dev`,
-`/wi-rpa` and on Codex `$wi-scan`, `$wi-dev`, `$wi-rpa`, flat aliases scan's bootstrap offers to install
+`/wi-rpa`, on Codex `$wi-scan`, `$wi-dev`, `$wi-rpa`, and on Grok `/scan`, `/dev`, `/rpa` (or the `/wi-*`
+aliases) - flat aliases scan's bootstrap offers to install
 to `~/.agents/skills/` (the raw plugin forms `/wi dev` and `$dev` always work), or, on any harness,
 auto-trigger from natural language. Only these three entry points surface as commands; the phase skills
 are hidden (`user-invocable: false`) and run inside the loop.
@@ -53,20 +54,29 @@ Persistence uses Autopilot instead of `/goal`: wi's hands-off handoff prints
 unattended** (prompts suppressed, all tools/paths granted); drop `--allow-all` to keep risky-action
 confirmations. The exact handoff templates and the full warning live in `references/keep-alive.md`.
 
+**Grok Build**: Grok discovers Claude-installed plugins with zero config - install wi for Claude Code
+(above) and list `wi` under `[plugins] enabled` in `~/.grok/config.toml`. Then install the flat `wi-*`
+aliases into `~/.agents/skills/` (scan's bootstrap offers the copy): the bare entry points are `/scan`,
+`/dev`, `/rpa`, and the aliases add the collision-free `/wi-scan`, `/wi-dev`, `/wi-rpa`. Persistence uses
+Grok's native `/goal`, which is **model-judged** (the agent self-completes via `update_goal`), not a hard
+predicate, so treat it as Copilot-class autonomy. Handoff templates and the warning live in
+`references/keep-alive.md`; tool mappings and the plugin-root resolution rule in
+`references/grok-tools.md`.
+
 ## Platform differences
 
 wi is one source across three harnesses; only the autonomy spine differs:
 
-| | Claude Code | Codex CLI | Copilot CLI |
-|---|---|---|---|
-| Skills | plugin (`.claude-plugin/`) | `.codex-plugin/` (+ reads `.claude-plugin/marketplace.json`) | `plugin install` (reads `.claude-plugin/`); fallback whole-repo `/skills add` |
-| Keep-alive | built-in `/goal` | native `/goal` | Autopilot flags |
-| Command namespace | `/wi:dev` | `$wi-dev` (alias) / `$dev` | `/wi-dev` (alias) / `/wi dev` |
-| `${CLAUDE_PLUGIN_ROOT}` | native | compat var | the installed plugin root (or the clone) |
-| Subagents | Agent/Task | `spawn_agent` | `task` / `/fleet` |
+| | Claude Code | Codex CLI | Copilot CLI | Grok Build |
+|---|---|---|---|---|
+| Skills | plugin (`.claude-plugin/`) | `.codex-plugin/` (+ reads `.claude-plugin/marketplace.json`) | `plugin install` (reads `.claude-plugin/`); fallback whole-repo `/skills add` | Claude-plugin discovery, zero config; enable in `~/.grok/config.toml` |
+| Keep-alive | built-in `/goal` | native `/goal` | Autopilot flags | native `/goal` (model-judged) |
+| Command namespace | `/wi:dev` | `$wi-dev` (alias) / `$dev` | `/wi-dev` (alias) / `/wi dev` | `/wi-dev` (alias) / `/dev` (bare; `/user:dev` on clash) |
+| `${CLAUDE_PLUGIN_ROOT}` | native | compat var | the installed plugin root (or the clone) | resolve to the plugin root (env var is hook-only) |
+| Subagents | Agent/Task | `spawn_agent` | `task` / `/fleet` | `spawn_subagent` (general-purpose, inline) |
 
-Tool-name mappings live in `references/codex-tools.md` and `references/copilot-tools.md`; the
-cross-platform bootstrap is `AGENTS.md`.
+Tool-name mappings live in `references/codex-tools.md`, `references/copilot-tools.md`, and
+`references/grok-tools.md`; the cross-platform bootstrap is `AGENTS.md`.
 
 ## How it flows
 

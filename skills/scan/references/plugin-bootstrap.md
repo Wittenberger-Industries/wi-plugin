@@ -15,7 +15,9 @@ without asking; never block if the user declines.
 ## How to check availability
 
 A skill/plugin is available if it appears in this session's skills list, or its directory exists under a
-known plugins path. If unsure, treat it as missing and offer it.
+known plugins path. If unsure, treat it as missing and offer it. (That lenient default is for this
+install offer only. Run-time delegation checks are stricter: integrations.md "How to detect an available
+skill" - absence must be verified against the installed-plugins registry before any fallback stamp.)
 
 ## Recommended set
 
@@ -26,18 +28,22 @@ known plugins path. If unsure, treat it as missing and offer it.
 | **vercel-labs/skills:find-skills** (optional) | lets wi pull a missing skill mid-run | `npx skills add vercel-labs/skills` |
 
 If you can't verify an exact marketplace slug, don't fabricate one: give the user the command shape and
-ask them to confirm the source, or point them at https://skills.sh to find it.
+ask them to confirm the source, or point them at https://skills.sh to find it. On Grok Build, superpowers
+is available on xAI's plugin marketplace as well as via Claude-plugin compatibility.
 
-## Entry-command aliases (Copilot / Codex only)
+## Entry-command aliases (Copilot / Codex / Grok)
 
 On Claude Code the plugin namespace already gives `/wi:scan`, `/wi:dev`, `/wi:rpa`; skip this section.
 On Copilot CLI the plugin prefix renders the entry points as `/wi scan`, `/wi dev`, `/wi rpa`, and on
-Codex they invoke as `$scan`, `$dev`, `$rpa`. wi ships flat **forwarding aliases** that read as one
-token: `/wi-scan`, `/wi-dev`, `/wi-rpa` (Copilot) and `$wi-scan`, `$wi-dev`, `$wi-rpa` (Codex).
+Codex they invoke as `$scan`, `$dev`, `$rpa`; on Grok Build they invoke as bare `/scan`, `/dev`, `/rpa`
+(Grok qualifies clashes by **scope**, `/user:scan`, not `/wi:scan`, and a built-in of the same name wins).
+wi ships flat **forwarding aliases** that read as one token: `/wi-scan`, `/wi-dev`, `/wi-rpa` (Copilot /
+Grok) and `$wi-scan`, `$wi-dev`, `$wi-rpa` (Codex), which are also the collision-free branded form on Grok.
 
 As part of the same offer below, ask once whether to install them: copy each directory under
 `${CLAUDE_PLUGIN_ROOT}/references/skill-aliases/` (i.e. `wi-scan/`, `wi-dev/`, `wi-rpa/`) into
-`~/.agents/skills/`, the flat skills directory both harnesses read (create it if absent; overwriting an
+`~/.agents/skills/`, the shared flat-skills directory these harnesses read (Copilot, Codex, and Grok Build
+all scan it; never a harness's own managed dir like `~/.grok/skills/`; create it if absent; overwriting an
 existing `wi-*` alias there is fine, they are wi's own forwarders). The aliases are version-independent
 (they forward to whatever wi plugin is installed), so this is a one-time copy per machine, not a
 per-update chore. Declining costs nothing: the plugin forms keep working.

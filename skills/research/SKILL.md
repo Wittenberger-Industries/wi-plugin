@@ -162,7 +162,8 @@ Only an explicit approve (or auto-approve) advances to implementation.
 **Interactive gate only:** if persistence wasn't armed at handoff, print the ready-made keep-alive
 again (the user is present; they just approved), **verbatim from
 `${CLAUDE_PLUGIN_ROOT}/references/keep-alive.md`**, the single source of the platform templates
-(`/goal` on Claude Code & Codex, the Autopilot relaunch + unattended-run warning on Copilot). Pasting
+(`/goal` on Claude Code & Codex, Grok Build's model-judged `/goal`, the Autopilot relaunch +
+unattended-run warning on Copilot). Pasting
 the `/goal` line is the go: when it registers, continue into build **in the same turn**; don't end the
 turn waiting for another prompt. Under **auto-approve** skip the re-print: arming is the user's act,
 never wi's.

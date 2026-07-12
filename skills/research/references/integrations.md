@@ -17,13 +17,19 @@ standalone. `scan` offers to install the recommended set on first run (see the s
 ## How to detect an available skill
 
 A skill is "available" if it appears in the session's skills list, or its directory exists under a known
-plugin/skills path. If unsure, use `find-skills` (vercel-labs/skills) to discover/install one, or fall
+plugin/skills path. The deterministic sources, on any harness: the Claude plugin registry
+(`~/.claude/plugins/installed_plugins.json` - each entry's `installPath`, skills under
+`<installPath>/skills/`) and the flat `~/.agents/skills/` dir; harnesses that load Claude plugins
+(Grok Build) read the same registry (the platform tool map has the concrete paths). **Never stamp a
+`(<skill> absent)` fallback from memory: verify absence against the session list AND the registry
+first.** If unsure, use `find-skills` (vercel-labs/skills) to discover/install one, or fall
 back. Never hard-fail because an optional skill is missing; degrade gracefully and say which mode you're in.
 
 **Delegation is mandatory when the skill is present.** The fallback column applies only when it is
 absent. Every delegating phase logs its mode to progress.md: `<phase> via <skill>` or `<phase> via wi
 fallback (<skill> absent)`, so a run's delegation behavior is auditable afterwards. Running a fallback
-while the preferred skill is installed is a defect.
+while the preferred skill is installed is a defect; speed, `--auto`, or "wi's format is required anyway"
+are not bypass reasons - the delegate supplies the method, wi supplies the artifact.
 
 This file is also the canonical **capability -> skill registry**: each row (and the "Frontend work"
 mapping below) maps a wi capability to the skill(s) that serve it and the fallback. Pinned runners have

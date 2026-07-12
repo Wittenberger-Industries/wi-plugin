@@ -76,6 +76,28 @@ MOA_SECTION = """
 | aggregator | opus |
 """
 
+# Golden: byte-identical to the ## Platform model map table in references/models.md
+GROK_PLATFORM_SECTION = """
+## Platform model map
+| Tier | grok |
+|------|------|
+| fable | grok-4.5 |
+| opus | grok-4.5 |
+| sonnet | grok-composer-2.5-fast |
+| haiku | grok-composer-2.5-fast |
+"""
+
+XAI_CONFIG = """---
+preset: custom
+---
+## Cross-provider config
+| Key | Value |
+|-----|-------|
+| provider | xai |
+| model | grok-4.5 |
+| api_key_env | XAI_API_KEY |
+"""
+
 
 class ParseConfigTest(unittest.TestCase):
     def test_roles_parsed(self):
@@ -142,6 +164,48 @@ class ModelForTest(unittest.TestCase):
 
     def test_no_config_inherits(self):
         self.assertEqual(cross_review.model_for("wi-task-runner", None), "inherit")
+
+
+class PlatformMapTest(unittest.TestCase):
+    def test_platform_map_parsed(self):
+        cfg = cross_review.parse_models_config(FULL_CONFIG + GROK_PLATFORM_SECTION)
+        self.assertEqual(cfg["platform_map"]["grok"]["opus"], "grok-4.5")
+        self.assertEqual(cfg["platform_map"]["grok"]["sonnet"], "grok-composer-2.5-fast")
+
+    def test_absent_platform_map_is_empty(self):
+        cfg = cross_review.parse_models_config(FULL_CONFIG)
+        self.assertEqual(cfg["platform_map"], {})
+
+    def test_claude_host_passes_tier_through(self):
+        cfg = cross_review.parse_models_config(FULL_CONFIG + GROK_PLATFORM_SECTION)
+        # wi-task-runner role is sonnet; on the Claude host the tier is unchanged
+        self.assertEqual(cross_review.platform_model_for("wi-task-runner", cfg, "claude"), "sonnet")
+
+    def test_grok_host_maps_tier_to_model(self):
+        cfg = cross_review.parse_models_config(FULL_CONFIG + GROK_PLATFORM_SECTION)
+        self.assertEqual(cross_review.platform_model_for("wi-task-runner", cfg, "grok"), "grok-composer-2.5-fast")
+        # wi-researcher has an override to haiku -> cheap Grok model
+        self.assertEqual(cross_review.platform_model_for("wi-researcher", cfg, "grok"), "grok-composer-2.5-fast")
+
+    def test_grok_host_unmapped_tier_passes_through(self):
+        cfg = cross_review.parse_models_config(SIMPLE_CONFIG + GROK_PLATFORM_SECTION)
+        # 'inherit' is not a mapped tier -> returned verbatim
+        self.assertEqual(cross_review.platform_model_for("some-agent", cfg, "grok"), "inherit")
+
+
+class XaiProviderTest(unittest.TestCase):
+    def test_xai_defaults_base_url_when_unset(self):
+        # No base_url row -> parser pre-fills the OpenAI default -> normalization swaps in XAI_BASE.
+        cfg = cross_review.parse_models_config(XAI_CONFIG)
+        self.assertEqual(cfg["cross_provider"]["provider"], "xai")
+        self.assertEqual(cfg["cross_provider"]["base_url"], cross_review.XAI_BASE)
+        self.assertTrue(cross_review.cross_provider_configured(cfg))
+
+    def test_xai_respects_explicit_base_url(self):
+        cfg = cross_review.parse_models_config(
+            XAI_CONFIG + "| base_url | https://custom.example/v1 |\n"
+        )
+        self.assertEqual(cfg["cross_provider"]["base_url"], "https://custom.example/v1")
 
 
 if __name__ == "__main__":
