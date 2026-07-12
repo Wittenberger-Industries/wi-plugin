@@ -27,7 +27,9 @@ Look for `superpowers:brainstorming` in your available skills. **If present, you
 the dialogue; wi's job is then only to capture the outcome into `.wi/features/<slug>/brief.md` in the
 format below. Log the mode to `progress.md` either way (engine plus interactivity):
 `brainstorm via superpowers:brainstorming` or `brainstorm via wi fallback (superpowers absent)`, suffixed
-`, dialogue` | `, self-answered (headless)` (headless rule below). Running the fallback while superpowers
+`, dialogue` | `, self-answered (headless)` (headless rule below). These are the **only sanctioned
+stamps**: any other engine parenthetical or self-answer label (`roadmap-seeded`, `for speed`, ...) marks
+the run non-compliant. Running the fallback while superpowers
 is installed is a defect, not a preference: wi exists to orchestrate the best installed tool, and the
 delegation log gets checked after runs. **Either way, the dialogue is with the USER**: if
 `superpowers:brainstorming` starts answering its own questions, stop and put them to the user yourself;
@@ -50,7 +52,8 @@ Whoever runs the dialogue (superpowers or the fallback), the brief isn't done un
 4. **Hard constraints**: deadline / performance / compatibility / must-reuse / regulatory.
 
 Capture answers in `brief.md`; if the user genuinely can't answer one, log it under *Open questions for
-research*; don't invent it.
+research*; don't invent it. A fully-specified idea text or a matching `.wi/roadmap.md` row **seeds** these
+questions (sharper defaults, fewer rounds); it never substitutes for asking them.
 
 **Headless runs** (no user can answer at all; an unattended dispatch: CI, a subagent, a scheduled run):
 the must-asks still hold, but each is self-resolved with the smallest reasonable choice and logged as an

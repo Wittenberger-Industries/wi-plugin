@@ -47,7 +47,11 @@ never loaded at runtime).
    (`date -Iseconds`, or `python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/now.py`); never a date-only
    or guessed stamp.
 3. **Brainstorm** (skill `wi:brainstorm`): the dialogue about desired behavior, scope, constraints.
-   Writes `brief.md`.
+   Writes `brief.md`. **Interactive and never skipped**: `--auto` does not collapse it, and a detailed
+   idea or a matching roadmap row **seeds** the dialogue, never replaces it. The only sanctioned
+   self-answer stamp is `self-answered (headless)`, and headless means no user can answer at all (CI, a
+   subagent dispatch, a scheduled run; brainstorm's headless rule) - a session with a user present is
+   never headless.
 4. **Hand off and arm persistence (platform-aware).** First the **preflight**; resolve every check
    before printing anything:
    - **The gate commands are real.** The lint + test commands about to be embedded in the condition must
@@ -59,7 +63,8 @@ never loaded at runtime).
    - **The brief answers the must-asks.** Scope/non-goals, desired behavior, acceptance, hard constraints
      are actually answered in `brief.md`: not blank, not self-answered. One carve-out: a **headless run**
      (brainstorm's headless rule) is *sanctioned* self-answering; there the check becomes "every must-ask
-     has its logged assumption, and the stamp says `self-answered (headless)`". A hole → one more
+     has its logged assumption, and the stamp says `self-answered (headless)`". Any other `self-answered`
+     label (`roadmap-seeded`, `for speed`, ...) **fails this check**. A hole → one more
      brainstorm round to fill it.
    - **A PR-open condition needs a remote.** `git remote` prints nothing → do **not** print or arm the
      keep-alive at all. Note in progress.md that the run ends at ship's no-remote close-out (ship:7) and
