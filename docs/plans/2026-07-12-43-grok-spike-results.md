@@ -75,6 +75,13 @@ Operational notes for the record: run 1 executed elevated (worktree files owned 
 BUILTIN/Administrators -> git dubious-ownership friction during cleanup; not a wi defect); local gate on
 run 2 was typecheck + lint + format:check + 375 unit tests + build, result-mode checker PASS (0 BLOCKER).
 
+Post-hoc quality context (four-way independent review, 2026-07-12, full record in the checkpoint-b
+comparison doc): run 1 graded **A-** (ties the best Claude baseline; security core clean); run 2 graded
+**C+ / not shippable** - its in-run "checker 0 BLOCKER" was honest but judged a spec the model had
+itself narrowed after skipping brainstorm (no in-flight deactivation gate, hard delete self-deferred,
+PIN model inverted). Speed comparisons must always carry the grade; run 2's gaps are the measured cost
+of the F1 deviation and the reason its fix ships in this PR.
+
 Two contract deviations surfaced by the a/b/c comparison are **fixed on this branch**: (F1) run 2
 skipped the interactive brainstorm by minting an unsanctioned `self-answered (roadmap-seeded)` stamp -
 dev:3/dev:4 and brainstorm now close the stamp set (`self-answered (headless)` is the only sanctioned
