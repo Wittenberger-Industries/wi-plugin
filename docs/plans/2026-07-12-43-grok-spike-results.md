@@ -56,6 +56,25 @@ matches wi's AskUserQuestion usage.
 - Dispatching the two agents Grok did register by name (wi never relies on named-role dispatch).
 - `grok plugin install` from the xAI marketplace (wi is not published there yet).
 
+## Task 8 live E2E (2026-07-12): PASSED
+
+Two real `/wi-dev --auto` runs of QuestKeep roadmap 1.6 (`0011-kid-admin`) on Grok Build `0.2.93` /
+grok-4.5, wi 1.12.0 staged from this branch. Full record + frozen session dirs:
+`D:\ClaudeCowork\wi-plugin\checkpoint-b\baseline-c-facts.md` (permanent evidence folder).
+
+| Criterion | Result |
+|-----------|--------|
+| scan + dev end to end | PASS - run 1 included a scan refresh commit; both runs drove brainstorm -> research -> plan -> gate -> build -> ship |
+| Reaches an open PR | PASS - run 1: origin PR #13, CI 5/5 green (standard remote terminal); run 2: owner-constrained local terminal (merge into baseline-c, no push/PR) honored |
+| Parallel `spawn_subagent` wave in a wi feature worktree | PASS - run 1: 3 researchers parallel + 5 task-runners; run 2: 2 researchers parallel + 6 task-runners; both in a `wi/0011-kid-admin` worktree |
+| Keep-alive armed and driven | PASS - run 2: `/goal` armed, 6 `update_goal` events, no early self-completion; the armed objective text steered the terminal (run 1's PR deviation traced to the constraint missing from brief+goal, wi default correct-by-spec) |
+| Agent-resolved plugin root + bundled scripts | PASS - resolution via `installed_plugins.json` (no pasted path); in-run ledger scaffold + post-run `grok_token_report.py --write` finalize, ledger gate green |
+| Exact token accounting | PASS - run 1: 640,738 / 19m58s compute / 22m10s wall; run 2: 552,992 / 18m06s compute / 24m12s wall (10 dispatches each, from `subagent_finished.tokens_used`) |
+
+Operational notes for the record: run 1 executed elevated (worktree files owned by
+BUILTIN/Administrators -> git dubious-ownership friction during cleanup; not a wi defect); local gate on
+run 2 was typecheck + lint + format:check + 375 unit tests + build, result-mode checker PASS (0 BLOCKER).
+
 ## Consequences already folded into the branch
 
 S1/S2 -> resolution protocol hardened (resolve once, cache in `progress.md`, absolute path per call);
