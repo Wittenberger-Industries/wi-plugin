@@ -181,7 +181,11 @@ Append a row the **moment** each subagent's completion notification arrives (**t
 phase skills cite it by this name): the token figure exists only in that notification, and a dispatch
 that returns without one (e.g. a resumed agent) records `unavailable`, never an estimate. Each row also
 carries its **Duration**: the notification's elapsed time, or the delta between your dispatch stamp and
-the notification's arrival (OS clock); `unavailable` when neither exists, never an estimate. ship
+the notification's arrival (OS clock); `unavailable` when neither exists, never an estimate. Name each
+row's **Source** with the same short string you pass as the dispatch's `description` (the subagent + its
+specific job, e.g. `task-runner: task 3 (@/db seam)`): ship's `token_report.py` labels each
+`## Subagent detail` row from the harness's `agent-<id>.meta.json` `description`, so a shared name makes
+the split and this ledger joinable by eye. ship
 compiles the totals at the dossier tidy and `dev` includes the table in the final report. The scaffold is written by `check_tokens.py --init` from `_ledger.TEMPLATE`
 (the source of truth for the exact bytes); the block below is illustrative.
 
@@ -226,7 +230,9 @@ gate-open plus gate-approved → PR), which drops the brainstorm dialogue, the h
 wait, and idle time between resumed sessions; and, on **Claude Code**, appends a
 `## Subagent detail` section read from the harness's per-agent sidecar transcripts
 (`<session>/subagents/agent-*.jsonl`): each dispatch's exact input/output/cache-write/cache-read split,
-model, transcript-stamped duration, and an **estimated** cost (exact tokens × published list prices,
+model, transcript-stamped duration, and an **estimated** cost, each row labeled from the sidecar
+`agent-<id>.meta.json` `description` (fallback: the agent type, then the dispatch prompt's opening) so it
+matches the ledger `Source` above (exact tokens × published list prices,
 "as of" date shown: the tokens are exact; only the dollar figure is an estimate). Platform note: Codex
 and Copilot expose no per-subagent usage or sidecar transcripts; rows there record `unavailable`, and
 on Copilot the accountable unit is the session's **AI credits** (see

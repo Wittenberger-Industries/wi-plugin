@@ -192,8 +192,27 @@ def find_subagent_files(transcript):
     return sorted(d.glob("agent-*.jsonl")) if d.is_dir() else []
 
 
+def read_agent_meta(path):
+    """The harness's sidecar `agent-<id>.meta.json` (beside the .jsonl) as a dict, or {}.
+    Absent, unreadable, or invalid JSON all fall through to {} (older sessions, Codex/Copilot)."""
+    meta = Path(path).with_name(Path(path).stem + ".meta.json")
+    try:
+        obj = json.loads(meta.read_text(encoding="utf-8", errors="replace"))
+        return obj if isinstance(obj, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _clean_label(text):
+    return " ".join((text or "").split()).replace("|", "/")[:48]
+
+
 def parse_agent_file(path):
-    """One sidecar transcript -> {agent, model, tot, duration, label} or None (no usage)."""
+    """One sidecar transcript -> {agent, model, tot, duration, label} or None (no usage).
+
+    label prefers the dispatch's human name so the split joins the ledger's Source column
+    (issue #53): meta.json `description` (== the ledger Source by convention) -> `agentType`
+    short name -> the dispatch prompt's opening -> `(no prompt)`."""
     tot = {k: 0 for k in FIELDS}
     model, label, first_ts, last_ts, turns = None, "", None, None, 0
     with open(path, encoding="utf-8", errors="replace") as f:
@@ -231,7 +250,12 @@ def parse_agent_file(path):
     if turns == 0:
         return None
     duration = int((last_ts - first_ts).total_seconds()) if first_ts and last_ts else None
-    label = " ".join((label or "").split()).replace("|", "/")[:48] or "(no prompt)"
+    meta = read_agent_meta(path)
+    agent_type = (meta.get("agentType") or "").split(":")[-1]
+    label = (_clean_label(meta.get("description"))
+             or _clean_label(agent_type)
+             or _clean_label(label)
+             or "(no prompt)")
     agent_id = Path(path).stem.replace("agent-", "")[:7]
     return {"agent": agent_id, "model": model, "tot": tot,
             "duration": duration, "label": label}

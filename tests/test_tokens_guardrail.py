@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 import sys
@@ -10,6 +11,7 @@ SCRIPTS = ROOT / "skills" / "ship" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 import _ledger  # noqa: E402
+import token_report  # noqa: E402
 
 
 def _scaffold_text():
@@ -194,6 +196,63 @@ class LedgerHelperTests(unittest.TestCase):
             self.assertIn("Duration column", reason)
 
 
+def _write_agent(dirpath, agent_id, *, meta=None, model="claude-opus-4-8",
+                 prompt="You implement exactly ONE task for feature 0053- (boilerplate charter prose)"):
+    """Write a minimal agent-<id>.jsonl (one usage record + a user prompt) and, if given,
+    its sibling agent-<id>.meta.json. Returns the .jsonl Path."""
+    sub = Path(dirpath)
+    sub.mkdir(parents=True, exist_ok=True)
+    jsonl = sub / "agent-{}.jsonl".format(agent_id)
+    jsonl.write_text(
+        '{"type":"user","message":{"content":' + json.dumps(prompt) + '}}\n'
+        '{"message":{"usage":{"input_tokens":10,"output_tokens":20,'
+        '"cache_creation_input_tokens":0,"cache_read_input_tokens":5},"model":"' + model + '"}}\n',
+        encoding="utf-8",
+    )
+    if meta is not None:
+        (sub / "agent-{}.meta.json".format(agent_id)).write_text(
+            json.dumps(meta), encoding="utf-8")
+    return jsonl
+
+
+class AgentLabelTests(unittest.TestCase):
+    def test_label_prefers_meta_description(self):
+        with tempfile.TemporaryDirectory() as d:
+            j = _write_agent(d, "a1", meta={"agentType": "wi:wi-task-runner",
+                                             "description": "task-runner: task 3 (@/db seam)"})
+            a = token_report.parse_agent_file(j)
+            self.assertEqual(a["label"], "task-runner: task 3 (@/db seam)")
+
+    def test_label_falls_back_to_agent_type_when_description_blank(self):
+        with tempfile.TemporaryDirectory() as d:
+            j = _write_agent(d, "a2", meta={"agentType": "wi:wi-researcher", "description": "  "})
+            a = token_report.parse_agent_file(j)
+            self.assertEqual(a["label"], "wi-researcher")
+
+    def test_label_falls_back_to_prompt_prefix_without_meta(self):
+        with tempfile.TemporaryDirectory() as d:
+            j = _write_agent(d, "a3", meta=None)  # no sidecar -> legacy behavior
+            a = token_report.parse_agent_file(j)
+            self.assertTrue(a["label"].startswith("You implement exactly ONE task"))
+            self.assertLessEqual(len(a["label"]), 48)
+
+    def test_label_survives_unparseable_meta(self):
+        with tempfile.TemporaryDirectory() as d:
+            j = _write_agent(d, "a4", meta=None)
+            (Path(d) / "agent-a4.meta.json").write_text("{not json", encoding="utf-8")
+            a = token_report.parse_agent_file(j)  # must not raise
+            self.assertTrue(a["label"].startswith("You implement exactly ONE task"))
+
+    def test_label_normalizes_and_caps_description(self):
+        with tempfile.TemporaryDirectory() as d:
+            j = _write_agent(d, "a5", meta={"agentType": "x",
+                                            "description": "a b   c | d " + "z" * 60})
+            a = token_report.parse_agent_file(j)
+            self.assertNotIn("|", a["label"])
+            self.assertNotIn("  ", a["label"])
+            self.assertLessEqual(len(a["label"]), 48)
+
+
 CHECK = SCRIPTS / "check_tokens.py"
 REPORT = SCRIPTS / "token_report.py"
 
@@ -307,6 +366,31 @@ class TokenReportWriteTests(unittest.TestCase):
             self.assertIn("Orchestrator: unavailable for this run", out)
             self.assertNotIn("PENDING", out)
             self.assertEqual(run(CHECK, p).returncode, 0)         # honest unavailable passes
+
+    def test_split_rows_labeled_from_meta_and_join_ledger_source(self):
+        with tempfile.TemporaryDirectory() as d:
+            # ledger row Source == the dispatch description we will stamp in meta.json
+            p = init_ledger(d)
+            text = p.read_text(encoding="utf-8").replace(
+                "| orchestrator |",
+                "| research | researcher: db seam | 30 | 1m00s | exact |\n| orchestrator |",
+            )
+            p.write_text(text, encoding="utf-8")
+            t = fixture_transcript(d)  # -> <d>/t.jsonl ; sidecars live in <d>/t/subagents/
+            _write_agent(Path(d) / "t" / "subagents", "b1",
+                         meta={"agentType": "wi:wi-researcher", "description": "researcher: db seam"})
+            r = run(REPORT, "--write", p, "--transcript", t)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            out = p.read_text(encoding="utf-8")
+            self.assertIn("## Subagent detail", out)
+            # the split row's first cell verbatim-contains the ledger Source name
+            self.assertIn("| researcher: db seam (b1) |", out)
+            # idempotent: a second --write neither duplicates the section nor changes the label
+            r2 = run(REPORT, "--write", p, "--transcript", t)
+            self.assertEqual(r2.returncode, 0, r2.stderr)
+            out2 = p.read_text(encoding="utf-8")
+            self.assertEqual(out2.count("## Subagent detail"), 1)
+            self.assertEqual(out, out2)
 
     def test_write_missing_file_errors_and_creates_nothing(self):
         with tempfile.TemporaryDirectory() as d:
