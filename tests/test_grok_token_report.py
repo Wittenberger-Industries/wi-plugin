@@ -12,8 +12,10 @@ import _ledger  # noqa: E402
 import grok_token_report as gtr  # noqa: E402
 
 
-def make_session(tmp: Path) -> Path:
-    """Synthetic Grok session dir: updates.jsonl + subagents/*/meta.json + signals/summary."""
+def make_session(tmp: Path, permission_events=None) -> Path:
+    """Synthetic Grok session dir: updates.jsonl + subagents/*/meta.json + signals/summary.
+    permission_events: optional list of (iso_ts, wait_ms) written as permission_resolved
+    events into events.jsonl (the stream grok_token_report reads for approval waits)."""
     session = tmp / "D%3A%5Cx%5Crepo" / "0199-test-session"
     (session / "subagents" / "a1").mkdir(parents=True)
     (session / "subagents" / "a2").mkdir(parents=True)
@@ -51,6 +53,14 @@ def make_session(tmp: Path) -> Path:
         "info": {"id": "0199-test-session", "cwd": "D:\\x\\repo"},
         "generated_title": "test",
     }), encoding="utf-8")
+
+    if permission_events:
+        lines = []
+        for ts, wait_ms in permission_events:
+            lines.append(json.dumps({"ts": ts, "type": "permission_requested", "tool_name": "run_terminal_command"}))
+            lines.append(json.dumps({"ts": ts, "type": "permission_resolved", "tool_name": "run_terminal_command",
+                                     "decision": "allow", "wait_ms": wait_ms}))
+        (session / "events.jsonl").write_text("\n".join(lines) + "\n", encoding="utf-8")
     return session
 
 
@@ -142,6 +152,42 @@ class FinalizeWriteTest(unittest.TestCase):
         once = self.ledger.read_text(encoding="utf-8")
         gtr.run_write(self.ledger, self.session, self.progress)
         self.assertEqual(once, self.ledger.read_text(encoding="utf-8"))
+
+
+class ApprovalWaitTest(unittest.TestCase):
+    """#71: permission-prompt waits (events.jsonl permission_resolved.wait_ms) are measured and
+    subtracted from the autonomous wall-clock; waits outside the autonomous windows are ignored."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        # PROGRESS windows in UTC: [07:00,07:04] and [07:05,07:25] (stamps are +03:00)
+        self.session = make_session(self.tmp, permission_events=[
+            ("2026-07-12T07:10:00Z", 300000),   # 5m inside build+ship window -> subtracted
+            ("2026-07-12T06:50:00Z", 120000),   # before research -> ignored
+            ("2026-07-12T07:11:00Z", 0),        # zero wait -> ignored
+        ])
+        self.ledger = make_ledger(self.tmp)
+        self.progress = self.tmp / "progress.md"
+        self.progress.write_text(PROGRESS, encoding="utf-8")
+
+    def test_wall_is_net_of_in_window_waits(self):
+        rc = gtr.run_write(self.ledger, self.session, self.progress)
+        self.assertEqual(rc, 0)
+        text = self.ledger.read_text(encoding="utf-8")
+        # 24m00s gross - 5m00s in-window wait = 19m00s; the out-of-window 2m is not subtracted
+        self.assertIn("**Autonomous wall-clock (excl. manual steps): 19m00s.**", text)
+        self.assertIn("approval-wait", text)
+        self.assertIn("5m00s", text)
+        self.assertIsNone(_ledger.verify(self.ledger))
+
+    def test_no_events_file_keeps_gross_wall(self):
+        bare = make_session(Path(tempfile.mkdtemp()))
+        ledger = make_ledger(self.tmp.parent / self.tmp.name)  # fresh copy in same tmp
+        ledger.write_text(make_ledger(Path(tempfile.mkdtemp())).read_text(encoding="utf-8"), encoding="utf-8")
+        gtr.run_write(ledger, bare, self.progress)
+        text = ledger.read_text(encoding="utf-8")
+        self.assertIn("**Autonomous wall-clock (excl. manual steps): 24m00s.**", text)
+        self.assertNotIn("approval-wait", text)
 
 
 if __name__ == "__main__":

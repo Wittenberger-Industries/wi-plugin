@@ -281,7 +281,8 @@ def _iso(ts):
         return None
 
 
-def parse_progress_spans(text):
+def _progress_marks(text):
+    """(research, gate_open, gate_ok, end) tz-aware datetimes from progress.md, each or None."""
     events = []
     for line in text.splitlines():
         m = STAMP_RE.match(line)
@@ -305,17 +306,49 @@ def parse_progress_spans(text):
                 hit = dt
         return hit
 
-    def span(a, b):
-        if a is None or b is None:
-            return None
-        s = (b - a).total_seconds()
-        return int(s) if s >= 0 else None
+    return (first("phase = research"), first("design gate opened"),
+            last("design gate approved", "design gate auto-approved"),
+            last("pr opened") or last("phase = done"))
 
-    research = first("phase = research")
-    gate_open = first("design gate opened")
-    gate_ok = last("design gate approved", "design gate auto-approved")
-    end = last("pr opened") or last("phase = done")
-    return span(research, gate_open), span(gate_ok, end)
+
+def _span(a, b):
+    if a is None or b is None:
+        return None
+    s = (b - a).total_seconds()
+    return int(s) if s >= 0 else None
+
+
+def parse_progress_spans(text):
+    research, gate_open, gate_ok, end = _progress_marks(text)
+    return _span(research, gate_open), _span(gate_ok, end)
+
+
+def approval_wait_seconds(session_dir: Path, windows) -> int:
+    """Sum permission-prompt waits (events.jsonl `permission_resolved.wait_ms`) whose event ts
+    falls inside any (start, end) window. Grok measures each prompt's human wait itself; this
+    is what makes the wall-clock's 'excl. manual steps' honest on a prompted run. Missing
+    events.jsonl, no timestamps, or no windows -> 0."""
+    events = Path(session_dir) / "events.jsonl"
+    unfiltered = windows is None  # None = whole session (print mode); a list filters by window
+    windows = [] if unfiltered else [(a, b) for a, b in windows if a is not None and b is not None]
+    if not events.is_file() or (not unfiltered and not windows):
+        return 0
+    total_ms = 0
+    with events.open(encoding="utf-8", errors="replace") as f:
+        for line in f:
+            if '"permission_resolved"' not in line:
+                continue
+            try:
+                d = json.loads(line)
+            except ValueError:
+                continue
+            wait = d.get("wait_ms")
+            ts = _iso(d.get("ts") or "")
+            if not isinstance(wait, (int, float)) or wait <= 0 or ts is None or ts.tzinfo is None:
+                continue
+            if unfiltered or any(a <= ts <= b for a, b in windows):
+                total_ms += wait
+    return int(round(total_ms / 1000.0))
 
 
 # --- report / finalize ---------------------------------------------------------------------
@@ -324,7 +357,7 @@ def _dur_s(ms):
     return _ledger.format_duration(None if ms is None else int(round(ms / 1000.0)))
 
 
-def orchestrator_body(session_dir: Path, orch: dict) -> str:
+def orchestrator_body(session_dir: Path, orch: dict, approval_wait_s: int = 0) -> str:
     """The tokens.md Orchestrator tail: the honest sentinel + context-occupancy facts."""
     lines = [
         _ledger.UNAVAILABLE,
@@ -346,6 +379,10 @@ def orchestrator_body(session_dir: Path, orch: dict) -> str:
         orch.get("turn_count"), orch.get("assistant_message_count"), orch.get("tool_call_count")))
     lines.append("- session wall duration (incl. idle): {}".format(
         _ledger.format_duration(orch.get("session_duration_seconds"))))
+    if approval_wait_s > 0:
+        lines.append("- approval-wait inside the autonomous windows (permission prompts, "
+                     "`events.jsonl` wait_ms): {} - subtracted from the wall-clock total"
+                     .format(_ledger.format_duration(approval_wait_s)))
     lines.append(
         "- NOTE: the Grok TUI persists no cumulative input/output for the parent session; "
         "the figures above are context-window occupancy and are never added to the "
@@ -406,6 +443,9 @@ def run_print(session_dir: Path) -> int:
         print("  " + "-" * 80)
         print("  {:44} {:>10,}".format("SUBAGENTS TOTAL (exact)", total))
         print("  sum of dispatch durations: {} across {} dispatches".format(_dur_s(dur_ms), len(subs)))
+    wait_all = approval_wait_seconds(session_dir, None)
+    if wait_all:
+        print("  approval-wait, whole session (permission prompts): {}".format(_ledger.format_duration(wait_all)))
     print()
     print("## Orchestrator (parent session - context occupancy, NOT cumulative I/O)")
     for ln in orchestrator_body(session_dir, orch).splitlines()[2:]:
@@ -430,24 +470,34 @@ def run_write(token_path, session_dir, progress=None) -> int:
     if subs:
         compute_s = int(round(sum((s.get("duration_ms") or 0) for s in subs) / 1000.0))
 
-    text = _ledger.replace_tail(text, orchestrator_body(Path(session_dir), orch), split_section(subs))
+    ppath = Path(progress) if progress else p.parent / "progress.md"
+    span1 = span2 = None
+    wait_s = 0
+    if ppath.is_file():
+        ptext = ppath.read_text(encoding="utf-8", errors="replace")
+        research, gate_open, gate_ok, end = _progress_marks(ptext)
+        span1, span2 = _span(research, gate_open), _span(gate_ok, end)
+        # #71: the wall-clock says "excl. manual steps" - subtract the measured human
+        # approval-waits that fall inside the autonomous windows (Grok logs wait_ms per prompt).
+        wait_s = approval_wait_seconds(Path(session_dir),
+                                       [(research, gate_open), (gate_ok, end)])
+    spans = [s for s in (span1, span2) if s is not None]
+    wall = sum(spans) if spans else None
+    if wall is not None and wait_s:
+        wall = max(0, wall - wait_s)
+
+    text = _ledger.replace_tail(text, orchestrator_body(Path(session_dir), orch, wait_s), split_section(subs))
     if subs:
         # Exact source of truth on Grok is the session split, not the 0/unavailable rows.
         text = _ledger.set_subagents_sum(text, total)
-
-    ppath = Path(progress) if progress else p.parent / "progress.md"
-    span1 = span2 = None
-    if ppath.is_file():
-        span1, span2 = parse_progress_spans(ppath.read_text(encoding="utf-8", errors="replace"))
-    spans = [s for s in (span1, span2) if s is not None]
-    wall = sum(spans) if spans else None
     text = _ledger.set_compute_totals(text, compute_s, n, wall)
 
     p.write_text(text, encoding="utf-8")
     print("grok_token_report: finalized {}".format(token_path))
-    print("timing: research+plan={} build+ship={} autonomous-total={} | sum-compute={} across {} dispatches".format(
+    print("timing: research+plan={} build+ship={} autonomous-total={} (net of approval-wait={}) | sum-compute={} across {} dispatches".format(
         _ledger.format_duration(span1), _ledger.format_duration(span2),
-        _ledger.format_duration(wall), _ledger.format_duration(compute_s), n))
+        _ledger.format_duration(wall), _ledger.format_duration(wait_s) if wait_s else "0s",
+        _ledger.format_duration(compute_s), n))
     return 0
 
 
