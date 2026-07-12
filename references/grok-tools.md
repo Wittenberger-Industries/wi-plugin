@@ -46,13 +46,20 @@ hard protocol because Grok shells out. The script-invocation fallback is `refere
 
 ## Install & enable
 
-Confirmed: Grok loads wi from the **Claude plugin cache** (`~/.claude/plugins/cache/wi/wi/<version>/`) when
-`~/.grok/config.toml`'s `[plugins] enabled` lists `wi` - no `grok plugin install` step is needed, and
-`grok plugin list` shows Grok's *own* registry (empty for wi, since wi loads via Claude compatibility).
-Once wi is published to the xAI marketplace, `grok plugin install <name>` becomes the first-class path
-(that command pulls from a marketplace / git source, not a local branch); a local clone + `--plugin-dir` is
-the fallback for testing an unpublished build. Publishing to the official catalog is a separate PR to
-`xai-org/plugin-marketplace`.
+The standard wi install on Grok is **two steps**:
+
+1. **The plugin.** Confirmed: Grok loads wi from the **Claude plugin cache**
+   (`~/.claude/plugins/cache/wi/wi/<version>/`) when `~/.grok/config.toml`'s `[plugins] enabled` lists
+   `wi` - no `grok plugin install` step is needed, and `grok plugin list` shows Grok's *own* registry
+   (empty for wi, since wi loads via Claude compatibility). Once wi is published to the xAI marketplace,
+   `grok plugin install <name>` becomes the first-class path (that command pulls from a marketplace / git
+   source, not a local branch); a local clone + `--plugin-dir` is the fallback for testing an unpublished
+   build. Publishing to the official catalog is a separate PR to `xai-org/plugin-marketplace`.
+2. **The flat `wi-*` aliases** into `~/.agents/skills/` (the shared flat-skills dir Grok scans; confirmed
+   live). The bare plugin commands are `/scan`, `/dev`, `/rpa`; the aliases add the collision-free branded
+   forms `/wi-scan`, `/wi-dev`, `/wi-rpa`. scan's bootstrap offers this copy
+   (`skills/scan/references/plugin-bootstrap.md`); it is additive, one-time, and version-independent (the
+   forwarders locate whatever wi plugin is installed).
 
 ## Tools
 

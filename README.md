@@ -54,12 +54,14 @@ Persistence uses Autopilot instead of `/goal`: wi's hands-off handoff prints
 unattended** (prompts suppressed, all tools/paths granted); drop `--allow-all` to keep risky-action
 confirmations. The exact handoff templates and the full warning live in `references/keep-alive.md`.
 
-**Grok Build**: `grok plugin install Wittenberger-Industries/wi-plugin --trust`, then enable it if plugins
-are disabled by default (Grok loads Claude-plugin skills/agents with zero config). Entry points invoke as
-`/scan`, `/dev`, `/rpa` (or the `/wi-*` aliases). Persistence uses Grok's native `/goal`, which is
-**model-judged** (the agent self-completes via `update_goal`), not a hard predicate, so treat it as
-Copilot-class autonomy. Handoff templates and the warning live in `references/keep-alive.md`; tool
-mappings and the plugin-root resolution rule in `references/grok-tools.md`.
+**Grok Build**: Grok discovers Claude-installed plugins with zero config - install wi for Claude Code
+(above) and list `wi` under `[plugins] enabled` in `~/.grok/config.toml`. Then install the flat `wi-*`
+aliases into `~/.agents/skills/` (scan's bootstrap offers the copy): the bare entry points are `/scan`,
+`/dev`, `/rpa`, and the aliases add the collision-free `/wi-scan`, `/wi-dev`, `/wi-rpa`. Persistence uses
+Grok's native `/goal`, which is **model-judged** (the agent self-completes via `update_goal`), not a hard
+predicate, so treat it as Copilot-class autonomy. Handoff templates and the warning live in
+`references/keep-alive.md`; tool mappings and the plugin-root resolution rule in
+`references/grok-tools.md`.
 
 ## Platform differences
 
@@ -67,9 +69,9 @@ wi is one source across three harnesses; only the autonomy spine differs:
 
 | | Claude Code | Codex CLI | Copilot CLI | Grok Build |
 |---|---|---|---|---|
-| Skills | plugin (`.claude-plugin/`) | `.codex-plugin/` (+ reads `.claude-plugin/marketplace.json`) | `plugin install` (reads `.claude-plugin/`); fallback whole-repo `/skills add` | `grok plugin install --trust` (reads `.claude-plugin/`); enable if disabled |
+| Skills | plugin (`.claude-plugin/`) | `.codex-plugin/` (+ reads `.claude-plugin/marketplace.json`) | `plugin install` (reads `.claude-plugin/`); fallback whole-repo `/skills add` | Claude-plugin discovery, zero config; enable in `~/.grok/config.toml` |
 | Keep-alive | built-in `/goal` | native `/goal` | Autopilot flags | native `/goal` (model-judged) |
-| Command namespace | `/wi:dev` | `$wi-dev` (alias) / `$dev` | `/wi-dev` (alias) / `/wi dev` | `/dev` (or `/wi:dev`) / `wi-dev` (alias) |
+| Command namespace | `/wi:dev` | `$wi-dev` (alias) / `$dev` | `/wi-dev` (alias) / `/wi dev` | `/wi-dev` (alias) / `/dev` (bare; `/user:dev` on clash) |
 | `${CLAUDE_PLUGIN_ROOT}` | native | compat var | the installed plugin root (or the clone) | resolve to the plugin root (env var is hook-only) |
 | Subagents | Agent/Task | `spawn_agent` | `task` / `/fleet` | `spawn_subagent` (general-purpose, inline) |
 
