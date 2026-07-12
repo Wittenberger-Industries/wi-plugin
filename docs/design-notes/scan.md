@@ -15,10 +15,10 @@ whose "why" is deleted instead of relocated loses its guard against future "simp
 
 ## Intro
 
-- **Mission.** scan does the one-time groundwork so `/wi:dev` can run smoothly later; every later phase
+- **Mission.** scan does the one-time groundwork so `/wit:dev` can run smoothly later; every later phase
   reads what scan wrote instead of re-deriving it. The four output files are the contract; the procedure
   is just how they get filled.
-- **Why `--refresh` re-verifies instead of re-documenting:** repos move on without wi (humans commit,
+- **Why `--refresh` re-verifies instead of re-documenting:** repos move on without wit (humans commit,
   dependencies change, modules appear), and `dev` auto-invokes the refresh at feature start, so it must
   stay cheap; re-documenting is the expensive path and mostly churns prose.
 
@@ -36,27 +36,27 @@ whose "why" is deleted instead of relocated loses its guard against future "simp
   feature can fill honest gaps; the confirmed intent is on record either way.
 - **Why one folded question round:** the greenfield questions merge into scan:4's constitution-confirm
   so the user answers once, not twice.
-- **Why the greenfield `.gitignore` names `.wi/features/*/.logs/`:** that dir is wi's redirected command
+- **Why the greenfield `.gitignore` names `.wit/features/*/.logs/`:** that dir is wit's redirected command
   output (workflow.md's output house rule); seeding the ignore at scan time keeps the first build from
   leaking caches, build artifacts, and command logs into `git status`.
 
 ## scan:5 (plugin bootstrap)
 
 - **Why offer, don't force:** canonical in `plugin-bootstrap.md` (never install without asking; never
-  block if the user declines). The plugins are an enhancement, not a requirement: wi's phase skills
+  block if the user declines). The plugins are an enhancement, not a requirement: wit's phase skills
   re-detect availability at run time and fall back gracefully, so a "skip now" is never fatal.
 
 ## scan:6 (commit)
 
-- **Why scan commits its own outputs:** wi-directory.md's project-level rule (committed where written).
-  The commit is what makes the committed-`.wi/` promise true and puts the docs in every future worktree,
+- **Why scan commits its own outputs:** wit-directory.md's project-level rule (committed where written).
+  The commit is what makes the committed-`.wit/` promise true and puts the docs in every future worktree,
   since build worktrees branch from main and inherit them.
 
 ## scan:7 (report; the lean-file warning)
 
 - **Why the ~150-line ceiling is worth a warning line:** `constitution.md` and `repo-map.md` are held in
   the orchestrator's context for entire runs (workflow.md's context budget), so overweight there is paid
-  on every turn (~75 re-reads measured on a real run). The ceiling itself is wi-directory.md's lean-file
+  on every turn (~75 re-reads measured on a real run). The ceiling itself is wit-directory.md's lean-file
   rule; scan only surfaces breaches.
 
 ## `--refresh` A (drift check)
@@ -75,7 +75,7 @@ whose "why" is deleted instead of relocated loses its guard against future "simp
 
 ## `--refresh` B (memory hygiene)
 
-- **Why the index target (roughly 30 lines):** learnings recall is via the index (wi-directory.md);
+- **Why the index target (roughly 30 lines):** learnings recall is via the index (wit-directory.md);
   every phase reads it per feature, so the compounding memory only stays useful if it stays lean.
 - **Why promote-then-tombstone:** a standing rule belongs in its source of truth, where every phase
   already looks; the tombstone keeps the index honest about where the learning went, and deleting the
@@ -83,7 +83,7 @@ whose "why" is deleted instead of relocated loses its guard against future "simp
 - **Why ADRs are never pruned:** they are the project's decision history; superseding with a new ADR
   preserves the trail a future maintainer follows.
 - **Timing note (lag, not drift):** ship commits a feature's learnings on the feature branch, so main's
-  `learnings.md` lacks in-flight features' lines until their PRs merge; wi-directory.md tells
+  `learnings.md` lacks in-flight features' lines until their PRs merge; wit-directory.md tells
   `scan --refresh` to read that as normal lag, not drift.
 
 ## Templates & the mermaid section
@@ -99,4 +99,4 @@ whose "why" is deleted instead of relocated loses its guard against future "simp
   installed it also does a true render. The skill mandates only "fix every error; never save a diagram
   that doesn't pass".
 - **Why "tight and skimmable" closes the skill:** these files are read at the top of every later phase,
-  so bloat there is paid many times over; the canonical ceiling is wi-directory.md's lean-file rule.
+  so bloat there is paid many times over; the canonical ceiling is wit-directory.md's lean-file rule.

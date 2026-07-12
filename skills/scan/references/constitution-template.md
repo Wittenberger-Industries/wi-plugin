@@ -1,14 +1,14 @@
 ---
 type: Template
 title: "Project constitution: template"
-description: Template for an OKF-conformant .wi/constitution.md (the project's ground rules).
+description: Template for an OKF-conformant .wit/constitution.md (the project's ground rules).
 timestamp: 2026-06-14
 tags: [constitution, template, okf, scan]
 ---
 
 # Project constitution: template
 
-Copy this to `.wi/constitution.md`, fill in from what `scan` detected, and ask the user to confirm the
+Copy this to `.wit/constitution.md`, fill in from what `scan` detected, and ask the user to confirm the
 lines marked `(confirm)`. This file is the project's ground rules. **Every phase reads it**, so it is the
 cheapest possible place to encode "how we build here": write it once, and you stop re-explaining
 conventions in every plan and every build subagent.
@@ -19,18 +19,18 @@ Keep it short and declarative. If a rule isn't worth enforcing, don't write it.
 ---
 type: Constitution
 title: "Constitution: <project name>"
-description: The project's ground rules, read by every wi phase.
+description: The project's ground rules, read by every wit phase.
 timestamp: <YYYY-MM-DD>
 ---
 
 # Constitution: <project name>
 
-> The rules wi follows for this repo. Edit freely; this overrides wi's defaults.
+> The rules wit follows for this repo. Edit freely; this overrides wit's defaults.
 
 ## Language & tooling
 - **Primary language:** <e.g. Python 3.12>   (confirm)
 - **Package manager / runner:** <uv>   (confirm)
-- **Canonical commands:** see .wi/repo-map.md (do not duplicate here)
+- **Canonical commands:** see .wit/repo-map.md (do not duplicate here)
 
 ## Code style
 - Format with <ruff format>; lint with <ruff check>. Lint must pass before ship.   (confirm)
@@ -69,9 +69,9 @@ timestamp: <YYYY-MM-DD>
 - <list things this project deliberately avoids, e.g. "no new microservices", "no ORM swaps">
 ```
 
-## Defaults wi assumes when a rule is left blank
+## Defaults wit assumes when a rule is left blank
 
-If the user doesn't override, wi applies these (Python-leaning) defaults, because an opinionated
+If the user doesn't override, wit applies these (Python-leaning) defaults, because an opinionated
 baseline beats no opinion:
 
 - Test before merge; prefer TDD for non-trivial logic.

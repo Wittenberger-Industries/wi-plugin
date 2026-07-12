@@ -1,14 +1,14 @@
 ---
 type: Reference
 title: "Brainstorm: refine the TO-BE (the one conversation)"
-description: "This is the interactive phase and the value of `wi:rpa`: a PDD is usually AS-IS-heavy and gap-ridden, so turn it into a buildable TO-BE."
+description: "This is the interactive phase and the value of `wit:rpa`: a PDD is usually AS-IS-heavy and gap-ridden, so turn it into a buildable TO-BE."
 timestamp: 2026-06-09
 tags: [rpa, reference]
 ---
 
 # Brainstorm: refine the TO-BE (the one conversation)
 
-This is the interactive phase and the value of `wi:rpa`: a PDD is usually AS-IS-heavy and gap-ridden, so turn
+This is the interactive phase and the value of `wit:rpa`: a PDD is usually AS-IS-heavy and gap-ridden, so turn
 it into a buildable TO-BE. **Refine the PDD's own ToBe, but do NOT trust it** (see protocol:0). Assume gaps *and
 errors* exist even when the PDD looks complete.
 
@@ -26,9 +26,9 @@ it; else run this protocol directly. **Either engine, the dialogue is with the U
 skill starts self-answering, stop and put the questions to the user yourself. A **headless run** still
 invokes the engine when present (it structures the questions; the answers are then self-resolved under the
 headless rule above and the stamp records both); if the engine cannot run without a user, run this
-protocol directly and stamp `via wi fallback, self-answered (headless)`. **Stamp the mode in `progress.md`**:
-engine **and** interactivity: `brainstorm via superpowers:brainstorming | via wi fallback`, suffixed
-`, dialogue` | `, self-answered (headless)` (e.g. `brainstorm via wi fallback, self-answered (headless)`).
+protocol directly and stamp `via wit fallback, self-answered (headless)`. **Stamp the mode in `progress.md`**:
+engine **and** interactivity: `brainstorm via superpowers:brainstorming | via wit fallback`, suffixed
+`, dialogue` | `, self-answered (headless)` (e.g. `brainstorm via wit fallback, self-answered (headless)`).
 
 **Must-ask before the design gate (never skipped in dialogue; only a headless run self-resolves each as a
 logged assumption, and says so):**
@@ -54,7 +54,7 @@ logged assumption, and says so):**
 
 ## 0. Baseline, and challenge it
 
-Read `pdd.md`, `.wi/inputs.md`, `.wi/components.md`, `.wi/rpa-constitution.md`. **Extract the PDD's
+Read `pdd.md`, `.wit/inputs.md`, `.wit/components.md`, `.wit/rpa-constitution.md`. **Extract the PDD's
 existing ToBe section as the *starting* `tobe.md`** (only
 *derive* one from the AS-IS when the PDD has none), **but the PDD's ToBe and its To-Be diagram are a draft,
 often wrong or incomplete, NOT ground truth.** Actively challenge them with the user: does every step match
@@ -111,7 +111,7 @@ and do not produce a separate "everything-must-be-API" table.
 
 ## 4. Reuse before build
 
-For each capability a step needs (notify, login to SystemX, read a queue…), check `.wi/components.md`
+For each capability a step needs (notify, login to SystemX, read a queue…), check `.wit/components.md`
 first. If a component exists, the step **reuses** it (note the component). Only genuinely new capabilities
 become new sub-workflows.
 
@@ -158,7 +158,7 @@ become new sub-workflows.
 The SDD's infrastructure (sdd:1.3) and Orchestrator sections (sdd:7.2–7.6) need **concrete resource names + values**,
 and the back-half build provisions from them. **Ask the user for the real values**; anything they don't know
 becomes an **open dependency `D`** (surfaced at the gate), not a silent `(confirm)` placeholder you build past.
-Capture answers into `.wi/orchestrator.md`:
+Capture answers into `.wit/orchestrator.md`:
 
 - **Naming conventions**: the org's standard for workflow / argument / asset / queue / process names
   (prefixes, casing, the `<Project>_<Unit>` pattern). Ask; don't invent one silently.
@@ -171,7 +171,7 @@ Capture answers into `.wi/orchestrator.md`:
   per environment** (dev/test/prod): URLs, folder/UNC paths, poll interval, queue concurrency/retries,
   target-system constants, feature toggles. Names *and* values: ask, don't default silently.
 - **UiPath Agent(s)**: if a step calls a UiPath Agent (e.g. a document-extraction agent), its **name** +
-  input/output contract (point at the sample output registered in `.wi/inputs.md`).
+  input/output contract (point at the sample output registered in `.wit/inputs.md`).
 - **Triggers**: time or queue, schedule, concurrency.
 
 In a headless run (or when the user doesn't have them yet) **propose convention-based names**

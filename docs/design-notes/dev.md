@@ -20,7 +20,7 @@ against future "simplification".
   conversations (brainstorm and the design gate) around an otherwise autonomous run. The intro used
   to enumerate the interactive moments; the Boundaries "by mode" bullet is the canonical statement,
   so the intro now carries only the contract.
-- **Why the keep-alive pairing is stated up front:** wi provides the method (skills, artifacts,
+- **Why the keep-alive pairing is stated up front:** wit provides the method (skills, artifacts,
   gates); the loop provides persistence and keeps the run going until done. The platform split
   (Claude Code and Codex have a built-in `/goal`; Copilot relaunches under Autopilot) matters at
   dev:4, where the templates print verbatim from keep-alive.md, the single source. `validate.py`
@@ -89,7 +89,7 @@ against future "simplification".
 - **Why the context budget is instantiated, not just cited:** workflow.md owns the umbrella rule;
   dev's bullet pins the dev-specific reads (resume detection touches each in-flight `progress.md`
   and nothing else; the preflight reads `brief.md` exactly once) so resume detection never becomes a
-  crawl of the whole `.wi/` tree.
+  crawl of the whole `.wit/` tree.
 - **Why mid-run input is routed:** the run never derails on input, and input never vanishes. The
   three routes keep the design gate the only re-opening point: in-scope work joins `tasks.md`,
   out-of-scope work becomes a roadmap row, and only a contradiction of the approved design re-opens

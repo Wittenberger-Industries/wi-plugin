@@ -20,26 +20,26 @@ working tree, and two features can build at once.
 
 ```bash
 # from the repo root; <slug> is the feature slug
-git worktree add -b wi/<slug> ../<repo>-wi-<slug>
+git worktree add -b wit/<slug> ../<repo>-wit-<slug>
 ```
 
-Then work happens in `../<repo>-wi-<slug>` on branch `wi/<slug>`. Record both in `progress.md`:
+Then work happens in `../<repo>-wit-<slug>` on branch `wit/<slug>`. Record both in `progress.md`:
 
 ```
-- **Worktree:** ../<repo>-wi-<slug>
-- **Branch:** wi/<slug>
+- **Worktree:** ../<repo>-wit-<slug>
+- **Branch:** wit/<slug>
 ```
 
 The feature folder arrives with the checkout: research commits the dossier on main at the design gate
-(`docs(<slug>): feature dossier (design gate)`), and the worktree branches from main; `.wi/features/<slug>/`
+(`docs(<slug>): feature dossier (design gate)`), and the worktree branches from main; `.wit/features/<slug>/`
 is in place from the first command. During build the worktree's copy is canonical, and main's copy catches
 up when the branch merges. Resume-safe: a dossier already present in the worktree needs nothing.
 
 ### Finish / clean up (done by the ship phase)
 
 ```bash
-git worktree remove ../<repo>-wi-<slug>     # only after ship:8's remote-checks gate lands (green / none / user-accepted red)
-git branch -d wi/<slug>                      # if fully merged
+git worktree remove ../<repo>-wit-<slug>     # only after ship:8's remote-checks gate lands (green / none / user-accepted red)
+git branch -d wit/<slug>                      # if fully merged
 ```
 
 Never `git worktree remove --force` a tree with uncommitted work without telling the user.
@@ -48,7 +48,7 @@ Never `git worktree remove --force` a tree with uncommitted work without telling
 
 - **No git repo:** skip worktrees; work in place but still branch the discipline (small commits once a
   repo exists, or a clear changelog). Note "Worktree: -" in progress.md.
-- **User opted for "branch, no worktree":** `git switch -c wi/<slug>` in the current checkout instead of
+- **User opted for "branch, no worktree":** `git switch -c wit/<slug>` in the current checkout instead of
   adding a worktree. Everything else is identical.
 - **Existing worktree for this feature (resume):** reuse it; don't create a second.
 - **Restricted filesystems** (network/Windows mounts that forbid rmdir): put the worktree on a local
@@ -60,7 +60,7 @@ Never `git worktree remove --force` a tree with uncommitted work without telling
   ship hand the user a suggested branch name, commit message, and PR body to apply via the platform's
   native controls. Note "Worktree: - (sandboxed)" in progress.md.
 - **Grok Build session worktrees:** Grok's own `grok -w` session worktree is an optional outer shell;
-  keep the wi feature worktree canonical and do **not** nest it inside a session worktree. A Grok session
+  keep the wit feature worktree canonical and do **not** nest it inside a session worktree. A Grok session
   workspace is a standalone **copy** of the repo, so the git signals above do not fire: detect it by cwd
   under `~/.grok/worktrees/` and then follow this same sandboxed variant
   (`${CLAUDE_PLUGIN_ROOT}/references/grok-tools.md`). Subagent `isolation: worktree` (`spawn_subagent`)
@@ -72,7 +72,7 @@ trees) well. This file is the fallback.
 ## Subagent dispatch
 
 Each task runs in a **fresh** subagent so context doesn't accumulate across a long build. Use the
-`wi-task-runner` agent (`agents/wi-task-runner.md`). Scope its prompt tightly: give it the task and its
+`wit-task-runner` agent (`agents/wit-task-runner.md`). Scope its prompt tightly: give it the task and its
 immediate context, not the whole project.
 
 The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` /
@@ -81,10 +81,10 @@ The dispatch mechanism is platform-specific (see `${CLAUDE_PLUGIN_ROOT}/referenc
 `spawn_subagent` with the built-in `general-purpose` type and the runner prompt inline. The prompt
 **content** is inline on every
 platform: the skeleton below gives each runner its task block + context in full. The dispatch *target*
-differs: on Claude Code, dispatch the **registered `wi-task-runner` agent** (build:2's instruction: the
+differs: on Claude Code, dispatch the **registered `wit-task-runner` agent** (build:2's instruction: the
 plugin registers it, and tiered model routing rides the dispatch); only on platforms without reliable
 named-agent registration (Codex: named-role dispatch is unreliable across builds there) pass the prompt
-to a generic worker carrying the `agents/wi-task-runner.md` contract inline.
+to a generic worker carrying the `agents/wit-task-runner.md` contract inline.
 
 ### Task-runner prompt skeleton
 
@@ -95,9 +95,9 @@ Environment: file access = <exact tools/paths the runner must use>; do NOT git c
 stash and do NOT write progress.md; the orchestrator commits and ticks. Test execution this wave:
 <allowed (sole test-runner) | authored-not-run (the orchestrator verifies serially)>.
 
-Repo / worktree: <path>   Branch: <wi/slug>
-Constitution (obey these rules): <paste the relevant lines from .wi/constitution.md>
-Repo commands: test-one = <cmd>, lint = <cmd>, typecheck = <cmd>   (from .wi/repo-map.md)
+Repo / worktree: <path>   Branch: <wit/slug>
+Constitution (obey these rules): <paste the relevant lines from .wit/constitution.md>
+Repo commands: test-one = <cmd>, lint = <cmd>, typecheck = <cmd>   (from .wit/repo-map.md)
 
 TASK <n>: <title>   [<tag>]
 - Files: <paths>
@@ -124,7 +124,7 @@ build runs in waves: every task whose dependencies are met and whose `Files` are
 ready tasks is dispatched concurrently, in the same turn. Reports are reconciled as they return; the
 orchestrator is the only committer, so parallel edits in one worktree stay safe: runners touch disjoint
 files, commits land serially. The git landmines that bind runners sharing a worktree (the no-stash /
-no-clean / no-reset list) are pinned once in `agents/wi-task-runner.md`, echoed by the prompt skeleton
+no-clean / no-reset list) are pinned once in `agents/wit-task-runner.md`, echoed by the prompt skeleton
 above. `superpowers:dispatching-parallel-agents` codifies the pattern if installed.
 
 The escalation ladder when parallel work would collide:
@@ -133,8 +133,8 @@ The escalation ladder when parallel work would collide:
    for almost every wave.
 2. **Per-task ephemeral worktree**: when two ready tasks genuinely must touch the same file, or a task's
    tests interfere with siblings (fixed port, shared db file, global fixture):
-   `git worktree add -b wi/<slug>-t<N> ../<repo>-wi-<slug>-t<N> wi/<slug>`, run the task there, merge back
-   into `wi/<slug>` in dependency order, then remove the worktree. Mind the cost: a fresh worktree often
+   `git worktree add -b wit/<slug>-t<N> ../<repo>-wit-<slug>-t<N> wit/<slug>`, run the task there, merge back
+   into `wit/<slug>` in dependency order, then remove the worktree. Mind the cost: a fresh worktree often
    needs its own env (`uv sync` / `npm install`), so escalate when the conflict is real, not routinely.
 3. **Serialize**: last resort, when the DAG is a chain or merge-back conflicts would outweigh the win.
 

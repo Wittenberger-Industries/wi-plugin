@@ -3,9 +3,9 @@ type: Skill
 name: plan
 user-invocable: false
 description: >
-  Turn a decided brief into an executable plan. Use this skill when the user says "/wi:plan", "plan this
+  Turn a decided brief into an executable plan. Use this skill when the user says "/wit:plan", "plan this
   out", "write the spec", "break this into tasks", or as the plan phase of the research skill
-  (autonomous). Planning only writes inside .wi/; no project code is touched yet.
+  (autonomous). Planning only writes inside .wit/; no project code is touched yet.
 ---
 
 # plan: brief → spec, tasks, pitfalls, ADR
@@ -14,9 +14,9 @@ Produce the artifacts that make build mechanical and review easy. Good planning 
 so the build phase is mostly typing, and so a fresh subagent can pick up any single task and execute it
 without re-reading the whole world.
 
-Inputs: `.wi/features/<slug>/brief.md`, the chosen approach in `research/`, `.wi/repo-map.md`, `.wi/constitution.md`.
+Inputs: `.wit/features/<slug>/brief.md`, the chosen approach in `research/`, `.wit/repo-map.md`, `.wit/constitution.md`.
 Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually written in the research phase).
-**No source edits: planning only writes inside `.wi/`. Build starts only after the design gate, where the user confirms the architecture + design.**
+**No source edits: planning only writes inside `.wit/`. Build starts only after the design gate, where the user confirms the architecture + design.**
 
 ## Procedure
 
@@ -26,7 +26,7 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
 
 2. **Decide on an ADR (if research didn't already record it).** If the feature commits to anything hard to reverse (a datastore, a framework, an
    external service, a public API or schema shape, an auth model), record it as the next **ADR-NNNN** in the
-   project-wide `.wi/adr/` log using `${CLAUDE_PLUGIN_ROOT}/skills/plan/references/adr-template.md`
+   project-wide `.wit/adr/` log using `${CLAUDE_PLUGIN_ROOT}/skills/plan/references/adr-template.md`
    (global numbering; append the index.md row). Trivial
    features get no ADR; don't manufacture decisions.
 
@@ -43,12 +43,12 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
 4. **Break it into tasks** → `tasks.md` (format below). Aim for small, independently verifiable steps.
    Each task names the files it touches and the exact command/test that proves it. Default to TDD; **red
    and green live inside one task**: the task's runner writes the failing test first, then implements to
-   green (`agents/wi-task-runner.md`); never plan a *separate* failing-test task: it can't "end green",
+   green (`agents/wit-task-runner.md`); never plan a *separate* failing-test task: it can't "end green",
    and in a parallel wave it races any sibling whose Verify runs the tests. **Delegation check:** if
    `superpowers:writing-plans` is in your available skills you MUST use it for the decomposition
    (capturing the result in this format) and log `plan via superpowers:writing-plans` to progress.md.
-   The inline format below is the fallback only when it's absent (log `plan via wi fallback`).
-   **Scope of that delegation:** wi's `tasks.md` **is** the plan artifact (no `docs/superpowers/plans/`
+   The inline format below is the fallback only when it's absent (log `plan via wit fallback`).
+   **Scope of that delegation:** wit's `tasks.md` **is** the plan artifact (no `docs/superpowers/plans/`
    file), and the delegate's end-of-plan "execute now?" choice doesn't apply: build owns execution, and
    only after the design gate.
 
@@ -61,7 +61,7 @@ Outputs: `spec.md`, `tasks.md`, `pitfalls.md` (the approach ADR is usually writt
    a full-suite Verify inside a parallel wave races its siblings' red phases.
 
    **Docs follow structure.** If a task changes the architecture (new module, dependency, layer, external
-   service), the structure docs (`.wi/architecture.md`, `.wi/overview.md`) go stale; ship's docs-sync
+   service), the structure docs (`.wit/architecture.md`, `.wit/overview.md`) go stale; ship's docs-sync
    updates them, but when the doc work is substantial give it its own `[docs]` task.
 
 5. **Mirror the task titles** into `progress.md`, **leave Phase = `plan`**, and stop. plan does not own the

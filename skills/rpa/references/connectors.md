@@ -16,7 +16,7 @@ not listed, or for specifics (current connector names, scopes, activities), **de
 ## Decision ladder (per step, pick the highest that fits)
 
 1. **Integration Service connector** activity, if a maintained connector exists for the system.
-2. **Vendor API** via HTTP Request, if there's a documented API but no connector (see `.wi/inputs.md` API
+2. **Vendor API** via HTTP Request, if there's a documented API but no connector (see `.wit/inputs.md` API
    refs).
 3. **Official UiPath activity package**: Mail, Excel, Word, PDF, Database, etc.
 4. **UI automation**, when none of the above exist or the interaction is inherently UI. A valid choice;

@@ -65,7 +65,7 @@ def make_session(tmp: Path, permission_events=None) -> Path:
 
 
 def make_ledger(tmp: Path) -> Path:
-    """A wi tokens.md as an in-run Grok orchestrator writes it (0-token rows, real durations)."""
+    """A wit tokens.md as an in-run Grok orchestrator writes it (0-token rows, real durations)."""
     text = _ledger.make_template("0011-test")
     rows = (
         "| build | Task 1 schema | 0 | 1m05s | Grok: tokens unobservable in-run |\n"

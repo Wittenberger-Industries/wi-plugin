@@ -1,14 +1,14 @@
 ---
 type: Design Notes
-title: "wi-researcher: design rationale (maintainer notes)"
-description: The "why" behind agents/wi-researcher.md's rules, relocated out of the loaded charter by issue 41; the runtime never reads this file; each entry is anchored to the charter section it explains.
+title: "wit-researcher: design rationale (maintainer notes)"
+description: The "why" behind agents/wit-researcher.md's rules, relocated out of the loaded charter by issue 41; the runtime never reads this file; each entry is anchored to the charter section it explains.
 timestamp: 2026-07-11
-tags: [wi-researcher, agents, design-notes, context-budget]
+tags: [wit-researcher, agents, design-notes, context-budget]
 ---
 
-# wi-researcher: design rationale (maintainer notes)
+# wit-researcher: design rationale (maintainer notes)
 
-`agents/wi-researcher.md` is loaded on every researcher dispatch, often several in parallel per feature,
+`agents/wit-researcher.md` is loaded on every researcher dispatch, often several in parallel per feature,
 so it carries rules only. The rationale lives here, anchored by the charter section it explains. When
 editing the charter, keep this file in sync; a rule whose "why" is deleted instead of relocated loses its
 guard against future "simplification".

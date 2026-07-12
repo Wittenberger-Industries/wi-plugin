@@ -1,7 +1,7 @@
 ---
 type: Template
 title: SDD template
-description: Base ToC + precedence rules for an OKF-conformant Solution Design Document (.wi/features/<run-slug>/sdd.md).
+description: Base ToC + precedence rules for an OKF-conformant Solution Design Document (.wit/features/<run-slug>/sdd.md).
 timestamp: 2026-06-14
 tags: [sdd, template, okf, rpa]
 ---
@@ -10,8 +10,8 @@ tags: [sdd, template, okf, rpa]
 
 The Solution Design Document is the high-fidelity spec handed to `uipath-rpa`: the "robust
 prompt" meant to one-shot the build. **One SDD per solution**, with sdd:7 repeated per process. Pull from
-`tobe.md`, `.wi/inputs.md`, `.wi/components.md`, the rpa-constitution, and the assumptions. Reference,
-don't duplicate. Fill sdd:1.3, sdd:3.1 and sdd:7.2–7.6 from `.wi/orchestrator.md` (the resource manifest elicited in
+`tobe.md`, `.wit/inputs.md`, `.wit/components.md`, the rpa-constitution, and the assumptions. Reference,
+don't duplicate. Fill sdd:1.3, sdd:3.1 and sdd:7.2–7.6 from `.wit/orchestrator.md` (the resource manifest elicited in
 the brainstorm): concrete names, not placeholders.
 
 ## Choosing the structure (ToC): precedence
@@ -20,7 +20,7 @@ Clients have different SDD standards, so the structure is **overridable**. Pick 
 
 1. **An existing SDD in the project wins.** If the repo already has an `sdd.md` (or a delivered SDD doc)
    with a Table of Contents, **mirror that ToC**: match the client's house standard, don't impose ours.
-2. **A project override.** Else, if `.wi/sdd-template.md` exists (a per-project ToC) or the
+2. **A project override.** Else, if `.wit/sdd-template.md` exists (a per-project ToC) or the
    `rpa-constitution.md` names an SDD structure, use it.
 3. **The base ToC below** otherwise.
 
@@ -43,7 +43,7 @@ do not apply. sdd:7.1.3 stays the per-process flow diagram for both, and the acc
 
 ## Base ToC (UiPath enterprise standard)
 
-Copy to `.wi/features/<run-slug>/sdd.md` (or the client's structure):
+Copy to `.wit/features/<run-slug>/sdd.md` (or the client's structure):
 
 ```markdown
 ---
@@ -75,12 +75,12 @@ timestamp: <YYYY-MM-DD>
 <UiPath Data Service entities/fields if used, or "not used">
 
 ## 5. Libraries used
-<reusable Library projects / shared components (from .wi/components.md) + activity packages & versions>
+<reusable Library projects / shared components (from .wit/components.md) + activity packages & versions>
 
 ## 6. Applications Used
 <each application/system the automation touches, version, environment, and how (UI / API / connector)>
 ### 6.1 Postman collections for Applications automated through APIs
-<for API-automated apps: the Postman collection / endpoint list (ref .wi/inputs.md API references)>
+<for API-automated apps: the Postman collection / endpoint list (ref .wit/inputs.md API references)>
 
 ## 7. Process details
 ### 7.1 <Process name>            <!-- repeat 7.1.x for each process in the solution -->
@@ -103,7 +103,7 @@ timestamp: <YYYY-MM-DD>
 <concurrency, execution target, runtime arguments>
 ### 7.6 Agents
 <any UiPath Agent a process calls (e.g. a document-extraction agent): name, where it runs, its input and
- output schema (ref the sample in .wi/inputs.md), and how the Performer invokes/awaits it, or "none">
+ output schema (ref the sample in .wit/inputs.md), and how the Performer invokes/awaits it, or "none">
 
 ## 8. Other remarks
 <assumptions, open questions, risks, manual fallbacks, anything for sign-off; link assumptions.md

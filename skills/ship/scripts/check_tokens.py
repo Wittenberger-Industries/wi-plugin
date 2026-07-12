@@ -13,7 +13,7 @@ PENDING placeholder). That five-column format is the only one recognized.
 Otherwise exit 1 and print the first failing check. A non-zero exit is the hard guardrail:
 ship must not mark Phase=done, so the keep-alive loop keeps working the feature. Stdlib only.
 Canonical prose for the ledger discipline ("the ledger rule"):
-skills/research/references/wi-directory.md, tokens.md template section.
+skills/research/references/wit-directory.md, tokens.md template section.
 """
 import argparse
 import sys

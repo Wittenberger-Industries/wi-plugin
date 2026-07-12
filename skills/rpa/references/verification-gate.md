@@ -9,7 +9,7 @@ tags: [rpa, reference]
 # RPA verification gate
 
 The bar a built UiPath solution must clear before it ships. It uses UiPath's own tooling via the `uip`
-CLI / the `uipath-platform` skill; wi doesn't invent checks. Run every command **non-interactively and
+CLI / the `uipath-platform` skill; wit doesn't invent checks. Run every command **non-interactively and
 time-bounded** (a hands-off run must never stall on a prompt; a hang is a blocker to surface).
 
 **Publishing is not part of this gate.** Pushing the package to a tenant (`progress.md` → `Publish: feed |
@@ -74,7 +74,7 @@ claim green you didn't verify).
 
 ## Checker (result mode): feature-level + line-level, one dispatch
 
-Beyond the tooling above, dispatch the **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wi-code-checker.md`) in `result`
+Beyond the tooling above, dispatch the **checker** (`${CLAUDE_PLUGIN_ROOT}/agents/wit-code-checker.md`) in `result`
 mode, **one dispatch, two sequential passes**, same interface and logging as ship:2:
 
 - **Feature-level pass**: against **the SDD's acceptance-criteria section** (sdd:10 in the base ToC) + the
@@ -85,12 +85,12 @@ mode, **one dispatch, two sequential passes**, same interface and logging as shi
   reviewer template, the `code-reviewer.md` inside that skill's installed directory (Glob the plugin
   roots, e.g. `~/.claude/plugins/**/requesting-code-review/**/code-reviewer.md`), and pass its absolute
   path in the dispatch as `Line review template: <path>`; absent → `Line review template: none` (the
-  checker runs wi's built-in line review over the branch diff; here, the generated project). Log
-  `review via wi-code-checker + superpowers:requesting-code-review[inline]` or
-  `review via wi-code-checker (wi line review; superpowers absent)`.
+  checker runs wit's built-in line review over the branch diff; here, the generated project). Log
+  `review via wit-code-checker + superpowers:requesting-code-review[inline]` or
+  `review via wit-code-checker (wit line review; superpowers absent)`.
 
 **Mixture of Agents (optional, off by default)**: when `progress.md`'s resolved-routing block's MoA row
-includes `review` in its `points` (mirroring `.wi/models.md`'s `## Mixture of Agents` section), this
+includes `review` in its `points` (mirroring `.wit/models.md`'s `## Mixture of Agents` section), this
 dispatch mirrors ship:2's MoA branch (rpa runs mirror the review point only): instead of one
 checker dispatch, dispatch N proposer checkers (one per listed `proposers` tier) in parallel with
 IDENTICAL prompts (result mode, both passes, `sdd.md`'s acceptance
@@ -102,7 +102,7 @@ Then one aggregator checker (`MoA role: aggregator`, at the `aggregator` tier) r
 dedupes, keeps the MAX severity any proposer assigned, verifies against the repo before dropping anything
 as a false positive, and alone writes `verification.md`. Append
 `+ MoA (<N> proposers, <L> layers, aggregator <tier>)` to the review log line (e.g.
-`review via wi-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`);
+`review via wit-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`);
 each dispatch appends its own `tokens.md` row. The cross-provider layer and the max-2-rounds loop are
 unchanged (a full MoA pass = one round). Without the section (or `review` not in `points`) the single
 dispatch above is unchanged.
@@ -125,7 +125,7 @@ run the checker says isn't met.
 - the **checker (result mode) verdict is PASS**: every SDD acceptance criterion and locked decision
   delivered and wired, and no line-level BLOCKER outstanding.
 
-## The iron law (same as wi:dev)
+## The iron law (same as wit:dev)
 
 No PASS without a fresh run this session: analyzer/validate output from *this* build, not quoted from
 earlier and not "should pass". A red gate stops the ship: fix the workflow (loop back to build) or, if the

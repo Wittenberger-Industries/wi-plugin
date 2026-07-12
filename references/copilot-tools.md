@@ -1,33 +1,33 @@
 ---
 type: Reference
-title: "Copilot CLI: tool & capability mapping for wi"
-description: Claude Code → GitHub Copilot CLI tool-name and capability equivalents used when running wi on Copilot.
+title: "Copilot CLI: tool & capability mapping for wit"
+description: Claude Code → GitHub Copilot CLI tool-name and capability equivalents used when running wit on Copilot.
 timestamp: 2026-06-09
 tags: [copilot, tools, portability, reference]
 ---
 
-# Copilot CLI: tool & capability mapping for wi
+# Copilot CLI: tool & capability mapping for wit
 
-wi's skills are written with Claude Code names. On Copilot CLI, use these equivalents.
+wit's skills are written with Claude Code names. On Copilot CLI, use these equivalents.
 
 ## ${CLAUDE_PLUGIN_ROOT}
-Copilot has no plugin-root variable. `${CLAUDE_PLUGIN_ROOT}` means the **wi plugin root**: the directory
-holding `skills/`, `agents/`, and `.claude-plugin/`. Where that root lives depends on how wi was installed:
+Copilot has no plugin-root variable. `${CLAUDE_PLUGIN_ROOT}` means the **wit plugin root**: the directory
+holding `skills/`, `agents/`, and `.claude-plugin/`. Where that root lives depends on how wit was installed:
 
-- **Preferred (plugin install):** `copilot plugin install Wittenberger-Industries/wi-plugin` (Copilot CLI
+- **Preferred (plugin install):** `copilot plugin install Wittenberger-Industries/witloop` (Copilot CLI
   reads `.claude-plugin/plugin.json` and defaults to `skills/` + `agents/`). The whole repo lands under
-  `~/.copilot/installed-plugins/…`; that installed directory is the wi root. Update with
-  `copilot plugin update wi`.
+  `~/.copilot/installed-plugins/…`; that installed directory is the wit root. Update with
+  `copilot plugin update wit`.
 - **Fallback (clone):** `git clone` + `/skills add <repo>/skills` (older CLI versions). The clone is the
-  wi root.
+  wit root.
 
-Either way, install wi **whole** and resolve every `${CLAUDE_PLUGIN_ROOT}` path against that root. This is
+Either way, install wit **whole** and resolve every `${CLAUDE_PLUGIN_ROOT}` path against that root. This is
 why per-skill `gh skill install` is discouraged: cross-skill refs such as `ship` reading
 `${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py`, and the plugin-version read from
 `.claude-plugin/plugin.json`, need the shared root.
 
 ## Tools
-| wi/skill says | Copilot equivalent |
+| wit/skill says | Copilot equivalent |
 |---|---|
 | Read | `view` |
 | Write | `create` |
@@ -38,7 +38,7 @@ why per-skill `gh skill install` is discouraged: cross-skill refs such as `ship`
 | parallel waves | `/fleet` (monitor with `/tasks`) |
 | WebFetch | `web_fetch` |
 | WebSearch | no equivalent; use `web_fetch` with a search URL |
-| invoke a wi skill | skills load natively: `/wi <skill>` (plugin), `/wi-scan`/`/wi-dev`/`/wi-rpa` (flat aliases), or auto-trigger by description |
+| invoke a wit skill | skills load natively: `/wit <skill>` (plugin), `/wit-scan`/`/wit-dev`/`/wit-rpa` (flat aliases), or auto-trigger by description |
 | resolve a skill's `SKILL.md` path (dispatch pointer for pinned runners) | it is under the skill's install dir (`~/.copilot/installed-plugins/<...>/SKILL.md`, or the clone dir from `/skills add`); the orchestrator resolves it once and passes it in the `[frontend]`-style dispatch |
 
 ## /goal keep-alive
@@ -49,18 +49,18 @@ fully unattended (prompts suppressed, all tools/paths granted); drop `--allow-al
 confirmations.
 
 ## Command namespace
-`/wi:dev` etc. do not exist. Plugin-installed skills are auto-prefixed with the plugin name: wi's entry
-points invoke as `/wi scan`, `/wi dev`, `/wi rpa` (the prefix is Copilot's, not configurable; a separator
+`/wit:dev` etc. do not exist. Plugin-installed skills are auto-prefixed with the plugin name: wit's entry
+points invoke as `/wit scan`, `/wit dev`, `/wit rpa` (the prefix is Copilot's, not configurable; a separator
 inside a skill `name` makes it silently fail to load). For a one-token form, scan's bootstrap offers to
-copy the flat aliases from `references/skill-aliases/` into `~/.agents/skills/`, giving `/wi-scan`,
-`/wi-dev`, `/wi-rpa` (flat skills carry no prefix). The clone + `/skills add` fallback registers skills
+copy the flat aliases from `references/skill-aliases/` into `~/.agents/skills/`, giving `/wit-scan`,
+`/wit-dev`, `/wit-rpa` (flat skills carry no prefix). The clone + `/skills add` fallback registers skills
 flat too. The phase skills (brainstorm, research, plan, build, ship) are `user-invocable: false`: hidden
 from the `/` picker, invoked by the orchestrating skill or by natural language; every skill still
 auto-triggers from its `description`.
 
 ## Usage & AI credits (the `tokens.md` ledger on Copilot)
 Copilot bills in **GitHub AI Credits** (since 2026-06-01; 1 credit = $0.01, computed from token
-consumption at per-model rates, the successor to premium requests). What wi can and cannot record:
+consumption at per-model rates, the successor to premium requests). What wit can and cannot record:
 
 - **Per-subagent rows: `unavailable`.** `task`-tool dispatches produce no per-task usage figure and no
   per-agent transcript; the finest native unit is the session (total credits + a per-model token
@@ -74,8 +74,8 @@ consumption at per-model rates, the successor to premium requests). What wi can 
   `Orchestrator: unavailable for this run`; never estimate credits.
 - **`token_report.py`'s transcript parse and per-subagent split are Claude Code-only** (they read
   `~/.claude/projects/**` and its `subagents/` sidecars). The duration totals and `progress.md`
-  wall-clock still finalize normally on Copilot: timing comes from wi's own stamps, not the platform.
+  wall-clock still finalize normally on Copilot: timing comes from wit's own stamps, not the platform.
 - **Post-hoc reconciliation** (outside the run): `GET /users/{username}/settings/billing/ai_credit/usage`
   (or the `/organizations/{org}/…` variant) reports credits per day/model/user with ~30-minute lag, and
   the billing CSV itemizes per interaction, useful to attribute a run's real cost after the fact, but
-  wi never writes these delayed figures into a shipping dossier as if they were measured in-run.
+  wit never writes these delayed figures into a shipping dossier as if they were measured in-run.

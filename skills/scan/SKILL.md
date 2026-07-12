@@ -2,39 +2,41 @@
 type: Skill
 name: scan
 description: >
-  Understand a project folder and bootstrap wi in it. Use this skill when the user types "/wi:scan", opens
-  a new project and says "scan the repo", "set up wi here", "document this codebase", "what is this
+  Understand a project folder and bootstrap wit in it. Use this skill when the user types "/wit:scan", opens
+  a new project and says "scan the repo", "set up wit here", "document this codebase", "what is this
   project", or at the very start of work in an unfamiliar folder: code-bearing, empty, or greenfield.
-  Also use it as "/wi:scan --refresh" (or "refresh the scan", "update the repo map", "is the scan
-  stale?") on an already-scanned project that has moved on without wi. Python-first, stack-agnostic.
+  Also use it as "/wit:scan --refresh" (or "refresh the scan", "update the repo map", "is the scan
+  stale?") on an already-scanned project that has moved on without wit. Python-first, stack-agnostic.
 ---
 
-# /wi:scan (understand the project, then bootstrap wi)
+# /wit:scan (understand the project, then bootstrap wit)
 
 Two jobs:
 
 1. **Understand** what's in this folder and write it down.
-2. **Bootstrap** wi: the constitution, and the optional plugins wi leans on.
+2. **Bootstrap** wit: the constitution, and the optional plugins wit leans on.
 
-Already scanned? **`/wi:scan --refresh`** (section below) re-verifies instead of re-documenting.
+Already scanned? **`/wit:scan --refresh`** (section below) re-verifies instead of re-documenting.
 
-Design rationale for this skill lives in the wi repo's `docs/wi-design-notes/scan.md` (maintainer doc,
+Design rationale for this skill lives in the wit repo's `docs/design-notes/scan.md` (maintainer doc,
 never loaded at runtime).
 
-Outputs (all under a committed `.wi/`):
+Outputs (all under a committed `.wit/`):
 - `repo-map.md`: terse facts (stack, the exact test/lint/typecheck/run commands, layout, conventions).
   Read by every later phase.
 - `overview.md`: readable documentation of an **existing** project (skipped for greenfield).
 - `architecture.md`: a **mermaid** diagram of the architecture (existing projects only).
 - `constitution.md`: the project's ground rules (bootstrapped if absent).
 
-Plus a plugin check (scan:5) that may install the skills wi delegates to.
+Plus a plugin check (scan:5) that may install the skills wit delegates to.
 
 ## Procedure
 
 1. **Confirm the root & census the folder.** `git rev-parse --show-toplevel` (init only if the user wants
    it). Decide **greenfield vs existing**: `git ls-files | wc -l` plus a top-level listing. A near-empty
    folder is greenfield; anything with real source is existing.
+   **Legacy state dir:** if the project has a `.wi/` (pre-1.12.2 name) and no `.wit/`, offer to rename it
+   (`git mv .wi .wit`, one commit) and treat it as `.wit/` from then on; don't create a second state dir.
 
 2. **If existing code, understand and document it.** Use the cookbook in
    `${CLAUDE_PLUGIN_ROOT}/skills/scan/references/stack-detection.md` to read config/lock files (not source
@@ -51,34 +53,34 @@ Plus a plugin check (scan:5) that may install the skills wi delegates to.
    uv · pytest · ruff · mypy · src layout; Node/TS → pnpm · vitest · eslint · prettier · tsc. Write the
    confirmed answers into `repo-map.md` (`Kind: greenfield`) and seed `constitution.md` from them; skip
    `overview.md`. Anything the user genuinely can't answer → `UNKNOWN - ask`; don't invent it. Also drop
-   a stack-appropriate `.gitignore` (caches, build artifacts, `.wi/features/*/.logs/`: wi's redirected
+   a stack-appropriate `.gitignore` (caches, build artifacts, `.wit/features/*/.logs/`: wit's redirected
    command output).
 
 3. **Classify frontend / backend / both.** A UI framework in `package.json` or a `components/` tree ⇒
    frontend present. Record it; build routes `[frontend]` tasks to a design skill.
 
-4. **Bootstrap the constitution.** If `.wi/constitution.md` is absent, copy
+4. **Bootstrap the constitution.** If `.wit/constitution.md` is absent, copy
    `${CLAUDE_PLUGIN_ROOT}/skills/scan/references/constitution-template.md`, fill in what you detected, and
    ask the user to confirm the few lines marked `(confirm)`. If it already exists, leave it.
 
 5. **Plugin bootstrap (offer, don't force).** Follow
    `${CLAUDE_PLUGIN_ROOT}/skills/scan/references/plugin-bootstrap.md`: check which recommended plugins are
    available; for any missing, use AskUserQuestion to offer installing them, and on yes give/run the exact
-   `/plugin marketplace add` + `/plugin install` commands. wi works fully without them.
+   `/plugin marketplace add` + `/plugin install` commands. wit works fully without them.
 
 6. **Commit the scan outputs** (`repo-map.md`, `overview.md`, `architecture.md`, `constitution.md`, plus
-   the greenfield `.gitignore` when one was created): `chore(wi): scan - repo docs` (the project-level
-   rule in `wi-directory.md`: committed where written; a constitution override can disable wi commits to
+   the greenfield `.gitignore` when one was created): `chore(wit): scan - repo docs` (the project-level
+   rule in `wit-directory.md`: committed where written; a constitution override can disable wit commits to
    main).
 
 7. **Report** (4-8 lines): stack, frontend/backend, what docs were written, which plugins are present vs
    newly installed, anything left `UNKNOWN`, and a **lean-file warning** when `constitution.md` or
-   `repo-map.md` exceeds the ~150-line ceiling (wi-directory.md).
+   `repo-map.md` exceeds the ~150-line ceiling (wit-directory.md).
 
 ## `--refresh`: drift check + memory hygiene (already-scanned projects)
 
-`--refresh` keeps the `.wi/` facts honest **without re-documenting**: verify what a later phase would
-actually trust, touch only what drifted. Precondition: `.wi/repo-map.md` exists (otherwise this IS a
+`--refresh` keeps the `.wit/` facts honest **without re-documenting**: verify what a later phase would
+actually trust, touch only what drifted. Precondition: `.wit/repo-map.md` exists (otherwise this IS a
 first scan: run the full procedure). `dev` runs this automatically at feature start when the scan looks
 stale.
 
@@ -108,7 +110,7 @@ Re-stamp `repo-map.md` (`scanned <today>, refreshed`). If the **Kind or core sta
 
 ### B · Memory hygiene (learnings consolidation)
 
-If `.wi/learnings.md` exists (dev or rpa projects alike), give the compounding memory a maintenance pass:
+If `.wit/learnings.md` exists (dev or rpa projects alike), give the compounding memory a maintenance pass:
 
 1. **Dedupe:** index lines (or detail files) describing the same gotcha → merge into one, keep the
    clearest hook, fix the links.
@@ -126,7 +128,7 @@ ADRs are **immutable history, never pruned** (supersede with a new ADR instead).
 
 ### C · Report (refresh)
 
-Commit what drifted (`chore(wi): scan refresh`). Then report, 3-6 lines: what drifted and was fixed
+Commit what drifted (`chore(wit): scan refresh`). Then report, 3-6 lines: what drifted and was fixed
 (commands, diagram, facts), contradictions flagged for the user, learnings merged/promoted/pruned
 (counts), or "no drift - scan is current."
 
@@ -187,7 +189,7 @@ description: A human-facing tour of what this project is and how it's organized.
 timestamp: <YYYY-MM-DD>
 ---
 
-# <project> - overview  (documented <YYYY-MM-DD> by /wi:scan)
+# <project> - overview  (documented <YYYY-MM-DD> by /wit:scan)
 
 ## What it is
 <1-3 sentences: purpose and who uses it.>
@@ -225,7 +227,7 @@ timestamp: <YYYY-MM-DD>
 ---
 
 # Architecture - <project>
-_Diagrammed <YYYY-MM-DD> by /wi:scan._
+_Diagrammed <YYYY-MM-DD> by /wit:scan._
 
 <the primary mermaid flowchart (shape below), then a one-line legend>
 ```
@@ -266,12 +268,12 @@ Add a second diagram only if it genuinely adds clarity.
 **Validate the diagram for real before committing**; don't eyeball it:
 
 ```
-python ${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py .wi/architecture.md
+python ${CLAUDE_PLUGIN_ROOT}/skills/scan/scripts/check_mermaid.py .wit/architecture.md
 ```
 
 (python fallback: `references/workflow.md` "Script invocation".)
 
 Fix every error the checker prints; never save a diagram that doesn't pass.
 
-Keep these files tight and skimmable (wi-directory.md's lean-file rule); they're read at the top of
+Keep these files tight and skimmable (wit-directory.md's lean-file rule); they're read at the top of
 later phases.

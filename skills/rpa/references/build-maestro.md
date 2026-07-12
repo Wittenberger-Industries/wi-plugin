@@ -1,26 +1,26 @@
 ---
 type: Reference
 title: "Build: Maestro flow (.flow) via uipath-maestro-flow"
-description: "How wi:rpa builds when Framework = maestro: delegate flow generation to the uipath-maestro-flow skill, validate with uip maestro flow."
+description: "How wit:rpa builds when Framework = maestro: delegate flow generation to the uipath-maestro-flow skill, validate with uip maestro flow."
 timestamp: 2026-06-16
 tags: [rpa, maestro, reference]
 ---
 
 # Build: Maestro flow (`.flow`)
 
-Used when **`Framework: maestro`** (the REFramework path is `build-uipath.md`). wi owns the method, the gate,
+Used when **`Framework: maestro`** (the REFramework path is `build-uipath.md`). wit owns the method, the gate,
 and the artifacts; **`uipath-maestro-flow` owns the build**: borrow, don't reinvent.
 
 Precondition: the design gate passed (recorded in `progress.md`) and the worktree exists with the
 run dossier committed in-tree: rpa:6's framework-neutral isolate, same as the REFramework path.
-First act: append `rpa build engaged (wi <version>)` to the log.
+First act: append `rpa build engaged (wit <version>)` to the log.
 
 ## 1. Execute the build DAG in waves (from `tasks.md`)
 
 The DAG is: **shared components → per-flow scaffolds → subflows → wire-up** (see `maestro-architecture.md`).
 Run it as wide as the DAG allows.
 
-1. **Reuse first.** Before generating anything, check `.wi/components.md`; reuse a shared flow/subflow or a
+1. **Reuse first.** Before generating anything, check `.wit/components.md`; reuse a shared flow/subflow or a
    Library before building new.
 2. **Generate the flow.** Delegate each flow/subflow to **`uipath-maestro-flow`** in parallel waves. **State
    the node plan from the SDD in every delegation prompt**: the trigger, each node (connector / approval /
@@ -32,14 +32,14 @@ Run it as wide as the DAG allows.
    `progress.md`. **Append each delegated unit's token count to `tokens.md`** the moment that subagent
    reports completion (the only point the count exists): `tokens.md` is **mandatory**; initialize it on the
    first delegation if absent
-   (`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md`;
+   (`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wit/features/<run-slug>/tokens.md`;
    python fallback: `references/workflow.md` "Script invocation"), and ship finalizes it
    (`token_report.py --write`) under a `check_tokens.py` close-out gate.
 5. **Register new components.** If the build created something reusable (a shared subflow, a notifier flow),
-   add it to `.wi/components.md` so the next flow inherits it.
+   add it to `.wit/components.md` so the next flow inherits it.
 
 ## 2. Wire-up (if in scope)
 
 For connections / triggers / agent registrations, delegate to `uipath-platform` (it owns the `uip` CLI +
-Orchestrator side). Connection and asset **names** come from `.wi/orchestrator.md`; values live in
+Orchestrator side). Connection and asset **names** come from `.wit/orchestrator.md`; values live in
 Orchestrator, never in the flow.

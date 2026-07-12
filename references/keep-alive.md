@@ -8,8 +8,8 @@ tags: [keep-alive, goal, autopilot, handoff, portability, reference]
 
 # The keep-alive handoff: one canonical block
 
-wi pairs with a keep-alive loop for persistence: armed at handoff, the run continues across turns until
-its condition holds (wi works without it, just less robustly through a stalled turn). Claude Code and
+wit pairs with a keep-alive loop for persistence: armed at handoff, the run continues across turns until
+its condition holds (wit works without it, just less robustly through a stalled turn). Claude Code and
 Codex CLI use their built-in `/goal`; Copilot CLI has no predicate `/goal` and relaunches under
 **Autopilot** with the condition in the prompt. Grok Build has a native `/goal` too, but it is
 **model-judged** (the agent self-completes via `update_goal`), so it behaves like Autopilot, not like the
@@ -26,7 +26,7 @@ repo (ship closes out locally instead, ship:7); dev's preflight checks this befo
 - **Claude Code / Codex CLI** (both have a built-in `/goal`):
 
   ```
-  /goal The <slug> PR is open with its remote checks green (or none configured) and its branch passes <lint + test commands from repo-map.md>; .wi/features/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change; never force-push; tests are never weakened to pass.
+  /goal The <slug> PR is open with its remote checks green (or none configured) and its branch passes <lint + test commands from repo-map.md>; .wit/features/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change; never force-push; tests are never weakened to pass.
   ```
 
   Print and paste as **one line**. A multi-line `/goal` can register only its first line as the
@@ -39,7 +39,7 @@ repo (ship closes out locally instead, ship:7); dev's preflight checks this befo
   ```
   copilot --autopilot --max-autopilot-continues <N> --no-ask-user --allow-all -p "Drive the <slug> feature to done:
   build then ship until the <slug> PR is open with its remote checks green (or none configured), its
-  branch passes <lint + test commands>, and .wi/features/<slug>/progress.md Phase is done. Only files
+  branch passes <lint + test commands>, and .wit/features/<slug>/progress.md Phase is done. Only files
   named in tasks.md change; never force-push; never weaken tests."
   ```
 
@@ -50,7 +50,7 @@ repos you trust; drop `--allow-all` if you want Copilot to still confirm risky a
 - **Grok Build** (native `/goal`, but **model-judged**, not a predicate):
 
   ```
-  /goal The <slug> PR is open with its remote checks green (or none configured) and its branch passes <lint + test commands from repo-map.md>; .wi/features/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change; never force-push; tests are never weakened to pass.
+  /goal The <slug> PR is open with its remote checks green (or none configured) and its branch passes <lint + test commands from repo-map.md>; .wit/features/<slug>/progress.md Phase is done. Constraints: only files named in tasks.md change; never force-push; tests are never weakened to pass.
   ```
 
   Grok drives the goal itself and marks it complete via `update_goal` when **it** judges the work done, so

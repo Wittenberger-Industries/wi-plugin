@@ -1,19 +1,19 @@
 ---
 type: Reference
-title: The `.wi/` layout for RPA
-description: The RPA tier of the .wi/ knowledge store (project → run → process) and its OKF frontmatter.
+title: The `.wit/` layout for RPA
+description: The RPA tier of the .wit/ knowledge store (project → run → process) and its OKF frontmatter.
 timestamp: 2026-06-14
-tags: [rpa, wi-directory, okf, conventions]
+tags: [rpa, wit-directory, okf, conventions]
 ---
 
-# The `.wi/` layout for RPA
+# The `.wit/` layout for RPA
 
-`wi:rpa` reuses the `.wi/` model (same [OKF](/docs/specs/2026-06-14-okf-knowledge-format.md) frontmatter
-profile) with an extra tier: **project → run (a PDD/solution) → process**. One `/wi:rpa` run is one feature
+`wit:rpa` reuses the `.wit/` model (same [OKF](/docs/specs/2026-06-14-okf-knowledge-format.md) frontmatter
+profile) with an extra tier: **project → run (a PDD/solution) → process**. One `/wit:rpa` run is one feature
 folder for the whole solution, with **one SDD** covering its 1..N processes.
 
 ```
-.wi/
+.wit/
 ├── rpa-constitution.md      # project: RPA house standards (REFramework, connectors-over-UI, naming, gate)
 ├── sdd-template.md          # project (OPTIONAL): a client/house SDD ToC override; used if present
 ├── inputs.md                # project: input/asset registry (API refs, CSVs, samples); see ingest.md
@@ -24,7 +24,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
 ├── learnings.md             # project: learnings INDEX: one line + hook per run; read this, not the dir
 ├── learnings/               # project: substantial learnings, each its own .md (indexed above)
 └── features/
-    └── 0001-<run-slug>/     # one /wi:rpa run = one PDD -> solution; NNNN- global ordinal (creation order)
+    └── 0001-<run-slug>/     # one /wit:rpa run = one PDD -> solution; NNNN- global ordinal (creation order)
         ├── progress.md      # state machine for the run (single source of truth)
         ├── pdd.md           # the ingested PDD (faithful to source .docx)
         ├── architecture.md  # the whole-solution Runtime diagram (sdd:2): dispatcher + all performers
@@ -46,7 +46,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
 - **Framework references:** REFramework uses `refr-architecture.md` + `build-uipath.md`; Maestro uses
   `maestro-architecture.md` + `build-maestro.md`; the gate (`verification-gate.md`) branches on `Framework:`.
 - **Run-slugs are numbered**: `NNNN-<name>` (a global 4-digit ordinal assigned at creation; the dev
-  flow's convention, wi-directory.md's **Slugs bullet**), so runs list in implementation order.
+  flow's convention, wit-directory.md's **Slugs bullet**), so runs list in implementation order.
 - **Project-level files persist & compound** across runs: `rpa-constitution.md`, `sdd-template.md` (if
   present), `inputs.md`, `components.md`, `orchestrator.md`, `glossary.md`, `models.md`, `adr/` (+ its index),
   `roadmap.md` (if present), `learnings.md`, `learnings/`. Never pruned. Build + compound write
@@ -54,7 +54,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
   when progress.md says `Flow: rpa`. A repo where both flows have run also carries the dev project files
   (`constitution.md`, `repo-map.md`, `overview.md`, `architecture.md`): the sweep whitelist is the
   **union** of both directory references' project-level lists.
-- **Project-level files are committed where they're written** (`wi-directory.md`'s rule; same here):
+- **Project-level files are committed where they're written** (`wit-directory.md`'s rule; same here):
   ingest/brainstorm commit `inputs.md` / `components.md` / `orchestrator.md` / `models.md` as they create
   them, so the post-gate worktree carries them.
 - **The run dossier**: what ship's tidy leaves under `features/<run-slug>/` at `done` (the manifest ship
@@ -64,7 +64,7 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
   (no `research/` exists here): their verdicts fold into `PR.md` (ship:5), then ship's dossier tidy
   prunes them (same rule as the dev flow).
 - **The SDD structure is overridable** (clients differ): an existing project `sdd.md`'s ToC wins; else
-  `.wi/sdd-template.md`; else the bundled base ToC (see `references/sdd-template.md`).
+  `.wit/sdd-template.md`; else the bundled base ToC (see `references/sdd-template.md`).
 - **`architecture.md` is the whole-solution Runtime diagram**: dispatcher + every performer (2nd/3rd) +
   queues + systems + Orchestrator. Per-process flow diagrams live in each `tobe.md` (and feed sdd:7.1.3).
 - **`orchestrator.md` is the resource manifest**: the concrete Orchestrator names (folder, processes,
@@ -72,11 +72,11 @@ folder for the whole solution, with **one SDD** covering its 1..N processes.
   it, and the back-half build provisions from it. Secret/credential **names** only, never values.
 - **Faithful `pdd.md`.** Don't edit it to "fix" the process; refinement lives in `tobe.md`.
 - ADRs for hard-to-reverse choices (REFramework vs coded, dispatcher split, queue model) go in the
-  project-wide `.wi/adr/` log, same as `wi:dev`.
+  project-wide `.wit/adr/` log, same as `wit:dev`.
 
 ## OKF frontmatter (RPA types)
 
-Same profile as `wi:dev` (see [wi-directory](/skills/research/references/wi-directory.md) and the
+Same profile as `wit:dev` (see [wit-directory](/skills/research/references/wit-directory.md) and the
 [OKF spec](/docs/specs/2026-06-14-okf-knowledge-format.md)); the RPA-specific `type` values are:
 `rpa-constitution.md` → `RPA Constitution`, `inputs.md` → `Input Registry`, `components.md` →
 `Component Registry`, `orchestrator.md` → `Orchestrator Manifest`; per run: `progress.md` →
@@ -149,7 +149,7 @@ timestamp: <YYYY-MM-DD>
 ---
 ```
 
-`tasks.md` uses the same `type: Task List` frontmatter as `wi:dev` (see the plan skill's `tasks.md` format).
+`tasks.md` uses the same `type: Task List` frontmatter as `wit:dev` (see the plan skill's `tasks.md` format).
 
 ## `progress.md` template (run-level)
 
@@ -169,20 +169,20 @@ timestamp: <YYYY-MM-DD>
 - **PDD:** <source .docx path>
 - **Created:** <YYYY-MM-DD>
 - **Phase:** ingest   <!-- bootstrap | ingest | brainstorm | plan | design-gate | build | ship | done -->
-- **Gate mode:** interactive   <!-- interactive | auto-approve (/wi:rpa --auto) -->
+- **Gate mode:** interactive   <!-- interactive | auto-approve (/wit:rpa --auto) -->
 - **Flow:** rpa   <!-- dev | rpa; ship keys its dossier manifest + sweep whitelist on it; a missing line means dev -->
 - **Framework:** reframework   <!-- reframework | maestro; proposed at brainstorm, confirmed at the design gate -->
 - **Build paradigm:** xaml-only   <!-- REFramework only: xaml-only (pure activities, NO Invoke Code) | coded-allowed (.cs); user-approved at the design gate -->
 - **Publish:** none   <!-- none | feed (publish package to tenant feed) | deploy (feed + deploy/activate to a folder); approved at the design gate; prod folder needs explicit approval -->
-- **SDD ToC source:** base | project sdd.md | .wi/sdd-template.md
+- **SDD ToC source:** base | project sdd.md | .wit/sdd-template.md
 - **Worktree:** <path or ->   **Branch:** <branch or ->
 
 ## Model routing (resolved)
-<!-- written when progress.md is seeded (dev:1-2 / rpa:2) from .wi/models.md; dispatches
-     read THIS block, not models.md. Rewrite only when absent or .wi/models.md changed after the
+<!-- written when progress.md is seeded (dev:1-2 / rpa:2) from .wit/models.md; dispatches
+     read THIS block, not models.md. Rewrite only when absent or .wit/models.md changed after the
      stamp (models.md's resolve-once rule). Keep the stamp mid-line: Log-span parsing keys on
      stamps that OPEN a line. -->
-- resolved <ISO-8601 stamp> from .wi/models.md (preset: <smart | simple | custom | none - all inherit>)
+- resolved <ISO-8601 stamp> from .wit/models.md (preset: <smart | simple | custom | none - all inherit>)
 - orchestrator=<tier> (informational) · checker=<tier> · researcher=<tier> · task-runner=<tier> · rpa-build=<tier>
 - cross-provider=<none | provider model (at-finish | per-wave)> · MoA=<none | points=<…>; proposers=<…>; layers=<n>; aggregator=<tier>>
 
@@ -192,7 +192,7 @@ timestamp: <YYYY-MM-DD>
 
 ## Log
 - <date> bootstrap: markitdown present; uipath plugin installed; discovery delegated
-- <date> brainstorm via superpowers:brainstorming, dialogue   <!-- engine: … | via wi fallback; interactivity: , dialogue | , self-answered (headless) -->
+- <date> brainstorm via superpowers:brainstorming, dialogue   <!-- engine: … | via wit fallback; interactivity: , dialogue | , self-answered (headless) -->
 - ...
 
 ## Decisions / assumptions / blockers

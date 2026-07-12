@@ -1,20 +1,20 @@
 ---
 type: Reference
-title: "The `.wi/` directory: WI's on-repo state"
-description: Layout, conventions, and OKF frontmatter for the .wi/ knowledge store wi writes per repo.
+title: "The `.wit/` directory: Witloop's on-repo state"
+description: Layout, conventions, and OKF frontmatter for the .wit/ knowledge store wit writes per repo.
 timestamp: 2026-06-14
-tags: [wi-directory, okf, conventions, state]
+tags: [wit-directory, okf, conventions, state]
 ---
 
-# The `.wi/` directory: WI's on-repo state
+# The `.wit/` directory: Witloop's on-repo state
 
-All WI state lives in a single `.wi/` folder at the repo root. It is an
+All Witloop state lives in a single `.wit/` folder at the repo root. It is an
 [OKF](/docs/specs/2026-06-14-okf-knowledge-format.md) knowledge bundle: plain Markdown with YAML
 frontmatter, meant to be **committed** so the team (and your future self) can see how a feature was
 reasoned about. Keep every file small and current; these are working artifacts, not essays.
 
 ```
-.wi/
+.wit/
 ├── index.md                # OKF root index (optional): directory listing; the one reserved index that MAY carry frontmatter (okf_version only).
 ├── constitution.md         # project ground rules. Written once by scan, read by every phase.
 ├── repo-map.md             # cached scan facts: stack, commands, conventions, frontend/backend.
@@ -45,29 +45,29 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 
 - **Slugs** are short, kebab-case, derived from the feature, **prefixed with a global 4-digit ordinal
   assigned at creation**: "Add Stripe webhooks" -> `0001-stripe-webhooks`. The prefix mirrors `ADR-NNNN`
-  (global across `.wi/features/`, monotonic, **never renumbered**) so `.wi/features/` lists in implementation
-  order; next number = highest existing `.wi/features/` ordinal + 1 (else `0001`); the scan reads only
+  (global across `.wit/features/`, monotonic, **never renumbered**) so `.wit/features/` lists in implementation
+  order; next number = highest existing `.wit/features/` ordinal + 1 (else `0001`); the scan reads only
   `NNNN-` prefixes, so non-numeric folder names contribute nothing to the max. A resumed feature keeps its
   number; a roadmap row's name is numbered when its folder is first created. Creation-time edge cases (resume,
   in-flight overlap, done-collision, roadmap rows):
   `${CLAUDE_PLUGIN_ROOT}/references/feature-folder-cases.md`.
-- **Commit `.wi/`.** It is documentation. Feature-folder lifecycle: untracked in the main checkout through
+- **Commit `.wit/`.** It is documentation. Feature-folder lifecycle: untracked in the main checkout through
   brainstorm/research/plan; research commits it on main at the design gate (`docs(<slug>): feature
   dossier (design gate)`), so the gate decides against committed artifacts and the build worktree
   (branched from main) starts with them; during build the **branch copy is canonical**, and main's copy
   catches up when the branch merges. **Project-level files are committed where they're written, by the
   phase that writes them**: scan its docs (+ the greenfield `.gitignore`), brainstorm glossary updates,
   research the ADR + its index row, dev/rpa `models.md` / `roadmap.md`, ship the docs-sync
-  (`chore(wi): …` / `docs(wi): …` subjects); **only the feature folder defers**, to research's design-gate
+  (`chore(wit): …` / `docs(wit): …` subjects); **only the feature folder defers**, to research's design-gate
   commit. That is what puts ADRs and the dossier on the branch (committed on main before build branches
   from HEAD) and lets every post-worktree phase read the same tracked
-  copies. A team that doesn't want wi committing to main overrides this in the constitution. Gitignore
+  copies. A team that doesn't want wit committing to main overrides this in the constitution. Gitignore
   `research/` only if it gets large or holds scraped material; leave a one-line summary in the ADR/spec
   instead.
 - **Keep files lean.** Past ~150 lines a file is doing too much; split or summarize. Cheap handoff is the
   whole point.
 - **One writer per phase.** A phase owns its outputs; later phases read but don't silently rewrite them.
-- **No strays.** Everything feature-specific lives under `features/<slug>/`, never loose in `.wi/`. If a phase
+- **No strays.** Everything feature-specific lives under `features/<slug>/`, never loose in `.wit/`. If a phase
   needs a scratch file, it goes in the slug folder (ship sweeps and deletes strays at the dossier tidy).
 - **`research/`, `verification.md`, `cross-review.md`, and `.logs/` are ephemeral.** Working notes exist to produce
   the ADR and spec; the checker's `verification.md` feeds the design gate (plan mode) and the ship review
@@ -82,7 +82,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
   `architecture.md`, `glossary.md`, `adr/`, `roadmap.md`, `models.md`, `learnings.md`, and `learnings/` belong to the
   project, never pruned. Each feature reads them at the start and ship writes back into them, so the project
   gets smarter per feature.
-- **Learnings recall is via the index.** Phases read `.wi/learnings.md` (one line + hook per feature) and
+- **Learnings recall is via the index.** Phases read `.wit/learnings.md` (one line + hook per feature) and
   open a `learnings/<slug>.md` detail file only when its hook is relevant to the current feature; never
   bulk-read the directory. Timing note: ship commits a feature's learnings (+ its index line) on the
   **feature branch**, so main's `learnings.md` lacks in-flight features' lines until their PRs merge;
@@ -90,12 +90,12 @@ reasoned about. Keep every file small and current; these are working artifacts, 
 
 ## OKF frontmatter & conventions
 
-Every `.wi/` file is an [OKF](/docs/specs/2026-06-14-okf-knowledge-format.md) concept: it opens with a
+Every `.wit/` file is an [OKF](/docs/specs/2026-06-14-okf-knowledge-format.md) concept: it opens with a
 YAML frontmatter block whose only required key is `type`. The full profile lives in that spec; the short
 version:
 
 - **Frontmatter.** `type` (required) + `title`, `description`, `timestamp` (ISO 8601), optional `tags`,
-  plus wi extensions `feature` / `status` / `resource` where they apply. Keep the body's `# Title` H1 and
+  plus wit extensions `feature` / `status` / `resource` where they apply. Keep the body's `# Title` H1 and
   `##` sections as they are.
 - **`type` per file:** `constitution.md` → `Constitution`, `repo-map.md` → `Repo Map`, `overview.md` →
   `Overview`, `architecture.md` → `Architecture`, `glossary.md` → `Glossary`, `adr/ADR-*.md` → `ADR`,
@@ -107,7 +107,7 @@ version:
   `research/runtime-state-inventory.md` → `Runtime State Inventory`.
 - **Index files.** OKF-reserved `index.md` / `log.md` files carry **no frontmatter**: `adr/index.md` is
   one (the ADR template's bare index is correct; `validate.py` exempts the reserved names), except the
-  optional root `.wi/index.md`, which may declare `okf_version: "0.1"`. `learnings.md` is *not* a reserved
+  optional root `.wit/index.md`, which may declare `okf_version: "0.1"`. `learnings.md` is *not* a reserved
   index (it's a named file) and **is** typed (`Learnings Index`). Entries in both reuse each concept's
   `description`.
 - **Log.** `progress.md`'s `## Log` lines open with a **full ISO-8601 timestamp** (date + time +
@@ -141,17 +141,17 @@ timestamp: <YYYY-MM-DD>
 - **Slug:** <slug>
 - **Created:** <YYYY-MM-DD>
 - **Phase:** brainstorm        <!-- brainstorm | research | plan | design-gate | build | ship | done -->
-- **Gate mode:** interactive   <!-- interactive | auto-approve (set by /wi:dev --auto) -->
+- **Gate mode:** interactive   <!-- interactive | auto-approve (set by /wit:dev --auto) -->
 - **Flow:** dev                <!-- dev | rpa; ship keys its dossier manifest + sweep whitelist on it; a missing line means dev -->
 - **Worktree:** <path or "-">
 - **Branch:** <branch or "-">
 
 ## Model routing (resolved)
-<!-- written when progress.md is seeded (dev:1-2 / rpa:2) from .wi/models.md; dispatches
-     read THIS block, not models.md. Rewrite only when absent or .wi/models.md changed after the
+<!-- written when progress.md is seeded (dev:1-2 / rpa:2) from .wit/models.md; dispatches
+     read THIS block, not models.md. Rewrite only when absent or .wit/models.md changed after the
      stamp (models.md's resolve-once rule). Keep the stamp mid-line: Log-span parsing keys on
      stamps that OPEN a line. -->
-- resolved <ISO-8601 stamp> from .wi/models.md (preset: <smart | simple | custom | none - all inherit>)
+- resolved <ISO-8601 stamp> from .wit/models.md (preset: <smart | simple | custom | none - all inherit>)
 - orchestrator=<tier> (informational) · checker=<tier> · researcher=<tier> · task-runner=<tier> · rpa-build=<tier>
 - cross-provider=<none | provider model (at-finish | per-wave)> · MoA=<none | points=<…>; proposers=<…>; layers=<n>; aggregator=<tier>>
 
@@ -175,7 +175,7 @@ timestamp: <YYYY-MM-DD>
 
 Update the **Phase** field and append to **Log** at every transition. During build, the **feature
 branch's copy is canonical**: the dossier was committed on main at the design gate and rides into the
-worktree at branch time, so tick tasks and log in the worktree's `.wi/` and the updates ride the PR;
+worktree at branch time, so tick tasks and log in the worktree's `.wit/` and the updates ride the PR;
 `main`'s copy catches up on merge. The build phase ticks the task
 checkboxes here, so a resumed (or handed-off) run knows exactly what's left. Record the chosen approach and
 any blocker here too; it's what the user reads after a hands-off run. `progress.md` is the run's state

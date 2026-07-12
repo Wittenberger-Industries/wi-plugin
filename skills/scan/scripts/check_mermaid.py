@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the mermaid diagram(s) in a markdown file (wi architecture diagrams).
+"""Validate the mermaid diagram(s) in a markdown file (wit architecture diagrams).
 
 Catches the real parse-failure classes WITHOUT needing a browser:
   - unclosed ```mermaid fence

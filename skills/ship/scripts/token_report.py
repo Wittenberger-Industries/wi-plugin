@@ -29,7 +29,7 @@ Subagent split (Claude Code): each dispatch's transcript lives at
 cost estimate (exact tokens × published list prices; clearly labeled an estimate).
 
 Stdlib only. Canonical prose for the ledger discipline ("the ledger rule"):
-skills/research/references/wi-directory.md, tokens.md template section.
+skills/research/references/wit-directory.md, tokens.md template section.
 """
 import argparse
 import json

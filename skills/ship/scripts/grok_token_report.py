@@ -14,7 +14,7 @@ does persist EXACT per-subagent figures. This script reads what Grok writes unde
 
   Subagents (exact):  `subagent_finished` events in updates.jsonl -> tokens_used,
                       duration_ms, tool_calls, turns; labels from subagents/*/meta.json
-                      `description` (== the ledger Source cell by wi convention).
+                      `description` (== the ledger Source cell by wit convention).
   Orchestrator:       signals.json context occupancy + peak `totalTokens` in the
                       updates stream. These measure CONTEXT WINDOW size, never
                       cumulative billable I/O; the ledger records them as such and the
@@ -454,7 +454,7 @@ def run_print(session_dir: Path) -> int:
 
 
 def run_write(token_path, session_dir, progress=None) -> int:
-    """Finalize an existing wi tokens.md from the Grok session (mirror of token_report --write)."""
+    """Finalize an existing wit tokens.md from the Grok session (mirror of token_report --write)."""
     p = Path(token_path)
     if not p.is_file():
         print("grok_token_report: {} does not exist - run check_tokens.py --init first".format(token_path),
@@ -506,7 +506,7 @@ def run_write(token_path, session_dir, progress=None) -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         description="Grok Build session token report (subagents exact; orchestrator context only); "
-                    "--write finalizes a wi tokens.md ledger.")
+                    "--write finalizes a wit tokens.md ledger.")
     ap.add_argument("--session", "-s", dest="session_id",
                     help="Grok session UUID (default: active session for --cwd, else newest in the cwd group)")
     ap.add_argument("--cwd", default=os.getcwd(),

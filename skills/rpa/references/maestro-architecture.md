@@ -68,7 +68,7 @@ and Orchestrator assets referenced by the connector/agent nodes, never hardcoded
 
 `tasks.md` orders the build:
 
-1. **Shared components** (Wave 1): anything in `.wi/components.md` the flows depend on, first.
+1. **Shared components** (Wave 1): anything in `.wit/components.md` the flows depend on, first.
 2. **Per-flow scaffolds**: each `.flow` (independent flows in parallel).
 3. **Subflows**: independent subflows within a flow in parallel; the main `.flow` serializes its wiring.
 4. **Wire-up**: connections / triggers / agent registrations via `uipath-platform`.

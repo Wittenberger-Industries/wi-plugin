@@ -15,8 +15,8 @@ this step is what makes the later UiPath handoff complete.
 
 - **Derive `<run-slug>` first**; it's the feature-folder name used everywhere below: a kebab name from the
   PDD/solution, **prefixed with the next global 4-digit ordinal** (`NNNN-<name>`, e.g. `0001-invoices`);
-  wi-directory.md's **Slugs bullet** (monotonic, assigned once at creation, never renumbered).
-- If the PDD is `.docx`/`.pdf`/`.pptx`: `markitdown <pdd> -o .wi/features/<run-slug>/pdd.md`.
+  wit-directory.md's **Slugs bullet** (monotonic, assigned once at creation, never renumbered).
+- If the PDD is `.docx`/`.pdf`/`.pptx`: `markitdown <pdd> -o .wit/features/<run-slug>/pdd.md`.
 - If it's already `.md`: copy/reference it as `pdd.md` as-is (don't re-process the **body**; the
   frontmatter added next is metadata *around* it, not a rewrite of it).
 - **Prepend OKF frontmatter** so `pdd.md` is a typed concept like the rest of the bundle: open the file
@@ -29,7 +29,7 @@ this step is what makes the later UiPath handoff complete.
   *AS-IS* diagram is usually fine; a dropped *To-Be / architecture / matrix* diagram is not: re-run
   markitdown with LLM image description, or ask the user to export those diagrams as files.
 
-## 2. Register supporting inputs → `.wi/inputs.md` (project-level)
+## 2. Register supporting inputs → `.wit/inputs.md` (project-level)
 
 PDDs travel with annexes the automation needs: API references, data dictionaries, CSV/Excel mapping
 tables, sample inputs, screenshots, business-rule sheets, credential lists (names only). Catalog every
@@ -62,7 +62,7 @@ the design needs, markitdown it into a sibling `.md` and note that.
   doc (mapping xlsx, template, API spec) isn't in the drop, surface it as a gap/assumption; don't silently
   assume it. (It may turn out to be already distilled into another input, e.g. a template file.)
 
-## 3. Detect reusable components → `.wi/components.md` (project-level)
+## 3. Detect reusable components → `.wit/components.md` (project-level)
 
 A project is 1..N processes; do **not** rebuild what already exists. Scan the repo (and the
 discovery-agent output) for reusable workflows / UiPath **Library** projects / shared sub-workflows, and
@@ -93,9 +93,9 @@ first.
 line, `_none found yet (fresh repo; the registry fills as builds register new components)_`. The file's
 existence is what later phases check; an absent registry reads as "ingest never ran".
 
-## 4. First-run constitution → `.wi/rpa-constitution.md` (project-level)
+## 4. First-run constitution → `.wit/rpa-constitution.md` (project-level)
 
-If `.wi/rpa-constitution.md` is absent, **create it now** from
+If `.wit/rpa-constitution.md` is absent, **create it now** from
 `${CLAUDE_PLUGIN_ROOT}/skills/rpa/references/rpa-constitution-template.md` (copy the template; fill what
 the PDD/inputs already settle, leave the rest on its defaults) and commit it with the other project-level
 outputs. Every later step assumes it exists: brainstorm reads it as baseline (protocol:0), the gate takes its

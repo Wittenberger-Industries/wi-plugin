@@ -47,7 +47,7 @@ rationale lives here, anchored by step. When editing the skill, keep this file i
 
 ## ship:4 (compound)
 
-- **Why this step exists:** harvesting non-obvious learnings is the one thing that compounds wi across
+- **Why this step exists:** harvesting non-obvious learnings is the one thing that compounds wit across
   features, and feeding a learning back into constitution/repo-map/glossary (not just the note) is
   how the next feature starts smarter. Done before the PR so the knowledge rides the branch and
   reaches the team through review.
@@ -75,8 +75,8 @@ rationale lives here, anchored by step. When editing the skill, keep this file i
   on Windows, which Claude Code provides; it is not guaranteed under Copilot CLI. The leading
   `{sub(/\r$/,"")}` keeps the frontmatter strip CRLF-safe on a `core.autocrlf=true` checkout, where
   the `---` delimiters arrive as `---\r` and a bare line compare would miss them.
-- **Why worktree/branch mechanics are never delegated:** wi's sibling-dir worktrees
-  (`../<repo>-wi-<slug>`) fail `superpowers:finishing-a-development-branch`'s `.worktrees/`-only
+- **Why worktree/branch mechanics are never delegated:** wit's sibling-dir worktrees
+  (`../<repo>-wit-<slug>`) fail `superpowers:finishing-a-development-branch`'s `.worktrees/`-only
   provenance rule; that skill is consulted only for the close-out *decision* in interactive runs.
 - **Why "impossible ≠ failed" for no-remote repos:** looping on `git push`/`gh pr create` in a
   local-only repo burns the run on an unsatisfiable step; the recorded recovery pair makes the branch

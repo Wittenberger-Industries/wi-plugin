@@ -1,14 +1,14 @@
 ---
 type: Reference
 title: "RPA prerequisites: bootstrap"
-description: "`wi:rpa` is thin: it produces the spec and delegates the build."
+description: "`wit:rpa` is thin: it produces the spec and delegates the build."
 timestamp: 2026-06-08
 tags: [rpa, reference]
 ---
 
 # RPA prerequisites: bootstrap
 
-`wi:rpa` is thin: it produces the spec and delegates the build. Two prerequisites make it work; check for
+`wit:rpa` is thin: it produces the spec and delegates the build. Two prerequisites make it work; check for
 them and **offer** to install what's missing (never hard-fail silently; say which mode you're in).
 
 ## 1. markitdown (mandatory: parses the PDD)
@@ -27,10 +27,10 @@ Microsoft's doc→Markdown converter. Used to turn a `.docx`/`.pdf`/`.pptx` PDD 
 UiPath ships its skills as a **Claude Code plugin marketplace**. They generate the XAML, know the
 activity packages, and include a project-discovery agent.
 
-wi delegates by **capability**, never by a hard-coded name: upstream can rename a slug, so resolve each
+wit delegates by **capability**, never by a hard-coded name: upstream can rename a slug, so resolve each
 capability through this table (the single source of truth the other rpa references point back to):
 
-| Capability wi delegates | UiPath skill (slug) | Verified as of |
+| Capability wit delegates | UiPath skill (slug) | Verified as of |
 |---|---|---|
 | `.xaml`/`.cs` RPA workflow authoring: the REFramework build engine | `uipath-rpa` | 2026-07 |
 | `.flow` Maestro flow authoring | `uipath-maestro-flow` | 2026-07 |
@@ -48,7 +48,7 @@ capability through this table (the single source of truth the other rpa referenc
   ```
   (Alternatively the UiPath CLI wizard: `npm i -g @uipath/cli` then `uip skills install`.)
 
-If the UiPath skills are absent, wi:rpa can still do the front half (ingest → SDD → architecture +
+If the UiPath skills are absent, wit:rpa can still do the front half (ingest → SDD → architecture +
 assumptions) and stop with a complete spec pack, but it cannot build the XAML. Tell the user that and
 offer to install.
 
@@ -71,8 +71,8 @@ limps on a roll-forward). Check at bootstrap and **offer to install**, same as t
 
 If the repo already contains a UiPath project (`project.json`, a `Framework/` folder, `.xaml` files),
 **delegate structure discovery to `uipath-project-discovery-agent`** rather than re-deriving it, and
-capture its output into `.wi/` (repo conventions, existing workflows, the components already present →
-seed `.wi/components.md`). This is the RPA analog of `wi:scan`; borrow it, don't reinvent it.
+capture its output into `.wit/` (repo conventions, existing workflows, the components already present →
+seed `.wit/components.md`). This is the RPA analog of `wit:scan`; borrow it, don't reinvent it.
 
 ## Record the outcome
 

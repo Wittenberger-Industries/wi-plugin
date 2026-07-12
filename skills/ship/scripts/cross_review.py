@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Cross-provider diff review: an independent layer beside wi-code-checker's result mode.
+"""Cross-provider diff review: an independent layer beside wit-code-checker's result mode.
 
-Reads the target project's `.wi/models.md` (the tiered model routing config), and, when a second
+Reads the target project's `.wit/models.md` (the tiered model routing config), and, when a second
 provider is configured, sends the diff + spec context to that model, possibly a different
 provider/architecture than the session (e.g. GPT via OPENAI_API_KEY). A layer on top of
-wi-code-checker's result-mode pass, never a replacement for it. Writes the findings to a file.
+wit-code-checker's result-mode pass, never a replacement for it. Writes the findings to a file.
 Stdlib only; no third-party deps.
 
 Usage:
-    python3 cross_review.py --config .wi/models.md --diff diff.patch \
+    python3 cross_review.py --config .wit/models.md --diff diff.patch \
         [--context spec.md ...] --out review.md
 
 Exit codes:
@@ -16,7 +16,7 @@ Exit codes:
     1  review ran, verdict `## ISSUES FOUND`
     2  config/usage error (bad file, cross-provider not configured, API failure)
     3  no API key in the configured env var: the cross-provider layer is
-       skipped; the wi-code-checker result pass runs regardless
+       skipped; the wit-code-checker result pass runs regardless
 """
 
 import argparse
@@ -73,7 +73,7 @@ def _section(body, heading):
 
 
 def parse_models_config(text):
-    """Parse `.wi/models.md` into {preset, roles, cross_provider, overrides}."""
+    """Parse `.wit/models.md` into {preset, roles, cross_provider, overrides}."""
     preset = "custom"
     body = text
     if text.startswith("---"):
@@ -132,7 +132,7 @@ def cross_provider_configured(cfg):
 
 
 def model_for(agent, cfg):
-    """Model for a wi-dispatched agent: per-agent override > its own role > inherit."""
+    """Model for a wit-dispatched agent: per-agent override > its own role > inherit."""
     if not cfg:
         return "inherit"
     if agent in cfg.get("overrides", {}):
@@ -141,7 +141,7 @@ def model_for(agent, cfg):
 
 
 def platform_model_for(agent, cfg, host="claude"):
-    """Concrete model for a wi-dispatched agent on a given host.
+    """Concrete model for a wit-dispatched agent on a given host.
 
     The canonical tier from `model_for` is the model on a Claude host (or when no `## Platform model
     map` is configured). On a non-Claude host, map that tier through the host's column; an unmapped
@@ -205,7 +205,7 @@ def run_review(cfg, diff_text, context_blobs, out_path):
     if not api_key:
         print(
             f"cross_review: no API key in ${provider['api_key_env']} - "
-            "cross-provider layer skipped; the wi-code-checker result pass still runs",
+            "cross-provider layer skipped; the wit-code-checker result pass still runs",
             file=sys.stderr,
         )
         return 3
@@ -231,7 +231,7 @@ def run_review(cfg, diff_text, context_blobs, out_path):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--config", required=True, help="path to .wi/models.md")
+    ap.add_argument("--config", required=True, help="path to .wit/models.md")
     ap.add_argument("--diff", required=True, help="path to the diff/patch file")
     ap.add_argument("--context", nargs="*", default=[], help="spec/context files")
     ap.add_argument("--out", required=True, help="findings output file")

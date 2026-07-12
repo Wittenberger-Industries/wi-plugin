@@ -1,26 +1,26 @@
 ---
 type: Reference
-title: "Mixture of Agents: optional proposer/aggregator layer at wi's judgment points"
-description: "An optional, default-off Mixture-of-Agents layer configured in .wi/models.md: N proposer agents answer the same judgment independently, an optional second layer refines against all round-1 proposals, and one aggregator synthesizes the single answer, applied at wi's two judgment points, the research approach decision and the checker's result-mode review at ship."
+title: "Mixture of Agents: optional proposer/aggregator layer at wit's judgment points"
+description: "An optional, default-off Mixture-of-Agents layer configured in .wit/models.md: N proposer agents answer the same judgment independently, an optional second layer refines against all round-1 proposals, and one aggregator synthesizes the single answer, applied at wit's two judgment points, the research approach decision and the checker's result-mode review at ship."
 timestamp: 2026-07-04
 tags: [moa, models, reference]
 ---
 
-# Mixture of Agents: optional proposer/aggregator layer at wi's judgment points
+# Mixture of Agents: optional proposer/aggregator layer at wit's judgment points
 
-wi normally forms each judgment once. **Mixture of Agents (MoA)** deepens the two judgments that decide a
+wit normally forms each judgment once. **Mixture of Agents (MoA)** deepens the two judgments that decide a
 feature's fate: **N proposer agents answer the SAME query independently**, an optional **second layer**
 lets each proposer refine after reading all round-1 proposals, and **one aggregator agent** synthesizes
 the single final answer. It applies at exactly two points, **research** (the approach decision behind the
-ADR) and **review** (the checker's result-mode pass at ship), and nowhere else: MoA never replaces wi's
+ADR) and **review** (the checker's result-mode pass at ship), and nowhere else: MoA never replaces wit's
 phases, it deepens the two decisions.
 
-**Off by default.** Both presets (smart AND simple) write `points: none`; a `.wi/models.md` that lacks the
+**Off by default.** Both presets (smart AND simple) write `points: none`; a `.wit/models.md` that lacks the
 section entirely is treated as `points: none`, no migration needed. MoA is enabled only by hand-editing
-`.wi/models.md` and setting `points`. The pricing rule carries over: no preset or default ever writes
+`.wit/models.md` and setting `points`. The pricing rule carries over: no preset or default ever writes
 `fable` here; a hand-written row may name any tier.
 
-## The config section (in `.wi/models.md`)
+## The config section (in `.wit/models.md`)
 
 ```markdown
 ## Mixture of Agents
@@ -59,7 +59,7 @@ dispatch: the literal tier, or `inherit`).
 
 Each proposer gets the same inputs a normal researcher dispatch would (`brief.md` + the round's
 researcher reports + the relevant constitution rules + any standing ADRs) plus its `MoA role:` marker.
-Proposer i writes `.wi/features/<slug>/research/proposal-<i>.md` (layer 2: `proposal-<i>-r2.md`); the
+Proposer i writes `.wit/features/<slug>/research/proposal-<i>.md` (layer 2: `proposal-<i>-r2.md`); the
 aggregator writes `research/proposal-synthesis.md` and returns the recommendation with dissent noted. All
 ephemeral (`research/` already is). The ORCHESTRATOR (research skill) still adopts the recommendation,
 writes the ADR, and owns Phase flips: the aggregator recommends, it does not decide; the synthesis's
@@ -73,14 +73,14 @@ Each proposer checker gets the IDENTICAL result-mode prompt (both passes, the sa
 template:` line) plus its `MoA role:` marker. Proposer checkers RETURN findings only: they NEVER write
 `verification.md`; the aggregator checker alone writes `verification.md` (both passes' sections, one
 verdict marker), after it dedupes the proposals, keeps the MAX severity any proposer assigned a finding,
-and verifies against the repo before dropping anything as a false positive. wi has exactly one review
-agent CONTRACT, `wi-code-checker`; MoA runs multiple INSTANCES of it, and only the aggregator instance
+and verifies against the repo before dropping anything as a false positive. wit has exactly one review
+agent CONTRACT, `wit-code-checker`; MoA runs multiple INSTANCES of it, and only the aggregator instance
 writes `verification.md`. Do not "fix" this by splitting the review into a second agent type. A full MoA
 pass counts as **one** review round: the cross-provider layer (`models.md`) and ship's max-2
 review-to-fix rounds are unchanged.
 
 Log line (progress.md): `review via MoA (<N> proposers, <L> layers, aggregator <tier>)`, appended to the
-existing review log label (e.g. `review via wi-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`).
+existing review log label (e.g. `review via wit-code-checker + superpowers:requesting-code-review[inline] + MoA (3 proposers, 1 layer, aggregator opus)`).
 
 ## Token ledger
 

@@ -218,16 +218,16 @@ def _write_agent(dirpath, agent_id, *, meta=None, model="claude-opus-4-8",
 class AgentLabelTests(unittest.TestCase):
     def test_label_prefers_meta_description(self):
         with tempfile.TemporaryDirectory() as d:
-            j = _write_agent(d, "a1", meta={"agentType": "wi:wi-task-runner",
+            j = _write_agent(d, "a1", meta={"agentType": "wit:wit-task-runner",
                                              "description": "task-runner: task 3 (@/db seam)"})
             a = token_report.parse_agent_file(j)
             self.assertEqual(a["label"], "task-runner: task 3 (@/db seam)")
 
     def test_label_falls_back_to_agent_type_when_description_blank(self):
         with tempfile.TemporaryDirectory() as d:
-            j = _write_agent(d, "a2", meta={"agentType": "wi:wi-researcher", "description": "  "})
+            j = _write_agent(d, "a2", meta={"agentType": "wit:wit-researcher", "description": "  "})
             a = token_report.parse_agent_file(j)
-            self.assertEqual(a["label"], "wi-researcher")
+            self.assertEqual(a["label"], "wit-researcher")
 
     def test_label_falls_back_to_prompt_prefix_without_meta(self):
         with tempfile.TemporaryDirectory() as d:
@@ -378,7 +378,7 @@ class TokenReportWriteTests(unittest.TestCase):
             p.write_text(text, encoding="utf-8")
             t = fixture_transcript(d)  # -> <d>/t.jsonl ; sidecars live in <d>/t/subagents/
             _write_agent(Path(d) / "t" / "subagents", "b1",
-                         meta={"agentType": "wi:wi-researcher", "description": "researcher: db seam"})
+                         meta={"agentType": "wit:wit-researcher", "description": "researcher: db seam"})
             r = run(REPORT, "--write", p, "--transcript", t)
             self.assertEqual(r.returncode, 0, r.stderr)
             out = p.read_text(encoding="utf-8")

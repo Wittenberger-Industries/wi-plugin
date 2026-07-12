@@ -10,22 +10,22 @@ tags: [rpa, reference]
 
 Used when **`Framework: reframework`** (the Maestro path is `build-maestro.md`).
 
-Build runs after the design gate. wi does **not** write XAML: it orchestrates `uipath-rpa`
+Build runs after the design gate. wit does **not** write XAML: it orchestrates `uipath-rpa`
 (the REFramework generator; the delegated-skill slugs live in the table in `uipath-bootstrap.md`) with the
 SDD as the spec, in parallel waves, reusing components. Same
-discipline as `wi:build`: isolate in a worktree, delegate, summarize, commit small.
+discipline as `wit:build`: isolate in a worktree, delegate, summarize, commit small.
 
 Precondition: the design gate passed (SDD + assumptions confirmed, or `--auto`), recorded in
-`progress.md`. First act: append `rpa build engaged (wi <version>)` to the log.
+`progress.md`. First act: append `rpa build engaged (wit <version>)` to the log.
 
 ## 1. Isolate
 
-The worktree + branch (`wi/<run-slug>`) are created at rpa:6, framework-neutral, exactly as
-`wi:build` does it (`${CLAUDE_PLUGIN_ROOT}/skills/build/references/worktrees-and-subagents.md`; use
+The worktree + branch (`wit/<run-slug>`) are created at rpa:6, framework-neutral, exactly as
+`wit:build` does it (`${CLAUDE_PLUGIN_ROOT}/skills/build/references/worktrees-and-subagents.md`; use
 `superpowers:using-git-worktrees` if installed); and the run dossier arrives with the checkout: it
 was committed on main at the design gate (`docs(<run-slug>): feature dossier (design gate)`), and the
 branch starts from main. Record path + branch in `progress.md`. Before wave 1, verify
-`.wi/features/<run-slug>/` is present in-tree and committed; if it isn't (an out-of-order
+`.wit/features/<run-slug>/` is present in-tree and committed; if it isn't (an out-of-order
 resume), do the move now and commit it as the branch's first commit
 (`chore(<run-slug>): feature dossier`).
 
@@ -34,10 +34,10 @@ resume), do the move now and commit it as the branch's first commit
 The DAG is: **shared components → per-process scaffolds → sub-workflows → wire-up**. Run it as wide as the
 DAG allows (independent processes and independent sub-workflows in parallel):
 
-1. **Reuse first.** Before generating anything, check `.wi/components.md`. If a needed capability already
+1. **Reuse first.** Before generating anything, check `.wit/components.md`. If a needed capability already
    exists (a shared workflow or Library), **invoke/reference it**; do not regenerate. Reuse is logged.
 2. **Delegate generation: low-code XAML REFramework, explicitly.** For each new workflow/process, hand
-   `uipath-rpa` the relevant SDD section + `tobe.md` + the input refs (`.wi/inputs.md`) + the
+   `uipath-rpa` the relevant SDD section + `tobe.md` + the input refs (`.wit/inputs.md`) + the
    constitution rules. **State the output paradigm in every delegation prompt** (the UiPath skill may default
    to coded otherwise): a **low-code XAML REFramework** project: `project.json` on the **REFramework
    template**, `Main.xaml` (state machine), `Framework/` (`InitAllSettings`, `GetTransactionData`, `Process`,
@@ -77,11 +77,11 @@ DAG allows (independent processes and independent sub-workflows in parallel):
    `progress.md`. **Append each delegated unit's token count to `tokens.md`** the moment that subagent
    reports completion (the only point the count exists): `tokens.md` is **mandatory**, not optional;
    initialize it on the first delegation if absent
-   (`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wi/features/<run-slug>/tokens.md`;
+   (`python ${CLAUDE_PLUGIN_ROOT}/skills/ship/scripts/check_tokens.py --init .wit/features/<run-slug>/tokens.md`;
    python fallback: `references/workflow.md` "Script invocation"), and ship finalizes it
    (`token_report.py --write`) under a `check_tokens.py` close-out gate.
 5. **Register new components.** If the build created something reusable (a generic login, a notifier),
-   add it to `.wi/components.md` so the next process inherits it.
+   add it to `.wit/components.md` so the next process inherits it.
 
 ## 3. Orchestrator wire-up (if in scope)
 
@@ -93,9 +93,9 @@ APIs). Names come from the sdd:7 resource manifest. Never hardcode secrets; crea
 Stay within the confirmed SDD; new scope becomes a logged task/assumption, not a silent addition. Never
 commit secrets or local robot artifacts; respect `.gitignore` for `.local`, `*.user`, etc.
 
-**Shared-worktree git landmines**: the parallel build waves share one worktree, same as `wi:build`, and
+**Shared-worktree git landmines**: the parallel build waves share one worktree, same as `wit:build`, and
 the same landmines bind every wave: the canonical list (no-stash / no-clean / no-reset, and how to park
-WIP safely) lives in `agents/wi-task-runner.md`'s shared-worktree rules: one statement, both flows. The
+WIP safely) lives in `agents/wit-task-runner.md`'s shared-worktree rules: one statement, both flows. The
 orchestrator commits per unit (build-uipath:2.4); a delegated build never runs destructive git.
 
 ## Notes

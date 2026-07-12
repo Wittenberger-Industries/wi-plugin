@@ -9,7 +9,7 @@ tags: [ship, reference]
 # The verification gate
 
 The gate is the objective bar a feature must clear before it can ship. It uses the **repo's own commands**
-(from `.wi/repo-map.md`): wi doesn't invent checks, it runs the ones the project already trusts.
+(from `.wit/repo-map.md`): wit doesn't invent checks, it runs the ones the project already trusts.
 
 ## The iron law
 

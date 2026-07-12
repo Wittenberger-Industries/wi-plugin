@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: "Phase contracts & resumability"
-description: "How wi's phases fit together and resume: one interactive brainstorm, then the autonomous research -> plan -> build -> ship pipeline, the two deliberate gates, and re-entry driven by progress.md's Phase field."
+description: "How wit's phases fit together and resume: one interactive brainstorm, then the autonomous research -> plan -> build -> ship pipeline, the two deliberate gates, and re-entry driven by progress.md's Phase field."
 timestamp: 2026-06-09
 tags: [research, reference]
 ---
@@ -17,7 +17,7 @@ after it, the pipeline makes and records decisions on its own.
 
 ```mermaid
 flowchart LR
-  scan["scan (once, project-level)"] -.-> dev["/wi:dev"]
+  scan["scan (once, project-level)"] -.-> dev["/wit:dev"]
   dev --> bstorm["brainstorm (interactive)"]
   bstorm -- "handoff" --> research
   subgraph rskill["research skill"]
@@ -30,7 +30,7 @@ flowchart LR
   ship --> done
 ```
 
-\* the design gate is interactive by default; `/wi:dev --auto` auto-approves it (the same summary is
+\* the design gate is interactive by default; `/wit:dev --auto` auto-approves it (the same summary is
 still recorded in progress.md).
 
 `progress.md`'s Phase field names the state. Resume = read it and re-enter that phase (design-gate
@@ -43,7 +43,7 @@ the design gate.
 |-------|--------|------|-------|--------|----------------|
 | scan | scan | one-time | the repo | repo-map, overview, constitution | repo-map exists & current |
 | brainstorm | dev | interactive | request, repo-map, constitution | brief.md | brief exists & intent unchanged |
-| research | research | autonomous | brief, repo-map, constitution | research/*, .wi/adr/ADR-* (if hard-to-reverse) | approach already chosen & recorded |
+| research | research | autonomous | brief, repo-map, constitution | research/*, .wit/adr/ADR-* (if hard-to-reverse) | approach already chosen & recorded |
 | plan | research | autonomous | brief, research, repo-map, constitution | spec, tasks, pitfalls | never |
 | design-gate | research | interactive* | adr, spec, tasks | dossier commit on main; gate outcome in progress.md | never: it is the second human gate |
 | build | post-gate loop (/goal or Autopilot keeps it alive) | autonomous | tasks, spec, constitution | source, ticked tasks | tasks already all ticked |
@@ -57,7 +57,7 @@ first, then the gate renders.*
 
 1. **Inputs before phase.** No research without a brief; no build without tasks. `dev` and the phase skills enforce order.
 2. **Two gates, both deliberate.** The brainstorm handoff sets scope; the design gate confirms the
-   architecture + design before any code (auto-approvable via `/wi:dev --auto`, always recorded).
+   architecture + design before any code (auto-approvable via `/wit:dev --auto`, always recorded).
    There is no third checkpoint.
 3. **No questions outside the gates** (the **no-questions rule** the phase skills cite). Between
    handoff and design gate, and after design-ok, decisions
@@ -100,11 +100,11 @@ skills cite them as **the context budget** and **the output house rule**:
    subagent dispatch, not an orchestrator Read.
 2. **The output house rule. Never pipe unbounded command output into context.** Redirect to the
    feature's log dir and read the verdict, not the stream. Once per feature:
-   `mkdir -p .wi/features/<slug>/.logs && printf '*\n' > .wi/features/<slug>/.logs/.gitignore`
+   `mkdir -p .wit/features/<slug>/.logs && printf '*\n' > .wit/features/<slug>/.logs/.gitignore`
    (self-gitignored: the dir never enters `git status` or a dossier commit). Then per command:
-   `<cmd> > .wi/features/<slug>/.logs/<name>.txt 2>&1; echo $?; tail -n 30 .wi/features/<slug>/.logs/<name>.txt`.
+   `<cmd> > .wit/features/<slug>/.logs/<name>.txt 2>&1; echo $?; tail -n 30 .wit/features/<slug>/.logs/<name>.txt`.
    On red, pull the failing lines (`grep -n -B1 -A3 -iE 'fail|error' <log>`), never the whole log;
-   the file stays on disk for deeper dives and is pruned at ship's dossier tidy (wi-directory.md's
+   the file stays on disk for deeper dives and is pruned at ship's dossier tidy (wit-directory.md's
    ephemera list). Diffs enter by summary, then hunk: `git diff --stat` first, open only the hunks a
    finding needs; never read a whole diff into context.
 
@@ -114,7 +114,7 @@ The cost and the time are also *measured* where they can be, never estimated: `t
 subagent's **exact** usage and `Duration`, ship's `token_report.py` parses the session transcript for
 the real orchestrator total and derives the autonomous wall-clock from `progress.md`'s OS-clock Log
 stamps, and anything unobservable is written `unavailable`, never a fabricated number. The full
-discipline (row timing, stamp format, what ship's finalize fills) is wi-directory.md's `tokens.md`
+discipline (row timing, stamp format, what ship's finalize fills) is wit-directory.md's `tokens.md`
 template section; phase skills cite it as **the ledger rule**.
 
 ## Script invocation

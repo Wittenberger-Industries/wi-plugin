@@ -1,14 +1,14 @@
 ---
 type: Design Notes
-title: "wi-code-checker: design rationale (maintainer notes)"
-description: The "why" behind agents/wi-code-checker.md's rules, relocated out of the loaded charter by #41 (the charter rides into every checker dispatch and carries rules only); each entry is anchored to the charter section it explains.
+title: "wit-code-checker: design rationale (maintainer notes)"
+description: The "why" behind agents/wit-code-checker.md's rules, relocated out of the loaded charter by #41 (the charter rides into every checker dispatch and carries rules only); each entry is anchored to the charter section it explains.
 timestamp: 2026-07-11
-tags: [wi-code-checker, agents, design-notes, context-budget]
+tags: [wit-code-checker, agents, design-notes, context-budget]
 ---
 
-# wi-code-checker: design rationale (maintainer notes)
+# wit-code-checker: design rationale (maintainer notes)
 
-`agents/wi-code-checker.md` is the checker's dispatch charter. It is loaded into every checker dispatch
+`agents/wit-code-checker.md` is the checker's dispatch charter. It is loaded into every checker dispatch
 (plan mode, result mode, and every MoA proposer and aggregator instance), so it carries rules only; the
 rationale lives here, anchored by section. When editing the charter, keep this file in sync: a rule whose
 "why" is deleted instead of relocated loses its guard against future "simplification".
@@ -16,7 +16,7 @@ rationale lives here, anchored by section. When editing the charter, keep this f
 ## Frontmatter
 
 - **Why `model: inherit` ships as the default:** a dispatch may pin a cheaper tier via the
-  `wi-code-checker` row of `.wi/models.md` (resolved per `references/models.md`); `inherit` is the
+  `wit-code-checker` row of `.wit/models.md` (resolved per `references/models.md`); `inherit` is the
   portable default when no routing is configured. The inline comment on the `model:` line is deliberate
   and stays; it is what stops a tidy-minded edit from dropping the "why" of the default.
 
@@ -36,7 +36,7 @@ rationale lives here, anchored by section. When editing the charter, keep this f
 
 ## Modes
 
-- **Why the line-review template is read at runtime and never copied into wi's tree:** wi complements
+- **Why the line-review template is read at runtime and never copied into wit's tree:** wit complements
   superpowers; reading `superpowers:requesting-code-review`'s reviewer template from its installed path
   means upstream template improvements are picked up automatically, with no vendored copy to drift.
 - **Why the external-severity mapping is stated in the charter:** the superpowers template grades in its
@@ -52,7 +52,7 @@ rationale lives here, anchored by section. When editing the charter, keep this f
   weighs, not a feature failure. Down-scoping (3) and over-building (4) point in opposite directions, so
   the two hunts never tension against each other.
 - **(6) Why the context-window ceiling matters:** oversized task-units are where build drifts from spec;
-  splitting work into units a fresh context can hold is wi's whole premise.
+  splitting work into units a fresh context can hold is wit's whole premise.
 
 ## Severity
 
@@ -69,7 +69,7 @@ rationale lives here, anchored by section. When editing the charter, keep this f
 ## Output
 
 - **Why the exists-check before returning:** a report about a file you never actually wrote is the exact
-  failure wi exists to prevent; it is "evidence before assertions" applied to the checker itself.
+  failure wit exists to prevent; it is "evidence before assertions" applied to the checker itself.
 - **Why `verification.md` is ephemeral:** ship folds the verdict and any waived findings into `PR.md`
   (ship:5), then the dossier tidy (ship:6) prunes it like research notes, so the flow's fixed dossier
   manifest is preserved.
@@ -83,7 +83,7 @@ rationale lives here, anchored by section. When editing the charter, keep this f
 
 ## MoA dispatches
 
-- **Why plan mode never carries a marker:** MoA applies at wi's two judgment points only (see
+- **Why plan mode never carries a marker:** MoA applies at wit's two judgment points only (see
   `references/moa.md`), and the checker's point is the result-mode review at ship; the plan-mode pre-gate
   check is a single dispatch by design.
 - **Why proposers skip the file-write but keep the console-report discipline:** parallel writers would

@@ -1,20 +1,21 @@
 {
-  "name": "wi",
+  "name": "witloop",
   "owner": {
-    "name": "WI"
+    "name": "Witloop"
   },
   "metadata": {
-    "description": "WI: an opinionated suite of engineering and automation plugins for Claude Code, Codex CLI, Copilot CLI, and Grok Build.",
-    "version": "0.1.0"
+    "description": "Witloop: an opinionated suite of engineering and automation plugins for Claude Code, Codex CLI, Copilot CLI, and Grok Build.",
+    "version": "0.2.0"
   },
   "plugins": [
     {
-      "name": "wi",
+      "name": "wit",
       "source": "./",
-      "description": "Opinionated dev loop built for keep-alive-driven work. /wi:scan documents and bootstraps a repo (with a mermaid architecture diagram; --refresh drift-checks the map and consolidates learnings); /wi:dev brainstorms a feature with you, designs (research skill), confirms architecture + design at one gate (auto-approvable with --auto), then implements to an open PR, arming a keep-alive loop (Claude/Codex predicate /goal; Grok model-judged /goal; Copilot Autopilot) so the run keeps going until the condition is met. Parallel subagent waves, isolated worktrees, ADR-NNNN decision log, token report. Soft-integrates obra/superpowers and frontend-design. /wi:rpa turns a UiPath PDD (parsed via markitdown) into a built REFramework or Maestro solution: deep TO-BE refinement, an SDD + architecture + assumptions, design gate (approve the framework and the build paradigm: XAML-only or coded), then delegates the build to the UiPath skills, one run per PDD (1..N processes), Workflow Analyzer gate.",
-      "version": "1.12.1",
+      "description": "Witloop: opinionated dev loop built for keep-alive-driven work. /wit:scan documents and bootstraps a repo (with a mermaid architecture diagram; --refresh drift-checks the map and consolidates learnings); /wit:dev brainstorms a feature with you, designs (research skill), confirms architecture + design at one gate (auto-approvable with --auto), then implements to an open PR, arming a keep-alive loop (Claude/Codex predicate /goal; Grok model-judged /goal; Copilot Autopilot) so the run keeps going until the condition is met. Parallel subagent waves, isolated worktrees, ADR-NNNN decision log, token report. Soft-integrates obra/superpowers and frontend-design. /wit:rpa turns a UiPath PDD (parsed via markitdown) into a built REFramework or Maestro solution: deep TO-BE refinement, an SDD + architecture + assumptions, design gate (approve the framework and the build paradigm: XAML-only or coded), then delegates the build to the UiPath skills, one run per PDD (1..N processes), Workflow Analyzer gate.",
+      "version": "1.12.2",
       "category": "development",
       "keywords": [
+        "witloop",
         "workflow",
         "spec-driven",
         "planning",

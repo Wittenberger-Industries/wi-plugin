@@ -1,14 +1,14 @@
 ---
 type: Design Notes
-title: "wi-task-runner: design rationale (maintainer notes)"
-description: The "why" behind agents/wi-task-runner.md's rules, relocated out of the loaded charter by #41 (the runtime never reads this file); each entry is anchored to the charter section it explains.
+title: "wit-task-runner: design rationale (maintainer notes)"
+description: The "why" behind agents/wit-task-runner.md's rules, relocated out of the loaded charter by #41 (the runtime never reads this file); each entry is anchored to the charter section it explains.
 timestamp: 2026-07-11
-tags: [wi-task-runner, agents, design-notes, context-budget]
+tags: [wit-task-runner, agents, design-notes, context-budget]
 ---
 
-# wi-task-runner: design rationale (maintainer notes)
+# wit-task-runner: design rationale (maintainer notes)
 
-`agents/wi-task-runner.md` is an autonomous agent charter, loaded whole into every task-runner
+`agents/wit-task-runner.md` is an autonomous agent charter, loaded whole into every task-runner
 dispatch (build sends a fresh runner per task, waves of them per build), so it carries rules only.
 The rationale lives here, anchored to the section it explains. When editing the charter, keep this
 file in sync; a rule whose "why" is deleted instead of relocated loses its guard against future
@@ -47,7 +47,7 @@ file in sync; a rule whose "why" is deleted instead of relocated loses its guard
   intent behind "never build UI blind": markup from memory defeats the installed design skill. The
   exact report strings matter because the orchestrator logs the line to `progress.md` (build:2;
   runners never write that file) and ship's checker greps that log for `frontend via
-  frontend-design` vs `frontend via wi fallback` to flag UI built blind while the skill was
+  frontend-design` vs `frontend via wit fallback` to flag UI built blind while the skill was
   installed.
 - **Fix vs. escalate:** "don't quietly redesign" was folded into STOP-and-ask; it is the same
   prohibition stated twice. `references/models.md` cites this bullet as the escalation contract
@@ -73,7 +73,7 @@ file in sync; a rule whose "why" is deleted instead of relocated loses its guard
 ## Report
 
 - **Why the self-check gates on file state, not console output:** the console narrative routinely
-  runs ahead of repo state, so existence checks plus the exact Verify command are the evidence; wi
+  runs ahead of repo state, so existence checks plus the exact Verify command are the evidence; wit
   gates on file state, not on what the console printed. build:2 applies the same principle from the
   orchestrator side ("no matter what the console printed") when it honors the `Self-Check` line.
 - **Why the runner never touches `progress.md`:** the orchestrator is its single writer during

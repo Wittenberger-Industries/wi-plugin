@@ -1,7 +1,7 @@
 ---
 type: Template
 title: "ADR: template"
-description: Template + conventions for an OKF-conformant Architecture Decision Record under .wi/adr/.
+description: Template + conventions for an OKF-conformant Architecture Decision Record under .wit/adr/.
 timestamp: 2026-06-14
 tags: [adr, template, okf, decisions]
 ---
@@ -12,11 +12,11 @@ Architecture Decision Record. Write one only for decisions that are **hard to re
 contributors will wonder "why did they do it this way?": datastore, framework, external service, public
 API/schema shape, auth model, concurrency model, a notable dependency. Trivial choices don't need one.
 
-Save as `.wi/adr/ADR-NNNN-short-title.md`; **one project-wide sequence** (ADR-0001, ADR-0002, ...), not
-per-feature: the next number is the highest existing in `.wi/adr/` + 1, zero-padded to four digits. ADRs are
+Save as `.wit/adr/ADR-NNNN-short-title.md`; **one project-wide sequence** (ADR-0001, ADR-0002, ...), not
+per-feature: the next number is the highest existing in `.wit/adr/` + 1, zero-padded to four digits. ADRs are
 immutable once accepted: to change a decision, write a new ADR that supersedes the old one.
 
-After writing an ADR, **append a row to `.wi/adr/index.md`** (create it from the template below if
+After writing an ADR, **append a row to `.wit/adr/index.md`** (create it from the template below if
 absent) so the decision log stays browsable at a glance.
 
 ```markdown
@@ -33,8 +33,8 @@ timestamp: <YYYY-MM-DD>
 
 - **Status:** proposed | accepted | superseded by ADR-MMMM
 - **Date:** <YYYY-MM-DD>
-- **Deciders:** <who signed off, or "wi research (autonomous)" + the gate outcome>
-- **Feature:** <slug>  (the wi feature that produced this decision)
+- **Deciders:** <who signed off, or "wit research (autonomous)" + the gate outcome>
+- **Feature:** <slug>  (the wit feature that produced this decision)
 
 ## Context
 <the forces at play: requirements, constraints, what in the repo or roadmap makes this decision necessary
@@ -63,7 +63,7 @@ now. Neutral: state the problem, not the answer.>
 - The "Context" should let someone disagree with the decision on the merits: give them the real forces.
 - Link the ADR from `spec.md`'s Design section so the plan and the rationale stay connected.
 
-## `.wi/adr/index.md` template
+## `.wit/adr/index.md` template
 
 ```markdown
 # Architecture decisions: <project>

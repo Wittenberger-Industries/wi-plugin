@@ -6,10 +6,10 @@ NOT an entrypoint. Imported by the two scripts the skills invoke:
   - token_report.py  (--write finalize: Orchestrator section + Subagents sum
                       + Duration totals + per-agent split/cost where recoverable)
 
-tokens.md is a per-feature RUNTIME artifact in a user's .wi/, never in this plugin repo.
+tokens.md is a per-feature RUNTIME artifact in a user's .wit/, never in this plugin repo.
 This module owns the file format; the scripts are thin CLIs over it. Stdlib only.
 Canonical prose for the ledger discipline ("the ledger rule"):
-skills/research/references/wi-directory.md, tokens.md template section.
+skills/research/references/wit-directory.md, tokens.md template section.
 """
 import re
 from datetime import date
@@ -17,7 +17,7 @@ from pathlib import Path
 
 # Exact sentinel ship writes when the orchestrator transcript can't be parsed. The verify
 # gate treats this as RESOLVED: an honest "can't measure" passes; only the untouched
-# PENDING placeholder fails. Must match the wording in ship/SKILL.md and wi-directory.md.
+# PENDING placeholder fails. Must match the wording in ship/SKILL.md and wit-directory.md.
 UNAVAILABLE = "Orchestrator: unavailable for this run"
 
 # [^.*] excludes the literal dot and asterisk, so the lazy capture stops before the closing '.**'

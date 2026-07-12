@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-validate.py: pre-release check for the wi plugin. Run from anywhere:
+validate.py: pre-release check for the wit plugin. Run from anywhere:
 
     python3 scripts/validate.py
 
@@ -24,8 +24,8 @@ Checks (from the repo root, detected automatically):
      frontmatter carrying a non-empty `type`. Each must also end with a trailing newline and have
      balanced code fences, the two signatures of a truncated/interrupted write (the bug class that
      shipped half-written docs before this guard existed). `index.md` / `log.md` are reserved and exempt.
-  6. Generated-`.wi/`-file templates (the ```markdown blocks inside skills/agents that emit the runtime
-     `.wi/` files) each open with frontmatter carrying a non-empty `type`, so a generated file can't ship
+  6. Generated-`.wit/`-file templates (the ```markdown blocks inside skills/agents that emit the runtime
+     `.wit/` files) each open with frontmatter carrying a non-empty `type`, so a generated file can't ship
      type-less. Reserved `index.md`/`log.md` listings are exempt; console/shell examples (non-`markdown`
      fences) are skipped.
   7. Mechanical lints, scoped to skills/ · agents/ · references/ · .claude-plugin/ (never docs/ or tests/,
@@ -34,7 +34,7 @@ Checks (from the repo root, detected automatically):
      (a truncated/lazy `...` or `..`); the section-sign symbol (U+00A7) is banned outright: citations
      use the name:N locator (ship:8, sdd:7.1.3, protocol:5) or a quoted heading (workflow.md
      "Script invocation"); and four dead strings are banned: the retired `uipath-rpa-workflows`
-     slug, the dead work-unit dir `.wi/goals` (the unit is a feature; the dir is `.wi/features`;
+     slug, the dead work-unit dir `.wit/goals` (the unit is a feature; the dir is `.wit/features`;
      banned unconditionally: #48 dropped the migration, an old-format repo is simply unrecognized),
      `python3` launching a bundled `${CLAUDE_PLUGIN_ROOT}` script (the broken Windows Store stub;
      prose `python3`/`py -3` fallback notes are not flagged, only actual invocations), and the retired
@@ -91,11 +91,11 @@ try:
     v_plugin = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")).get("version")
     v_codex = json.loads(codex.read_text(encoding="utf-8")).get("version") if codex.is_file() else None
     mp = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
-    v_market = next((p.get("version") for p in mp.get("plugins", []) if p.get("name") == "wi"), None)
+    v_market = next((p.get("version") for p in mp.get("plugins", []) if p.get("name") == "wit"), None)
     if len({v_plugin, v_codex, v_market}) != 1:
         errors.append(
             f"manifest version mismatch: .claude-plugin/plugin.json={v_plugin} "
-            f"marketplace.json(wi)={v_market} .codex-plugin/plugin.json={v_codex} - bump all three together"
+            f"marketplace.json(wit)={v_market} .codex-plugin/plugin.json={v_codex} - bump all three together"
         )
 except Exception:
     pass  # invalid JSON already reported above
@@ -218,8 +218,8 @@ for f in sorted(set(concept_md)):
     elif "type:" not in parts[1]:
         errors.append(f"{rel}: OKF - missing 'type'")
 
-# 6. Embedded generated-.wi/-file templates carry OKF `type` ---------------
-# The generated .wi/ files live in user repos and never reach this script, but the *templates* that emit
+# 6. Embedded generated-.wit/-file templates carry OKF `type` ---------------
+# The generated .wit/ files live in user repos and never reach this script, but the *templates* that emit
 # them are ```markdown blocks inside the skills/agents that write them. Guard those: every non-reserved
 # generated-file template must open with frontmatter carrying a non-empty `type`, so a generated file can't
 # ship type-less (the bug class: a bare `# Heading` template with no frontmatter, or frontmatter that
@@ -318,10 +318,10 @@ for f in desc_files:
     if desc is not None and desc.rstrip().endswith(("..", "…")):
         errors.append(f"{f.relative_to(ROOT)}: description ends mid-thought (trailing '..'/'…') - write a real one-line summary")
 
-# 7c. Dead strings: a retired external slug, the dead `.wi/goals` dir, and python3-launched
+# 7c. Dead strings: a retired external slug, the dead `.wit/goals` dir, and python3-launched
 #     bundled scripts (broken on Windows).
 DEAD_SLUG = re.compile(r"uipath-rpa-workflows")
-DEAD_GOALS_DIR = re.compile(r"\.wi/goals")  # goal->feature rename (M1): the work-unit dir is .wi/features
+DEAD_GOALS_DIR = re.compile(r"\.wit?/goals")  # goal->feature rename (M1): the work-unit dir is .wit/features (also bans the pre-rebrand .wi/ spelling)
 PY3_INVOKE = re.compile(r"python3[ \t]+\$\{CLAUDE_PLUGIN_ROOT\}")  # an invocation: bare prose `python3` won't match
 SECTION_SIGN = re.compile("§")  # the section-sign symbol is banned in shipped text (#49): cite name:N locators or quoted headings
 DEAD_SDD_S13 = re.compile(r"(?i)\b(?:sdd:13|section 13)\b")  # the SDD acceptance-criteria anchor is semantic (sdd:10 in the base ToC)
@@ -340,7 +340,7 @@ for f in lint_scope:
     if DEAD_SLUG.search(txt):
         errors.append(f"{rel}: dead skill slug 'uipath-rpa-workflows' (the UiPath authoring skill is 'uipath-rpa')")
     if DEAD_GOALS_DIR.search(txt):
-        errors.append(f"{rel}: dead path '.wi/goals' - the work unit is a feature; use '.wi/features' (goal->feature rename)")
+        errors.append(f"{rel}: dead path '.wit/goals' - the work unit is a feature; use '.wit/features' (goal->feature rename)")
     if PY3_INVOKE.search(txt):
         errors.append(f"{rel}: 'python3 ${{CLAUDE_PLUGIN_ROOT}}' invocation - use 'python' (python3 is the broken Store stub on Windows)")
     if SECTION_SIGN.search(txt):

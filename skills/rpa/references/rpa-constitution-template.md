@@ -1,14 +1,14 @@
 ---
 type: Template
 title: "RPA constitution: template"
-description: "Copy to `.wi/rpa-constitution.md`, fill in from what bootstrap/discovery found, and confirm the lines marked `(confirm)`."
+description: "Copy to `.wit/rpa-constitution.md`, fill in from what bootstrap/discovery found, and confirm the lines marked `(confirm)`."
 timestamp: 2026-06-08
 tags: [rpa, reference]
 ---
 
 # RPA constitution: template
 
-Copy to `.wi/rpa-constitution.md`, fill in from what bootstrap/discovery found, and confirm the lines
+Copy to `.wit/rpa-constitution.md`, fill in from what bootstrap/discovery found, and confirm the lines
 marked `(confirm)`. Every phase reads this. It is the cheapest place to encode "how we build automations
 here." Keep it short and declarative.
 
@@ -47,7 +47,7 @@ timestamp: <YYYY-MM-DD>
   run (no user to ask; brainstorm-protocol's headless rule) mocks the send rather than pick a framework.
   The build states the confirmed approach in every delegation and
   the gate checks no other email tech crept in.   (confirm)
-- **Publish (default `none`):** after a green build + PR, wi can publish to a connected Orchestrator tenant:
+- **Publish (default `none`):** after a green build + PR, wit can publish to a connected Orchestrator tenant:
   `none` (no push, default), `feed` (publish the package to the tenant feed), or `deploy` (`feed` +
   deploy/activate as a Process in a folder). The design gate confirms it each run; `--auto` uses this
   default. **No production-folder deploy without explicit approval at the gate.**   (confirm)
@@ -66,7 +66,7 @@ timestamp: <YYYY-MM-DD>
   grouped into subfolders by system/concern** (`Process/DocuWare/`, `Process/MasterData/`, `Process/IDoc/`, …),
   each holding that area's workflows, not flat at the project root.
 - **Orchestrator resources** named `<Solution>_<Process>_<Queue|Asset|Bucket>`, recorded in
-  `.wi/orchestrator.md`; assets/credentials referenced by **name** only.
+  `.wit/orchestrator.md`; assets/credentials referenced by **name** only.
 
 ## Configuration & secrets
 - All settings/assets in `Config.xlsx` (Settings/Constants/Assets). Secrets are Orchestrator
@@ -95,11 +95,11 @@ timestamp: <YYYY-MM-DD>
 - Orchestrator: queues for transactions, assets for config, folders per environment (dev/test/prod).
 
 ## Reuse
-- Check `.wi/components.md` before building any capability; reuse shared workflows / Library projects.
+- Check `.wit/components.md` before building any capability; reuse shared workflows / Library projects.
   Register new reusable components after building them.
 
 ## Simplicity  (build the least that works)
-- Before building a workflow/component, ask whether it needs to exist: reuse `.wi/components.md` or a
+- Before building a workflow/component, ask whether it needs to exist: reuse `.wit/components.md` or a
   Library first; a speculative handler the PDD never asked for = skip it, note it in one line. (YAGNI)
 - Reach in order: an existing component → an Integration Service **connector / API** → a standard activity →
   a small VB expression → only then a new sub-workflow (a coded `.cs` only if the gate approved coded).
@@ -122,7 +122,7 @@ timestamp: <YYYY-MM-DD>
 - <e.g. no production Orchestrator changes without approval; no UI automation of Citrix without CV>
 ```
 
-## Defaults wi:rpa assumes when a rule is blank
+## Defaults wit:rpa assumes when a rule is blank
 
 REFramework; connectors/APIs preferred over UI (but UI is fine where needed); secrets as Orchestrator
 assets; business vs system exceptions with 3 retries; Workflow Analyzer error-clean as the gate; reuse

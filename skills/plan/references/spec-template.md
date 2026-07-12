@@ -1,14 +1,14 @@
 ---
 type: Template
 title: "Spec: template"
-description: Template for an OKF-conformant feature spec (.wi/features/<slug>/spec.md).
+description: Template for an OKF-conformant feature spec (.wit/features/<slug>/spec.md).
 timestamp: 2026-06-14
 tags: [spec, template, okf, plan]
 ---
 
 # Spec: template
 
-Copy to `.wi/features/<slug>/spec.md`. The spec answers *what* and *why* and *how we'll know it's done*,
+Copy to `.wit/features/<slug>/spec.md`. The spec answers *what* and *why* and *how we'll know it's done*,
 not *how to build it* (that's `tasks.md`). Keep it tight; every section earns its place.
 
 ```markdown

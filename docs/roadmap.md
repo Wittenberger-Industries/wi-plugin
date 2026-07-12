@@ -1,12 +1,12 @@
 ---
 type: Roadmap
-title: "wi roadmap: the live queue of open issues"
+title: "Witloop roadmap: the live queue of open issues"
 description: Tracking surface for all open issues; order, version targets, sequencing constraints, and the standing per-PR guardrails. Supersedes the 2026-07 triage doc as the thing that gets updated; that doc is frozen as the sweep's history.
 timestamp: 2026-07-11
 tags: [roadmap, triage, plan]
 ---
 
-# wi roadmap (live)
+# Witloop roadmap (live)
 
 **This file is the tracking surface for open work: update it here, not in the triage doc.**
 History and rationale of the 2026-07 sweep live in `docs/plans/2026-07-10-issue-triage-35-42.md`
@@ -27,7 +27,7 @@ below stays owner-postponed; un-postpone it or file new work to continue.
 ## Sequencing rules (standing)
 
 - **Strictly serial on the hotspots**: `build/SKILL.md`, `ship/SKILL.md`, `dev/SKILL.md`,
-  `wi-directory.md`, `workflow.md`: never two branches editing them at once. Stacked PRs,
+  `wit-directory.md`, `workflow.md`: never two branches editing them at once. Stacked PRs,
   squash-merge, rebase + retarget the next after each merge.
 - **Agent charters are the most sensitive surface** (autonomous, no human in the loop): minimal
   additive diffs only; never alter report caps, output markers, verification-gate contracts, or
@@ -47,7 +47,7 @@ below stays owner-postponed; un-postpone it or file new work to continue.
    exit code swallowed); after bulk markdown edits check file **tails** (the repo has shipped
    mid-sentence truncations; validate.py guards only trailing-newline + fence balance).
 3. Behavior/artifact changes → **minor** bump, pure relocation/compression → patch; all **three**
-   manifests together (`.claude-plugin/plugin.json`, the wi entry in `marketplace.json`,
+   manifests together (`.claude-plugin/plugin.json`, the wit entry in `marketplace.json`,
    `.codex-plugin/plugin.json`; validate.py enforces parity).
 4. New files only in `.gitignore`-whitelisted dirs (`references/`, `docs/`); any new top-level path
    needs a `!/path` line or it silently vanishes.

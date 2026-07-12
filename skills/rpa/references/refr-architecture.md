@@ -86,11 +86,11 @@ the runtime diagram must show all of them.
 
 `tasks.md` orders the build so the parallel-wave engine can fan out:
 
-1. **Shared components** (Wave 1): anything in `.wi/components.md` the processes depend on, first.
+1. **Shared components** (Wave 1): anything in `.wit/components.md` the processes depend on, first.
 2. **Per-process scaffolds**: each Dispatcher/Performer REFramework project (independent ones in parallel).
 3. **Sub-workflows**: independent sub-workflows within a process in parallel; `Main.xaml`/`Config.xlsx`
    serialize.
 4. **Wire-up**: queues/assets/triggers via `uipath-platform`.
 
-Same "shared foundation as an early task so the rest fan out" rule as `wi:dev`, applied at the process
+Same "shared foundation as an early task so the rest fan out" rule as `wit:dev`, applied at the process
 level then again at the sub-workflow level.

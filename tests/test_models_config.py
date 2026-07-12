@@ -12,7 +12,7 @@ import cross_review  # noqa: E402
 FULL_CONFIG = """---
 type: Model Routing Config
 title: "Model assignments: demo"
-description: Per-role model assignments for wi-dispatched agents.
+description: Per-role model assignments for wit-dispatched agents.
 preset: smart
 timestamp: 2026-07-02
 ---
@@ -23,9 +23,9 @@ timestamp: 2026-07-02
 | Role | Model | Notes |
 |------|-------|-------|
 | orchestrator | fable | informational: session model |
-| wi-code-checker | fable | same-family fallback tier |
-| wi-researcher | opus | one tier below orchestrator |
-| wi-task-runner | sonnet | default for wi-task-runner dispatches |
+| wit-code-checker | fable | same-family fallback tier |
+| wit-researcher | opus | one tier below orchestrator |
+| wit-task-runner | sonnet | default for wit-task-runner dispatches |
 
 ## Cross-provider config
 | Key | Value |
@@ -39,13 +39,13 @@ timestamp: 2026-07-02
 ## Per-agent overrides
 | Agent | Model |
 |-------|-------|
-| wi-researcher | haiku |
+| wit-researcher | haiku |
 """
 
 SIMPLE_CONFIG = """---
 type: Model Routing Config
 title: "Model assignments: demo"
-description: Per-role model assignments for wi-dispatched agents.
+description: Per-role model assignments for wit-dispatched agents.
 preset: simple
 timestamp: 2026-07-02
 ---
@@ -56,9 +56,9 @@ timestamp: 2026-07-02
 | Role | Model | Notes |
 |------|-------|-------|
 | orchestrator | opus | informational |
-| wi-code-checker | opus | matches orchestrator tier |
-| wi-researcher | sonnet | one tier below orchestrator |
-| wi-task-runner | sonnet | default |
+| wit-code-checker | opus | matches orchestrator tier |
+| wit-researcher | sonnet | one tier below orchestrator |
+| wit-task-runner | sonnet | default |
 
 ## Cross-provider config
 | Key | Value |
@@ -104,9 +104,9 @@ class ParseConfigTest(unittest.TestCase):
         cfg = cross_review.parse_models_config(FULL_CONFIG)
         self.assertEqual(cfg["preset"], "smart")
         self.assertEqual(cfg["roles"]["orchestrator"], "fable")
-        self.assertEqual(cfg["roles"]["wi-code-checker"], "fable")
-        self.assertEqual(cfg["roles"]["wi-researcher"], "opus")
-        self.assertEqual(cfg["roles"]["wi-task-runner"], "sonnet")
+        self.assertEqual(cfg["roles"]["wit-code-checker"], "fable")
+        self.assertEqual(cfg["roles"]["wit-researcher"], "opus")
+        self.assertEqual(cfg["roles"]["wit-task-runner"], "sonnet")
 
     def test_cross_provider_parsed(self):
         cfg = cross_review.parse_models_config(FULL_CONFIG)
@@ -119,7 +119,7 @@ class ParseConfigTest(unittest.TestCase):
 
     def test_overrides_parsed(self):
         cfg = cross_review.parse_models_config(FULL_CONFIG)
-        self.assertEqual(cfg["overrides"]["wi-researcher"], "haiku")
+        self.assertEqual(cfg["overrides"]["wit-researcher"], "haiku")
 
     def test_provider_none_means_disabled(self):
         cfg = cross_review.parse_models_config(SIMPLE_CONFIG)
@@ -148,22 +148,22 @@ class ParseConfigTest(unittest.TestCase):
 class ModelForTest(unittest.TestCase):
     def test_override_beats_role(self):
         cfg = cross_review.parse_models_config(FULL_CONFIG)
-        self.assertEqual(cross_review.model_for("wi-researcher", cfg), "haiku")
+        self.assertEqual(cross_review.model_for("wit-researcher", cfg), "haiku")
 
     def test_task_runner_uses_its_own_role(self):
         cfg = cross_review.parse_models_config(FULL_CONFIG)
-        self.assertEqual(cross_review.model_for("wi-task-runner", cfg), "sonnet")
+        self.assertEqual(cross_review.model_for("wit-task-runner", cfg), "sonnet")
 
     def test_checker_uses_its_own_role(self):
         cfg = cross_review.parse_models_config(FULL_CONFIG)
-        self.assertEqual(cross_review.model_for("wi-code-checker", cfg), "fable")
+        self.assertEqual(cross_review.model_for("wit-code-checker", cfg), "fable")
 
     def test_unknown_agent_inherits(self):
         cfg = cross_review.parse_models_config(FULL_CONFIG)
         self.assertEqual(cross_review.model_for("some-other-agent", cfg), "inherit")
 
     def test_no_config_inherits(self):
-        self.assertEqual(cross_review.model_for("wi-task-runner", None), "inherit")
+        self.assertEqual(cross_review.model_for("wit-task-runner", None), "inherit")
 
 
 class PlatformMapTest(unittest.TestCase):
@@ -178,14 +178,14 @@ class PlatformMapTest(unittest.TestCase):
 
     def test_claude_host_passes_tier_through(self):
         cfg = cross_review.parse_models_config(FULL_CONFIG + GROK_PLATFORM_SECTION)
-        # wi-task-runner role is sonnet; on the Claude host the tier is unchanged
-        self.assertEqual(cross_review.platform_model_for("wi-task-runner", cfg, "claude"), "sonnet")
+        # wit-task-runner role is sonnet; on the Claude host the tier is unchanged
+        self.assertEqual(cross_review.platform_model_for("wit-task-runner", cfg, "claude"), "sonnet")
 
     def test_grok_host_maps_tier_to_model(self):
         cfg = cross_review.parse_models_config(FULL_CONFIG + GROK_PLATFORM_SECTION)
-        self.assertEqual(cross_review.platform_model_for("wi-task-runner", cfg, "grok"), "grok-composer-2.5-fast")
-        # wi-researcher has an override to haiku -> cheap Grok model
-        self.assertEqual(cross_review.platform_model_for("wi-researcher", cfg, "grok"), "grok-composer-2.5-fast")
+        self.assertEqual(cross_review.platform_model_for("wit-task-runner", cfg, "grok"), "grok-composer-2.5-fast")
+        # wit-researcher has an override to haiku -> cheap Grok model
+        self.assertEqual(cross_review.platform_model_for("wit-researcher", cfg, "grok"), "grok-composer-2.5-fast")
 
     def test_grok_host_unmapped_tier_passes_through(self):
         cfg = cross_review.parse_models_config(SIMPLE_CONFIG + GROK_PLATFORM_SECTION)
