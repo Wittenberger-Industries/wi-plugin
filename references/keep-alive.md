@@ -59,10 +59,11 @@ repos you trust; drop `--allow-all` if you want Copilot to still confirm risky a
   `grok -p "<prompt incl. the done-condition>" --always-approve --max-turns <N>` with `--continue` /
   session resume.
 
-  ⚠️ Because completion is model-judged (and `--always-approve` runs Grok unattended: prompts suppressed),
-  the agent can self-complete before remote checks are green or `progress.md` Phase is `done`. Treat it as
-  Copilot-class autonomy: use it in repos you trust, and do not assume the runtime blocks on the condition
-  the way Claude/Codex `/goal` does.
+  ⚠️ Completion is **model-judged**, not runtime-enforced. In testing, grok-4.5 verified the condition and
+  correctly held (it probed an unsatisfiable clause three ways and refused to self-complete or fake a green
+  status), so fidelity is good - but the guarantee is the model's diligence plus a clear, explicit
+  condition, not a hard predicate the way Claude/Codex `/goal` is. Keep the condition unambiguous, and since
+  `--always-approve` runs Grok unattended (prompts suppressed), use it in repos you trust.
 
 The Copilot command is never printed without the warning above. The per-platform mechanism behind
 `/goal` / Autopilot lives in `${CLAUDE_PLUGIN_ROOT}/references/codex-tools.md` / `copilot-tools.md` /
