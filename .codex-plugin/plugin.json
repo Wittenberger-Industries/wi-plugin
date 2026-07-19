@@ -1,6 +1,6 @@
 {
   "name": "wit",
-  "version": "1.13.3",
+  "version": "1.13.4",
   "description": "Witloop: an opinionated, low-token engineering loop for Claude Code, Codex CLI, Copilot CLI, and Grok Build, built for keep-alive-driven work. /wit:scan documents and bootstraps a project (--refresh drift-checks the map and consolidates learnings); /wit:dev brainstorms a feature with you, designs, confirms architecture + design at the design gate (or --auto), then implements to an open pull request, arming a keep-alive loop (Claude/Codex predicate /goal; Grok model-judged /goal; Copilot Autopilot) as the persistence wrapper. /wit:add-issues files a well-formed GitHub issue (Bug/Feature/Task) with typed body, labels, and relationships. Parallel subagent waves, isolated git worktrees, project-wide ADR-NNNN decision log, end-of-run token report. State in a committed .wit/ directory. Soft-integrates obra/superpowers and frontend-design. /wit:rpa builds UiPath RPA: parse a PDD (markitdown) -> refine the TO-BE -> SDD/architecture/assumptions -> design gate (approve the framework, REFramework or Maestro, and the build paradigm: XAML-only or coded) -> solution via the UiPath skills -> Workflow Analyzer gate -> PR. One run per PDD (1..N processes); reuses the wit spine.",
   "skills": "./skills/"
 }

@@ -34,7 +34,8 @@ command runs per workflow.md's **output house rule**: redirected to
 `.wit/features/<slug>/.logs/gate-<step>.txt`, verdict from the exit code + `tail -n 30`, failures pulled
 by grep. Every acceptance criterion in `spec.md` must map to something that actually passed. If
 `superpowers:verification-before-completion` is in your available skills you MUST run it too (log it):
-a delegation point; precedence: `skills/research/references/integrations.md`. Red → fix the code (loop
+a delegation point; precedence: `skills/research/references/integrations.md`. Red → first append the
+stamped Reflection line per verification-gate.md ("When the gate is red"), then fix the code (loop
 back to build), never lower the bar.
 
 ## 2 · Review against intent

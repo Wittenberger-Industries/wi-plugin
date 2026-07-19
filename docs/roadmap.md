@@ -17,9 +17,11 @@ pick-up, into `docs/plans/`, and rides in the PR.
 
 ## Queue (in order)
 
-**The queue is active** (2026-07-19): the learnings lifecycle shipped in v1.13.1, red-gate
-reflection shipped in v1.13.2, and process-drift telemetry ships in v1.13.3. The full dry-run starts
-immediately after #82 merges.
+**The queue is empty** (2026-07-19): learnings lifecycle (#78-#80/#83), Reflection (#81), and
+process-drift telemetry (#82) shipped as v1.13.1-v1.13.3; the post-#82 full dry-run verified the
+deferred ACs (report: `docs/plans/2026-07-19-learnings-lifecycle-dryrun.md`). The three orthogonal
+dry-run follow-ups (token-gate zero-dispatch, transcript host/repo guard, ship:1 Reflection pointer)
+ship as **v1.13.4**. Only #34 remains owner-postponed.
 
 | Slot | Issue | What | Version | Effort · Risk | Why this order |
 |---|---|---|---|---|---|
@@ -67,21 +69,30 @@ immediately after #82 merges.
 
 ## Shipped (roadmap-era)
 
-- **#82** process-drift telemetry: **v1.13.3** (2026-07-19). Ship close-out records a compact
+- **Dry-run follow-ups** (token gate + transcript scope + ship:1 Reflection): **v1.13.4**
+  (2026-07-19). Closes the three orthogonal findings from
+  `docs/plans/2026-07-19-learnings-lifecycle-dryrun.md`: (1) `check_tokens.py` accepts a finalized
+  zero-dispatch / all-`unavailable` ledger (sum 0, no integer-token rows); (2) `token_report.py`
+  `find_transcript` scopes to the encoded cwd project dir and never binds a foreign session;
+  (3) ship:1 red local gate explicitly requires the stamped Reflection line before the fix loop.
+  Also removes duplicated `docs/superpowers/plans/` (historical plans stay under `docs/plans/` only;
+  specs / design-notes unchanged).
+
+- **#82** process-drift telemetry: **v1.13.3** (2026-07-19, PR #86). Ship close-out records a compact
   `process:` clause on each feature's learnings-index line; scan `--refresh` trends shared friction
-  across features and proposes amendments at `>= 3`, but never applies them. The full dry-run,
-  including the deferred **#79 and #81 dry-run ACs**, runs immediately after merge.
+  across features and proposes amendments at `>= 3`, but never applies them. Post-merge dry-run:
+  `docs/plans/2026-07-19-learnings-lifecycle-dryrun.md` (PARTIAL overall; #82 AC PASS).
 
-- **#81** stamped failure Reflection: **v1.13.2** (2026-07-19). Every local gate, review BLOCKER,
-  remote-check, and plan-wrong red path writes a stamped Reflection before its fix loop; ship treats
-  those lines as mandatory compound candidates and calls out recurrence. **#81 dry-run AC deferred to
-  the post-#82 full dry-run**, tracked in the #82 shipped entry above.
+- **#81** stamped failure Reflection: **v1.13.2** (2026-07-19, PR #85). Every local gate, review
+  BLOCKER, remote-check, and plan-wrong red path writes a stamped Reflection before its fix loop;
+  ship treats those lines as mandatory compound candidates and calls out recurrence. Dry-run AC
+  **PASS** (planted ship-gate red; Reflection with `earlier catch: build` before fix).
 
-- **#78 + #79 + #80 + #83** learnings lifecycle: **v1.13.1** (2026-07-19). Research stamps applicable
-  learnings and the checker verifies them; lessons use causal WHEN to DO/AVOID to BECAUSE format with
-  evidence counters and reinforce-not-duplicate behavior; scan promotes and retires rules on evidence;
-  test-level, checker pre-mortem, and waiver-pointer polish complete the loop. **#79 dry-run AC deferred
-  to the post-#82 full dry-run**, tracked in the #82 shipped entry above.
+- **#78 + #79 + #80 + #83** learnings lifecycle: **v1.13.1** (2026-07-19, PR #84). Research stamps
+  applicable learnings and the checker verifies them; lessons use causal WHEN to DO/AVOID to BECAUSE
+  format with evidence counters and reinforce-not-duplicate behavior; scan promotes and retires rules
+  on evidence; test-level, checker pre-mortem, and waiver-pointer polish complete the loop. Dry-run:
+  #78/#79 PASS; #80 N/A (first feature).
 
 - **Witloop rebrand**: **v1.12.2**, PR #73 (2026-07-12, owner-directed, no issue number). The commercial
   rename: plugin id `wi` -> `wit` (commands `/wit:*` on Claude, `/wit-*` Copilot/Grok aliases, `$wit-*`

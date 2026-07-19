@@ -244,16 +244,18 @@ def verify(path):
         return "frontmatter missing or unparseable"
     if fm.get("type") != "Token Ledger":
         return "frontmatter 'type' is not 'Token Ledger'"
-    if not has_data_row(text):
-        return "no subagent row with an integer token count"
-    if not subagents_sum_filled(text):
-        return "Subagents (exact) sum not filled (still '<sum>')"
     if not has_duration_column(text):
         return "no Duration column in the ledger header (write the current 5-column format)"
-    if not _duration_cells_ok(text):
-        return "a subagent row's Duration cell is empty (write the figure or 'unavailable')"
+    if not subagents_sum_filled(text):
+        return "Subagents (exact) sum not filled (still '<sum>')"
     if not compute_totals_filled(text):
         return "duration totals not filled (Σ compute / wall-clock: token_report.py --write fills them)"
     if not orchestrator_resolved(text):
         return "Orchestrator section still PENDING / unresolved"
+    # Zero integer-token rows is an honest zero-dispatch / all-unavailable ledger (Codex, Copilot,
+    # or an inline-role host): pass once sum/totals/orchestrator are finalized (sum is typically 0).
+    # When rows exist, every Duration cell must be a figure or the honest 'unavailable'.
+    if has_data_row(text):
+        if not _duration_cells_ok(text):
+            return "a subagent row's Duration cell is empty (write the figure or 'unavailable')"
     return None

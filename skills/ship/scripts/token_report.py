@@ -64,13 +64,46 @@ STAMP_RE = re.compile(
     r"^\s*-\s*(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:?\d{2}))\b")
 
 
-def find_transcript():
-    base = Path.home() / ".claude" / "projects"
+def encode_claude_project_path(path):
+    """Claude Code project-dir encoding: drop the drive colon, turn separators into '-'."""
+    s = str(Path(path).resolve())
+    if len(s) >= 2 and s[1] == ":":
+        s = s[0] + s[2:]
+    return s.replace("\\", "-").replace("/", "-")
+
+
+def find_transcript(cwd=None, *, _home=None):
+    """Newest session transcript for *this* project only.
+
+    Scopes under ``~/.claude/projects/<encoded-cwd>/``. Never falls back to the newest
+    transcript across all projects (that silently binds a foreign session). No match → None
+    (caller writes the honest unavailable sentinel).
+    ``_home`` is test-only (overrides ``Path.home()``).
+    """
+    home = Path(_home) if _home is not None else Path.home()
+    base = home / ".claude" / "projects"
     if not base.is_dir():
         return None
-    files = sorted(base.glob("**/*.jsonl"),
+    root = Path(cwd) if cwd is not None else Path.cwd()
+    try:
+        root = root.resolve()
+    except OSError:
+        return None
+    encoded = encode_claude_project_path(root)
+    proj = base / encoded
+    if not proj.is_dir():
+        # Prefix match: session dirs sometimes nest under a parent-encoded path.
+        matches = [p for p in base.iterdir()
+                   if p.is_dir() and (p.name == encoded or p.name.startswith(encoded + "-"))]
+        if len(matches) != 1:
+            return None
+        proj = matches[0]
+    files = sorted(proj.glob("**/*.jsonl"),
                    key=lambda p: p.stat().st_mtime, reverse=True)
-    return files[0] if files else None
+    # Prefer the session root jsonl over subagent sidecars.
+    top = [f for f in files if "subagents" not in f.parts]
+    pool = top or files
+    return pool[0] if pool else None
 
 
 def extract_usage(obj):

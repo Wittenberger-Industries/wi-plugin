@@ -122,11 +122,22 @@ class LedgerHelperTests(unittest.TestCase):
             p = Path(d) / "tokens.md"
             self.assertEqual(_ledger.verify(p), "tokens.md missing")
             p.write_text(_scaffold_text(), encoding="utf-8")
-            self.assertEqual(_ledger.verify(p), "no subagent row with an integer token count")
+            self.assertEqual(_ledger.verify(p), "Subagents (exact) sum not filled (still '<sum>')")
             p.write_text(_with_row_and_sum(_scaffold_text()), encoding="utf-8")
             self.assertEqual(_ledger.verify(p), "Orchestrator section still PENDING / unresolved")
             p.write_text(_resolve_orchestrator(_with_row_and_sum(_scaffold_text())), encoding="utf-8")
             self.assertIsNone(_ledger.verify(p))            # full pass
+
+    def test_verify_zero_dispatch_finalized_passes(self):
+        # Honest zero-dispatch / all-unavailable ledger (Codex, Copilot, inline-role hosts).
+        t = _fill_totals(
+            _scaffold_text().replace("<sum>", "0"),
+            compute="unavailable", n="0", wall="unavailable",
+        )
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "tokens.md"
+            p.write_text(_resolve_orchestrator(t), encoding="utf-8")
+            self.assertIsNone(_ledger.verify(p))
 
     def test_verify_frontmatter_and_type_and_sum_reasons(self):
         with tempfile.TemporaryDirectory() as d:
@@ -294,12 +305,22 @@ class CheckTokensCliTests(unittest.TestCase):
             self.assertNotEqual(r.returncode, 0)
             self.assertIn("missing", (r.stdout + r.stderr).lower())
 
-    def test_verify_fresh_scaffold_fails_no_rows(self):
+    def test_verify_fresh_scaffold_fails_unfilled_sum(self):
         with tempfile.TemporaryDirectory() as d:
             p = init_ledger(d)
             r = run(CHECK, p)
             self.assertNotEqual(r.returncode, 0)
-            self.assertIn("row", (r.stdout + r.stderr).lower())
+            self.assertIn("sum", (r.stdout + r.stderr).lower())
+
+    def test_verify_zero_dispatch_cli_passes(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = init_ledger(d)
+            t = _fill_totals(
+                p.read_text(encoding="utf-8").replace("<sum>", "0"),
+                compute="unavailable", n="0", wall="unavailable",
+            )
+            p.write_text(_resolve_orchestrator(t), encoding="utf-8")
+            self.assertEqual(run(CHECK, p).returncode, 0)
 
     def test_verify_pending_fails_even_with_row_and_sum(self):
         with tempfile.TemporaryDirectory() as d:
@@ -398,6 +419,48 @@ class TokenReportWriteTests(unittest.TestCase):
             r = run(REPORT, "--write", p, "--transcript", fixture_transcript(d))
             self.assertNotEqual(r.returncode, 0)
             self.assertFalse(p.exists())
+
+
+class FindTranscriptTests(unittest.TestCase):
+    def test_encode_drops_drive_colon_and_separators(self):
+        enc = token_report.encode_claude_project_path(Path("D:/ClaudeCowork/demo"))
+        self.assertTrue(enc.startswith("D-"))
+        self.assertNotIn(":", enc)
+        self.assertNotIn("/", enc)
+        self.assertNotIn("\\", enc)
+
+    def test_scopes_to_cwd_project_ignores_newer_foreign(self):
+        with tempfile.TemporaryDirectory() as home:
+            with tempfile.TemporaryDirectory() as cwd:
+                base = Path(home) / ".claude" / "projects"
+                foreign = base / "C--Users-other-repo"
+                foreign.mkdir(parents=True)
+                (foreign / "foreign.jsonl").write_text("foreign\n", encoding="utf-8")
+                cwd_path = Path(cwd).resolve()
+                mine = base / token_report.encode_claude_project_path(cwd_path)
+                mine.mkdir(parents=True)
+                target = mine / "session.jsonl"
+                target.write_text("mine\n", encoding="utf-8")
+                # Foreign file is newer; old find_transcript would have picked it.
+                foreign_file = foreign / "foreign.jsonl"
+                foreign_file.write_text("foreign\n", encoding="utf-8")
+                import os
+                import time
+                now = time.time()
+                os.utime(foreign_file, (now + 10_000, now + 10_000))
+                os.utime(target, (now, now))
+                found = token_report.find_transcript(cwd=cwd_path, _home=home)
+                self.assertEqual(found.resolve(), target.resolve())
+
+    def test_no_matching_project_returns_none(self):
+        with tempfile.TemporaryDirectory() as home:
+            with tempfile.TemporaryDirectory() as cwd:
+                base = Path(home) / ".claude" / "projects"
+                foreign = base / "C--Users-other-repo"
+                foreign.mkdir(parents=True)
+                (foreign / "foreign.jsonl").write_text("foreign\n", encoding="utf-8")
+                found = token_report.find_transcript(cwd=Path(cwd), _home=home)
+                self.assertIsNone(found)
 
 
 if __name__ == "__main__":

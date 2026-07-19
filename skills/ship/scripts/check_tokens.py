@@ -6,10 +6,12 @@ check_tokens.py: scaffold and verify a feature's tokens.md ledger.
   check_tokens.py PATH          # verify (the close-out gate)
 
 Verify exits 0 iff the ledger is present and structurally finalized (frontmatter
-type: Token Ledger, >=1 integer-token row, Subagents sum filled, the Duration column
-present with every row's Duration cell and the Σ-compute/wall-clock totals filled,
-Orchestrator resolved: a real figure OR the honest "unavailable" sentinel, NOT the
-PENDING placeholder). That five-column format is the only one recognized.
+type: Token Ledger, Subagents sum filled, the Duration column present, the
+Σ-compute/wall-clock totals filled, Orchestrator resolved: a real figure OR the honest
+"unavailable" sentinel, NOT the PENDING placeholder). Integer-token rows are required
+only when dispatches recorded exact counts; a finalized zero-dispatch ledger (sum 0,
+no integer rows, honest unavailable totals) also passes. When rows exist, every Duration
+cell must be a figure or "unavailable". That five-column format is the only one recognized.
 Otherwise exit 1 and print the first failing check. A non-zero exit is the hard guardrail:
 ship must not mark Phase=done, so the keep-alive loop keeps working the feature. Stdlib only.
 Canonical prose for the ledger discipline ("the ledger rule"):
