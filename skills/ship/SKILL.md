@@ -57,7 +57,8 @@ Then dispatch **wit-code-checker** (`agents/wit-code-checker.md`) in `result` mo
 passes: the **feature-level result check**, every `spec.md` acceptance criterion + locked decision
 (ADRs, constitution) confirmed delivered and **wired**, not just present (the checker reads the actual
 repo), and the **line-level review** of the branch diff, from the template path above or the checker's
-built-in review when `none`. Findings from both passes land in `verification.md` in the
+built-in review when `none`. Include the applicable learnings from `progress.md`'s `applicable
+learnings:` Log line (same source as research:1). Findings from both passes land in `verification.md` in the
 BLOCKER/WARNING/INFO taxonomy. This dispatch is unconditional (on the `checker` tier from
 `progress.md`'s resolved-routing block; models.md's resolve-once rule; else inherit); no
 cross-provider configuration demotes or replaces it.
@@ -86,6 +87,8 @@ reduced to a stub, a correctness bug in the diff) sends the feature **back to bu
 Verification. A BLOCKER from any layer blocks the PR; ship never opens the PR on a feature
 wit-code-checker says isn't delivered. `cross-review.md` is ephemeral (pruned in ship:6, after ship:5
 distills it into `PR.md`). Address findings before proceeding; note anything deliberately deferred.
+A WARNING carried into `PR.md` as waived or deferred requires a pointer - a `roadmap.md` line or a
+GitHub issue (via `/wit:add-issues`) - not prose alone. Record the pointer in Verification.
 
 ## 3 · Sync docs & architecture
 
@@ -220,8 +223,9 @@ timestamp: <YYYY-MM-DD>
 <what was run and the result: test suite, lint, typecheck. Note new tests added.>
 
 ### Verification
-<checker result-mode verdict: every acceptance criterion + locked decision delivered and wired; any waived
-findings with severity. Distilled from verification.md; the dossier tidy (ship:6) then prunes it.>
+<checker result-mode verdict: every acceptance criterion + locked decision delivered and wired; any
+waived/deferred findings with severity AND a pointer (roadmap.md line or issue #). Distilled from
+verification.md; the dossier tidy (ship:6) then prunes it.>
 
 ### Risk & rollout
 <feature flag? migration order? back-out plan. From spec.md Rollout.>
