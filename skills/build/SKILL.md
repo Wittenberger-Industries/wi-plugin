@@ -104,8 +104,9 @@ orchestrator serial Verify.
 
 Don't thrash. Give the subagent a bounded number of attempts (≈3) to get its task green. If it's still
 stuck, switch to a debugging pass (`superpowers:systematic-debugging` if installed): reproduce,
-isolate, hypothesize, test. If the failure reveals the **plan** was wrong, stop and amend: note it in
-`progress.md`, update `spec.md`/`tasks.md`, and continue; never let code silently drift from the spec.
+isolate, hypothesize, test. If the failure reveals the **plan** was wrong, stop and amend: append a stamped Reflection line to
+`progress.md` (`- <ts> **Reflection** <check that failed>: <what went wrong, one clause> - earlier catch: plan`),
+update `spec.md`/`tasks.md`, and continue; never let code silently drift from the spec.
 
 ## 4 · Keep scope honest
 
