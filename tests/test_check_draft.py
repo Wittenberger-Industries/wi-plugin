@@ -104,6 +104,16 @@ class CheckDraftCliTests(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertIn("draft ok", r.stdout)
 
+    def test_bug_ok_crlf(self):
+        """Windows-style CRLF drafts must pass (publish awk is already CRLF-safe)."""
+        td = tempfile.TemporaryDirectory()
+        self.addCleanup(td.cleanup)
+        path = Path(td.name) / "draft.md"
+        path.write_bytes(BUG_OK.replace("\n", "\r\n").encode("utf-8"))
+        r = self._run(path)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("draft ok", r.stdout)
+
     def test_bug_ok_quoted_issue_type(self):
         """YAML-quoted issue_type values must parse (not 'got: none')."""
         for quoted in ('issue_type: "Bug"', "issue_type: 'Bug'"):

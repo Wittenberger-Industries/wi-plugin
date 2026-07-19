@@ -29,7 +29,7 @@ REQUIRED = {
     "task": ["Summary", "Context", "Acceptance criteria"],
 }
 
-# Word-boundary commitment to a new/automated test — not the substring "test"
+# Word-boundary commitment to a new/automated test - not the substring "test"
 # (which also matches contested / attestation / latest).
 NEW_AUTOMATED_TEST = re.compile(
     r"(?i)\b(?:new|automated|regression|unit|integration)\s+tests?\b"
@@ -60,10 +60,15 @@ def main() -> None:
     args = ap.parse_args()
 
     try:
-        with open(args.draft, encoding="utf-8") as fh:
+        # newline="" preserves CRLF so we can normalize explicitly (same intent as
+        # awk '{sub(/\r$/,"")}' in add-issues publish / ship:7). Default universal
+        # newlines would hide the bug; Windows drafts often arrive as CRLF.
+        with open(args.draft, encoding="utf-8", newline="") as fh:
             text = fh.read()
     except OSError as exc:
         sys.exit(f"ERROR: cannot read draft: {exc}")
+
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
 
     errors = []
 

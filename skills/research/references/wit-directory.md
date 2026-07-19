@@ -84,7 +84,7 @@ reasoned about. Keep every file small and current; these are working artifacts, 
   publishes or aborts (kept only when `gh issue create` fails, so the next run can resume). add-issues
   creates the dir with its own `.gitignore` containing `*` (same self-gitignore pattern as `.logs/`), so
   drafts never enter `git status` even on projects whose root `.gitignore` was not seeded by a greenfield
-  scan. Never committed. Ship's tidy never prunes or sweeps it — add-issues owns the lifecycle;
+  scan. Never committed. Ship's tidy never prunes or sweeps it - add-issues owns the lifecycle;
   `/wit:dev` / `/wit:rpa` and `/wit:add-issues` are separate entry points.
 - **Project-level memory persists & compounds.** `constitution.md`, `repo-map.md`, `overview.md`,
   `architecture.md`, `glossary.md`, `adr/`, `roadmap.md`, `models.md`, `learnings.md`, and `learnings/` belong to the

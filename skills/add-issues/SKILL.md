@@ -87,7 +87,7 @@ Design rationale for this skill lives in the wit repo's `docs/design-notes/add-i
 ### 5. Publish and clean up
 
 - Strip the draft's OKF frontmatter into a throwaway body file (dossier metadata, not issue
-  text — same CRLF-safe awk as `${CLAUDE_PLUGIN_ROOT}/skills/ship/SKILL.md` ship:7; inlined so
+  text - same CRLF-safe awk as `${CLAUDE_PLUGIN_ROOT}/skills/ship/SKILL.md` ship:7; inlined so
   agents that only load add-issues never publish YAML), then create the issue:
 
   ```bash
