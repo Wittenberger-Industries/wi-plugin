@@ -92,7 +92,9 @@ reasoned about. Keep every file small and current; these are working artifacts, 
   gets smarter per feature.
 - **Learnings recall is via the index.** Phases read `.wit/learnings.md` (one line + hook per feature) and
   open a `learnings/<slug>.md` detail file only when its hook is relevant to the current feature; never
-  bulk-read the directory. Timing note: ship commits a feature's learnings (+ its index line) on the
+  bulk-read the directory. Index lines may carry `(seen: N, last: NNNN-<slug>)` when a later feature
+  re-confirms a lesson; `reinforces <slug>'s <hook>` lines satisfy the close-out checklist without
+  duplicating a detail file. Timing note: ship commits a feature's learnings (+ its index line) on the
   **feature branch**, so main's `learnings.md` lacks in-flight features' lines until their PRs merge;
   `scan --refresh` on main reads that as normal lag, not drift.
 

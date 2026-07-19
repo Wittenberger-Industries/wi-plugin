@@ -48,6 +48,7 @@ existing code from repo-map.md. Diagrams optional; prose is fine. Reference any 
 - **Dependencies:** <added libs + one-line justification each>
 
 ## Test plan
+- **Level rule:** choose the cheapest level that can assert each criterion (unit > integration > e2e > manual); never assert the same thing at two levels.
 - **Unit:** <what gets unit-tested>
 - **Integration / e2e:** <if applicable>
 - **Edge cases:** <the ones worth an explicit test; pull from pitfalls.md>
