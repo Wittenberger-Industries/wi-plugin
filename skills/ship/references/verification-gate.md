@@ -61,7 +61,13 @@ These commands run unattended, so any one that blocks on input hangs the entire 
 
 ## When the gate is red
 
-Stop. A red gate is information, not an obstacle to route around. Options, in order of preference:
+Stop. A red gate is information, not an obstacle to route around. **Before any fix option**, append one
+stamped Log line to the feature's `progress.md`:
+
+`- <ts> **Reflection** <check that failed>: <what went wrong, one clause> - earlier catch: <phase | none>`
+
+(`<ts>` from the OS clock; `earlier catch` is the phase that should have caught it - research, plan,
+build, or `none`.) Then options, in order of preference:
 
 1. Fix the code (loop back to the build phase for the failing task).
 2. If a test is genuinely wrong, change it **deliberately** and say why in the PR; never delete a test
