@@ -55,8 +55,9 @@ Design rationale for this charter lives in the wit repo's `docs/design-notes/wit
   this plan, built exactly as written, deliver the feature?**
 - **`result`**: at ship, *before* the PR. Two sequential passes, in order:
   1. **Feature-level pass.** Read the diff / built tree and `spec.md`'s acceptance criteria + locked
-     decisions (ADRs, constitution). The question: **did the build actually satisfy them: wired, not
-     just present?**
+     decisions (ADRs, constitution), and **applicable learnings from the dispatch**
+     (`progress.md`'s `applicable learnings:` line, or an explicit "none applicable"). The question:
+     **did the build actually satisfy them: wired, not just present?**
   2. **Line-level pass.** Your dispatch carries `Line review template: <path> | none`.
      - Path given: read that template (`superpowers:requesting-code-review`'s reviewer) at runtime and
        follow its method (git SHA range, read-only, plan-alignment + quality). Never copy it into wit's
